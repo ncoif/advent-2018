@@ -1,24 +1,40 @@
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::str::Chars;
+use std::collections::HashSet;
 
 fn main() {
-    let file = File::open("input.txt").expect("cannot open file");
-    let file = BufReader::new(file);
+    let mut frequency: i64 = 0;
+    let mut seen = HashSet::new();
+    let mut first_seen = None;
+    let mut final_frequency = None;
 
-    let mut result: i64 = 0;
-    for line in file.lines().filter_map(|result| result.ok()) {
-        let mut chars = line.chars();
-        let sign = chars.next().expect("sign missing");
-        result =
-            if '+' == sign {
-                result + chars_to_int(chars) as i64 
-            } else {
-                result - chars_to_int(chars) as i64
-            };
+    while first_seen.is_none() {
+        let file = File::open("input.txt").expect("cannot open file");
+        let file = BufReader::new(file);
+
+        for line in file.lines().filter_map(|result| result.ok()) {
+            let mut chars = line.chars();
+            let sign = chars.next().expect("sign missing");
+            frequency =
+                if '+' == sign {
+                    frequency + chars_to_int(chars) as i64
+                } else {
+                    frequency - chars_to_int(chars) as i64
+                };
+            if first_seen.is_none() && seen.contains(&frequency) {
+                first_seen = Some(frequency);
+            }
+            seen.insert(frequency);
+        }
+
+        if final_frequency.is_none() {
+            final_frequency = Some(frequency);
+        }
     }
 
-    println!("Result: {}", result);
+    println!("First seen frequency: {:?}", first_seen);
+    println!("Final frequency: {:?}", final_frequency);
 }
 
 fn chars_to_int(arr: Chars) -> u64 {
