@@ -12,10 +12,13 @@ fn main() {
     while first_seen.is_none() {
         for input in &inputs {
             current_frequency += input;
-            if first_seen.is_none() && seen.contains(&current_frequency) {
-                first_seen = Some(current_frequency);
+
+            if first_seen.is_none() {
+                if seen.contains(&current_frequency) {
+                    first_seen = Some(current_frequency);
+                }
+                seen.insert(current_frequency);
             }
-            seen.insert(current_frequency);
         }
 
         final_frequency.get_or_insert(current_frequency);
