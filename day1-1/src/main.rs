@@ -18,9 +18,7 @@ fn main() {
             seen.insert(current_frequency);
         }
 
-        if final_frequency.is_none() {
-            final_frequency = Some(current_frequency);
-        }
+        final_frequency.get_or_insert(current_frequency);
     }
 
     println!("First seen frequency: {:?}", first_seen);
