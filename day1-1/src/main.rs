@@ -4,7 +4,7 @@ use std::str::Chars;
 use std::collections::HashSet;
 
 fn main() {
-    let mut frequency: i64 = 0;
+    let mut current_frequency: i64 = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
     let mut final_frequency = None;
@@ -16,20 +16,20 @@ fn main() {
         for line in file.lines().filter_map(|result| result.ok()) {
             let mut chars = line.chars();
             let sign = chars.next().expect("sign missing");
-            frequency =
+            current_frequency =
                 if '+' == sign {
-                    frequency + chars_to_int(chars) as i64
+                    current_frequency + chars_to_int(chars) as i64
                 } else {
-                    frequency - chars_to_int(chars) as i64
+                    current_frequency - chars_to_int(chars) as i64
                 };
-            if first_seen.is_none() && seen.contains(&frequency) {
-                first_seen = Some(frequency);
+            if first_seen.is_none() && seen.contains(&current_frequency) {
+                first_seen = Some(current_frequency);
             }
-            seen.insert(frequency);
+            seen.insert(current_frequency);
         }
 
         if final_frequency.is_none() {
-            final_frequency = Some(frequency);
+            final_frequency = Some(current_frequency);
         }
     }
 
