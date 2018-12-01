@@ -8,13 +8,10 @@ fn main() {
     let mut first_seen = None;
     let mut final_frequency = None;
 
+    let inputs = read_file();
     while first_seen.is_none() {
-        let file = File::open("input.txt").expect("cannot open file");
-        let file = BufReader::new(file);
-
-        for line in file.lines().filter_map(|result| result.ok()) {
-            let current = line.parse::<i32>().unwrap();
-            current_frequency += current;
+        for input in &inputs {
+            current_frequency += input;
             if first_seen.is_none() && seen.contains(&current_frequency) {
                 first_seen = Some(current_frequency);
             }
@@ -28,5 +25,15 @@ fn main() {
 
     println!("First seen frequency: {:?}", first_seen);
     println!("Final frequency: {:?}", final_frequency);
+}
+
+fn read_file() -> Vec<i32> {
+    let file = File::open("input.txt").expect("cannot open file");
+    let reader = BufReader::new(file);
+
+    reader.lines()
+        .filter_map(|result| result.ok())
+        .map(|s| s.parse::<i32>().expect("invalid number"))
+        .collect()
 }
 
