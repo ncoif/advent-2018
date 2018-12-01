@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashSet;
 
-fn main() {
+pub(crate) fn run() {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
@@ -29,7 +29,8 @@ fn main() {
 }
 
 fn read_file() -> Vec<i32> {
-    let file = File::open("input.txt").expect("cannot open file");
+    let filename = "input/input1.txt";
+    let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
 
     reader.lines()
