@@ -1,6 +1,6 @@
-use std::io::{BufRead, BufReader};
-use std::fs::File;
 use std::collections::HashSet;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 pub(crate) fn run() {
     let mut current_frequency = 0;
@@ -33,9 +33,9 @@ fn read_file() -> Vec<i32> {
     let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
 
-    reader.lines()
+    reader
+        .lines()
         .filter_map(|result| result.ok())
         .map(|s| s.parse::<i32>().expect("invalid number"))
         .collect()
 }
-
