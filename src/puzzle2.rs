@@ -5,14 +5,34 @@ use std::str::Chars;
 
 pub fn run() {
     let inputs = read_file();
+
+    let mut double_frequencies_box = 0;
+    let mut triple_frequencies_box = 0;
+    for input in inputs {
+        if input.values().find(|&v| *v == 2).is_some() {
+            double_frequencies_box += 1;
+        }
+        if input.values().find(|&v| *v == 3).is_some() {
+            triple_frequencies_box += 1;
+        }
+    }
+
+    println!(
+        "Checksum: {}",
+        double_frequencies_box * triple_frequencies_box
+    );
 }
 
-fn read_file() -> Vec<String> {
+fn read_file() -> Vec<HashMap<char, u32>> {
     let filename = "input/input2.txt";
     let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
 
-    reader.lines().filter_map(|result| result.ok()).collect()
+    reader
+        .lines()
+        .filter_map(|result| result.ok())
+        .map(|s| frequencies(s.chars()))
+        .collect()
 }
 
 fn frequencies(s: Chars) -> HashMap<char, u32> {
