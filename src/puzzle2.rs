@@ -4,12 +4,15 @@ use std::io::{BufRead, BufReader};
 use std::str::Chars;
 
 pub fn run() {
+    let inputs = read_file();
+
     {
-        let inputs = read_file_frequency();
+        let frequencies: Vec<HashMap<char, u32>> =
+            inputs.iter().map(|s| frequencies(s.chars())).collect();
 
         let mut double_frequencies_box = 0;
         let mut triple_frequencies_box = 0;
-        for input in &inputs {
+        for input in &frequencies {
             if input.values().find(|&v| *v == 2).is_some() {
                 double_frequencies_box += 1;
             }
@@ -25,8 +28,6 @@ pub fn run() {
     }
 
     {
-        let inputs = read_file();
-
         let box_size = inputs[0].chars().count();
         let mut result = None;
 
@@ -54,18 +55,6 @@ pub fn run() {
 
         println!("Common letter between correct boxes: {:?}", result);
     }
-}
-
-fn read_file_frequency() -> Vec<HashMap<char, u32>> {
-    let filename = "input/input2.txt";
-    let file = File::open(filename).expect("cannot open file");
-    let reader = BufReader::new(file);
-
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| frequencies(s.chars()))
-        .collect()
 }
 
 fn read_file() -> Vec<String> {
