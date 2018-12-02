@@ -10,21 +10,19 @@ pub fn run() {
         let frequencies: Vec<HashMap<char, u32>> =
             inputs.iter().map(|s| frequencies(s.chars())).collect();
 
-        let mut double_frequencies_box = 0;
-        let mut triple_frequencies_box = 0;
-        for input in &frequencies {
-            if input.values().find(|&v| *v == 2).is_some() {
-                double_frequencies_box += 1;
-            }
-            if input.values().find(|&v| *v == 3).is_some() {
-                triple_frequencies_box += 1;
-            }
-        }
+        let (double, triple) = frequencies
+            .iter()
+            .fold((0, 0), |(mut double, mut triple), freq| {
+                if freq.values().find(|&v| *v == 2).is_some() {
+                    double += 1;
+                }
+                if freq.values().find(|&v| *v == 3).is_some() {
+                    triple += 1;
+                }
+                (double, triple)
+            });
 
-        println!(
-            "Checksum: {}",
-            double_frequencies_box * triple_frequencies_box
-        );
+        println!("Checksum: {}", double * triple);
     }
 
     {
