@@ -1,4 +1,4 @@
-https://adventofcode.com/
+My try to learn rust with https://adventofcode.com/ this year
 
 # To format the code
 
