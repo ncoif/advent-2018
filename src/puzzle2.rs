@@ -28,28 +28,15 @@ pub fn run() {
     }
 
     {
-        let box_size = inputs[0].chars().count();
         let mut result = None;
 
-        for char_index in 0..box_size {
-            // to store the frequency of the box when a given letter is removed
-            let mut box_frequencies = HashMap::new();
-            for input in &inputs {
-                let box_with_removed_char = remove_char_at(input, char_index as u32);
-                let count = box_frequencies.entry(box_with_removed_char).or_insert(0);
-                *count += 1;
-            }
-
-            //if we get a frequency of 2 exactly, then it's our winner
-            //else it's the wrong letter that we removed, and we try with the next one
-            for (key, value) in box_frequencies {
-                if value == 2 {
-                    result = Some(key);
+        'outer: for x in &inputs {
+            for y in &inputs {
+                let common = common_letters(&x, &y);
+                if common.len() == x.len() - 1 {
+                    result = Some(common);
+                    break 'outer;
                 }
-            }
-
-            if result.is_some() {
-                break;
             }
         }
 
@@ -76,14 +63,12 @@ fn frequencies(s: Chars) -> HashMap<char, u32> {
     frequencies
 }
 
-fn remove_char_at(s: &String, index: u32) -> String {
-    let mut result = String::from("");
-    for (i, c) in s.char_indices() {
-        if i as u32 != index {
-            result.push(c);
-        }
-    }
-    result
+fn common_letters(s1: &String, s2: &String) -> String {
+    s1.chars()
+        .zip(s2.chars())
+        .filter(|(c1, c2)| c1 == c2)
+        .map(|(c1, _c2)| c1)
+        .collect()
 }
 
 #[cfg(test)]
@@ -107,18 +92,14 @@ mod tests {
     }
 
     #[test]
-    fn string_remove_at() {
+    fn common_letters() {
         assert_eq!(
-            puzzle2::remove_char_at(&String::from("abcdef"), 2),
-            String::from("abdef")
+            puzzle2::common_letters(&String::from("abc"), &String::from("abd")),
+            String::from("ab")
         );
         assert_eq!(
-            puzzle2::remove_char_at(&String::from("abcdef"), 0),
-            String::from("bcdef")
-        );
-        assert_eq!(
-            puzzle2::remove_char_at(&String::from("abcdef"), 5),
-            String::from("abcde")
+            puzzle2::common_letters(&String::from("abc"), &String::from("bbc")),
+            String::from("bc")
         );
     }
 }
