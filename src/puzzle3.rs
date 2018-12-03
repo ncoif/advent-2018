@@ -7,10 +7,7 @@ use std::io::{BufRead, BufReader};
 #[derive(Debug)]
 pub struct Area {
     id: u64,
-    x: u64,
-    y: u64,
-    width: u64,
-    length: u64,
+    points: Box<Vec<String>>,
 }
 
 lazy_static! {
@@ -22,34 +19,35 @@ lazy_static! {
 impl Area {
     pub fn from_str(text: &str) -> Self {
         for caps in RE.captures_iter(text) {
+            let id = caps["id"].parse::<u64>().unwrap();
+            let x = caps["x"].parse::<u64>().unwrap();
+            let y = caps["y"].parse::<u64>().unwrap();
+            let width = caps["width"].parse::<u64>().unwrap();
+            let length = caps["length"].parse::<u64>().unwrap();
+
+            let mut points = Box::new(Vec::new());
+            for i in 0..width {
+                for j in 0..length {
+                    points.push(format!("{}x{}", x + i, y + j));
+                }
+            }
+
             return Area {
-                id: caps["id"].parse::<u64>().unwrap(),
-                x: caps["x"].parse::<u64>().unwrap(),
-                y: caps["y"].parse::<u64>().unwrap(),
-                width: caps["width"].parse::<u64>().unwrap(),
-                length: caps["length"].parse::<u64>().unwrap(),
+                id: id,
+                points: points,
             };
         }
         unreachable!();
     }
 
-    pub fn keys(&self) -> Vec<String> {
-        let mut result = Vec::new();
-        for i in 0..self.width {
-            for j in 0..self.length {
-                result.push(format!("{}x{}", self.x + i, self.y + j));
-            }
-        }
-        result
-    }
-
     pub fn intersect(&self, area: &Area) -> bool {
         let mut points = HashSet::new();
-        for key in self.keys() {
+
+        for key in self.points.iter() {
             points.insert(key);
         }
 
-        for key in area.keys() {
+        for key in area.points.iter() {
             if points.contains(&key) {
                 return true;
             }
@@ -62,16 +60,16 @@ pub fn run() {
     let inputs = read_file();
 
     {
-        let mut points = HashMap::new();
+        let mut total_points = HashMap::new();
         for area in &inputs {
-            for key in area.keys() {
-                let count = points.entry(key).or_insert(0);
+            for key in area.points.iter() {
+                let count = total_points.entry(key).or_insert(0);
                 *count += 1;
             }
         }
 
-        points.retain(|_k, v| *v >= 2);
-        println!("Answer1: {}", points.len());
+        total_points.retain(|_k, v| *v >= 2);
+        println!("Answer1: {}", total_points.len());
     }
 
     {
@@ -90,7 +88,7 @@ pub fn run() {
     }
 }
 
-fn read_file() -> Vec<Area> {
+fn read_file<'a>() -> Vec<Area> {
     let filename = "input/input3.txt";
     let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
