@@ -1,10 +1,10 @@
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
+use std::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 // represent a single entry, for example #1 @ 1,3: 4x4
-#[derive(Debug)]
 pub struct Area {
     id: u64,
     points: Box<Vec<String>>,
@@ -53,6 +53,17 @@ impl Area {
             }
         }
         return false;
+    }
+}
+
+impl fmt::Debug for Area {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "Area {{ id: {}, number of points: {} }}",
+            self.id,
+            self.points.len()
+        )
     }
 }
 
