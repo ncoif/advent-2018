@@ -15,16 +15,15 @@ pub struct Area {
     length: u64,
 }
 
+lazy_static! {
+    static ref RE: Regex =
+        Regex::new(r"#(?P<id>\d+) @ (?P<x>\d+),(?P<y>\d+): (?P<width>\d+)x(?P<length>\d+)")
+            .unwrap();
+}
+
 impl Area {
     pub fn from_str(text: &str) -> Self {
-        lazy_static! {
-            static ref RE: Regex =
-                Regex::new(r"#(?P<id>\d+) @ (?P<x>\d+),(?P<y>\d+): (?P<width>\d+)x(?P<length>\d+)")
-                    .unwrap();
-        }
-
         for caps in RE.captures_iter(text) {
-            let id1 = caps["id"].parse::<u64>().unwrap();
             return Area {
                 id: caps["id"].parse::<u64>().unwrap(),
                 x: caps["x"].parse::<u64>().unwrap(),
