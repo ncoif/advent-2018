@@ -56,10 +56,6 @@ impl Area {
         }
         return false;
     }
-
-    pub fn intersect_key(&self, area: &Area) -> String {
-        format!("{}x{}", self.id, area.id)
-    }
 }
 
 pub fn run() {
@@ -79,17 +75,11 @@ pub fn run() {
     }
 
     {
-        let mut intersect_cache = HashSet::new();
         'candidat: for candidat in &inputs {
             //println!("evaluating {:?}", candidat);
             for area in &inputs {
-                if intersect_cache.contains(&candidat.intersect_key(area))
-                    || (candidat.id != area.id && candidat.intersect(&area))
-                {
+                if candidat.id != area.id && candidat.intersect(&area) {
                     //println!("{:?} intersects with {:?}", candidat.id, area.id);
-                    intersect_cache.insert(candidat.intersect_key(area));
-                    intersect_cache.insert(area.intersect_key(candidat));
-
                     continue 'candidat;
                 }
             }
