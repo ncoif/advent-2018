@@ -1,5 +1,5 @@
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -42,21 +42,52 @@ impl Area {
         }
         result
     }
+
+    pub fn intersect(&self, area: &Area) -> bool {
+        let mut points = HashSet::new();
+        for key in self.keys() {
+            points.insert(key);
+        }
+
+        for key in area.keys() {
+            if points.contains(&key) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 pub fn run() {
     let inputs = read_file();
 
-    let mut points = HashMap::new();
-    for area in inputs {
-        for key in area.keys() {
-            let count = points.entry(key).or_insert(0);
-            *count += 1;
+    {
+        let mut points = HashMap::new();
+        for area in &inputs {
+            for key in area.keys() {
+                let count = points.entry(key).or_insert(0);
+                *count += 1;
+            }
         }
+
+        points.retain(|_k, v| *v >= 2);
+        println!("Answer1: {}", points.len());
     }
 
-    points.retain(|_k, v| *v >= 2);
-    println!("Answer1: {}", points.len());
+    {
+        'candidat: for candidat in &inputs {
+            //println!("evaluating {:?}", candidat);
+            for area in &inputs {
+                if candidat.id != area.id && candidat.intersect(&area) {
+                    //println!("{:?} intersects with {:?}", candidat.id, area.id);
+                    continue 'candidat;
+                }
+            }
+            // candidat intersect with no-one
+            println!("Answer2: {:?}", candidat);
+            return;
+        }
+    }
 }
 
 fn read_file() -> Vec<Area> {
