@@ -1,9 +1,7 @@
 use regex::Regex;
 use std::collections::HashMap;
-use std::fmt::Debug;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::str::Chars;
 
 // represent a single entry, for example #1 @ 1,3: 4x4
 #[derive(Debug)]
@@ -34,11 +32,31 @@ impl Area {
         }
         unreachable!();
     }
+
+    pub fn keys(&self) -> Vec<String> {
+        let mut result = Vec::new();
+        for i in 0..self.width {
+            for j in 0..self.length {
+                result.push(format!("{}x{}", self.x + i, self.y + j));
+            }
+        }
+        result
+    }
 }
 
 pub fn run() {
     let inputs = read_file();
-    inputs.into_iter().for_each(|a| println!("{:?}", a))
+
+    let mut points = HashMap::new();
+    for area in inputs {
+        for key in area.keys() {
+            let count = points.entry(key).or_insert(0);
+            *count += 1;
+        }
+    }
+
+    points.retain(|_k, v| *v >= 2);
+    println!("Answer1: {}", points.len());
 }
 
 fn read_file() -> Vec<Area> {
