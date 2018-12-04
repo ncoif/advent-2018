@@ -7,7 +7,7 @@ use std::io::{BufRead, BufReader};
 // represent a single entry, for example #1 @ 1,3: 4x4
 pub struct Area {
     id: u64,
-    points: Box<Vec<String>>,
+    points: Box<HashSet<String>>,
 }
 
 lazy_static! {
@@ -25,10 +25,10 @@ impl Area {
             let width = caps["width"].parse::<u64>().unwrap();
             let length = caps["length"].parse::<u64>().unwrap();
 
-            let mut points = Box::new(Vec::new());
+            let mut points = Box::new(HashSet::new());
             for i in 0..width {
                 for j in 0..length {
-                    points.push(format!("{}x{}", x + i, y + j));
+                    points.insert(format!("{}x{}", x + i, y + j));
                 }
             }
 
@@ -41,18 +41,8 @@ impl Area {
     }
 
     pub fn intersect(&self, area: &Area) -> bool {
-        let mut points = HashSet::new();
-
-        for key in self.points.iter() {
-            points.insert(key);
-        }
-
-        for key in area.points.iter() {
-            if points.contains(&key) {
-                return true;
-            }
-        }
-        return false;
+        let intersect_set: HashSet<_> = self.points.intersection(&area.points).collect();
+        !intersect_set.is_empty()
     }
 }
 
