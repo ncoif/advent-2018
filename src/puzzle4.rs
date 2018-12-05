@@ -166,12 +166,47 @@ fn sleep_times(events: &Vec<Event>) -> Guard {
     Guard(max_guard)
 }
 
+fn best_minute(events: &Vec<Event>, worst_guard: &Guard) -> u32 {
+    let mut asleep_on = HashMap::new();
+    let mut last_sleep_start = 0;
+    let mut our_guard = false;
+    for e in events {
+        match &e.status {
+            Status::ShiftStart(g) => if g.0 == worst_guard.0 {
+                our_guard = true
+            } else {
+                our_guard = false
+            },
+            Status::FallsAsleep => if our_guard {
+                last_sleep_start = e.date.minute
+            },
+            Status::WakesUp => {
+                if our_guard {
+                    for m in last_sleep_start..e.date.minute {
+                        let nb = asleep_on.entry(m).or_insert(0);
+                        *nb += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    //find the max
+    let (&min, &nb) = asleep_on.iter().max_by_key(|(_, nb)| *nb).unwrap();
+    min
+}
+
 pub fn run() {
     let mut inputs = read_file();
     inputs.sort();
 
     let worst_guard = sleep_times(&inputs);
     println!("worst guard: {:?}", worst_guard);
+
+    let best_minute = best_minute(&inputs, &worst_guard);
+    println!("worst_minute: {:?}", best_minute);
+
+    println!("solution 1: {:?}", worst_guard.0 * best_minute);
 }
 
 fn read_file<'a>() -> Vec<Event> {
