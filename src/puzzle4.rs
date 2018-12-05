@@ -1,6 +1,5 @@
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
-use std::fmt;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
@@ -192,8 +191,30 @@ fn best_minute(events: &Vec<Event>, worst_guard: &Guard) -> u32 {
     }
 
     //find the max
-    let (&min, &nb) = asleep_on.iter().max_by_key(|(_, nb)| *nb).unwrap();
+    let (&min, _) = asleep_on.iter().max_by_key(|(_, nb)| *nb).unwrap();
     min
+}
+
+fn most_frequently_asleep(events: &Vec<Event>) -> (u32, u32) {
+    let mut asleep_on = HashMap::new();
+    let mut current_guard = 0;
+    let mut last_sleep_start = 0;
+    for e in events {
+        match &e.status {
+            Status::ShiftStart(g) => current_guard = g.0,
+            Status::FallsAsleep => last_sleep_start = e.date.minute,
+            Status::WakesUp => {
+                for m in last_sleep_start..e.date.minute {
+                    let nb = asleep_on.entry((current_guard, m)).or_insert(0);
+                    *nb += 1;
+                }
+            }
+        }
+    }
+
+    //find the max
+    let (&(g, m), _) = asleep_on.iter().max_by_key(|(_, nb)| *nb).unwrap();
+    (g, m)
 }
 
 pub fn run() {
@@ -207,6 +228,9 @@ pub fn run() {
     println!("worst_minute: {:?}", best_minute);
 
     println!("solution 1: {:?}", worst_guard.0 * best_minute);
+
+    let solution2 = most_frequently_asleep(&inputs);
+    println!("solution 2: {:?}", solution2.0 * solution2.1);
 }
 
 fn read_file<'a>() -> Vec<Event> {
