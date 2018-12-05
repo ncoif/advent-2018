@@ -46,7 +46,25 @@ impl FromStr for Date {
     }
 }
 
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
+impl Date {
+    fn new() -> Date {
+        Date {
+            year: 0,
+            month: 0,
+            day: 0,
+            hour: 0,
+            minute: 0,
+        }
+    }
+
+    fn duration_since(&self, date: &Date) -> u32 {
+        //TODO understand that
+        let modulo = 60 * 24;
+        (self.minute - date.minute + 60 * (self.hour - date.hour) % modulo + modulo) % modulo
+    }
+}
+
+#[derive(Ord, PartialOrd, Eq, PartialEq, Debug)]
 struct Guard(u32);
 
 impl FromStr for Guard {
@@ -117,9 +135,43 @@ impl PartialOrd for Event {
     }
 }
 
+// find the worst guard, i.e. the one with the longuest sleep
+fn sleep_times(events: &Vec<Event>) -> Guard {
+    let mut sleep_times_per_guards = HashMap::new();
+    let mut current_guard = 0;
+    let mut last_sleep_start = &Date::new();
+
+    // compute a map of total slept time per guard
+    for e in events {
+        match &e.status {
+            Status::ShiftStart(g) => current_guard = g.0,
+            Status::FallsAsleep => last_sleep_start = &e.date,
+            Status::WakesUp => {
+                let mut sleep_time = sleep_times_per_guards.entry(current_guard).or_insert(0);
+                *sleep_time += e.date.duration_since(&last_sleep_start);
+            }
+        }
+    }
+
+    // find the worst guard
+    let mut max_guard = 0;
+    let mut max_time = 0;
+    for (guard, time) in sleep_times_per_guards.iter() {
+        if *time > max_time {
+            max_guard = *guard;
+            max_time = *time;
+        }
+    }
+
+    Guard(max_guard)
+}
+
 pub fn run() {
     let mut inputs = read_file();
     inputs.sort();
+
+    let worst_guard = sleep_times(&inputs);
+    println!("worst guard: {:?}", worst_guard);
 }
 
 fn read_file<'a>() -> Vec<Event> {
