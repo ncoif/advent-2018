@@ -8,6 +8,7 @@ mod puzzle1;
 mod puzzle2;
 mod puzzle3;
 mod puzzle4;
+mod puzzle6;
 
 fn main() {
     if let Some(day) = env::args().nth(1) {
@@ -16,6 +17,7 @@ fn main() {
             Ok(2) => puzzle2::run(),
             Ok(3) => puzzle3::run(),
             Ok(4) => puzzle4::run(),
+            Ok(6) => puzzle6::run(),
             _ => panic!("Invalid problem day: {}", day),
         }
     } else {
