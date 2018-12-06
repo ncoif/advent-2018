@@ -135,8 +135,8 @@ pub fn answer2() {
 
     let mut nb_points_in_region = 0;
     for x in min_x..(max_x + 1) {
-        for y in min_y..(max_y+1) {
-            let candidate = Coord { x:x, y:y };
+        for y in min_y..(max_y + 1) {
+            let candidate = Coord { x: x, y: y };
             let sum = coords.iter().fold(0, |mut sum, c| {
                 sum += candidate.man_distance(c);
                 sum
@@ -147,6 +147,8 @@ pub fn answer2() {
         }
     }
 
-    println!("Answer2: number of coords in region is {}", nb_points_in_region);
+    println!(
+        "Answer2: number of coords in region is {}",
+        nb_points_in_region
+    );
 }
-

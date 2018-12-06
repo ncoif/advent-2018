@@ -24,7 +24,7 @@ pub fn answer1() {
     println!("Checksum: {}", double * triple);
 }
 
-pub fn answer2()    {
+pub fn answer2() {
     let inputs = read_file();
 
     let mut result = None;
