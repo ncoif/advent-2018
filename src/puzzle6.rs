@@ -89,9 +89,6 @@ pub fn answer1() {
         for y in min_y..(max_y + 1) {
             let current_coord = Coord { x: x, y: y };
             for candidate in coords.iter() {
-                //for id in 1..(coords.len() + 1) {
-                //let candidate = coords_map.get(&id).unwrap();
-                //println!("evaluating {}, {:?}", id, candidate);
                 let distance = current_coord.man_distance(candidate);
 
                 // myself, not doing anything
@@ -108,13 +105,10 @@ pub fn answer1() {
 
                 // if we have a closet coord
                 if distance != 0 && distance < closest_distance {
-                    //println!("{} and {:?} are at the same distance of ({}, {})", id, closest_coord, x, y);
                     closest_distance = distance;
                     closest_coord = Some(candidate);
                 }
             }
-
-            //println!("closest from {}, {} is {:?} with a distance of {}", x, y, closest_coord, closest_distance);
 
             if closest_coord.is_some() {
                 let closest = closest_coord.unwrap();
