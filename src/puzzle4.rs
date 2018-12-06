@@ -217,7 +217,7 @@ fn most_frequently_asleep(events: &Vec<Event>) -> (u32, u32) {
     (g, m)
 }
 
-pub fn run() {
+pub fn answer1() {
     let mut inputs = read_file();
     inputs.sort();
 
@@ -228,6 +228,11 @@ pub fn run() {
     println!("worst_minute: {:?}", best_minute);
 
     println!("solution 1: {:?}", worst_guard.0 * best_minute);
+}
+
+pub fn answer2() {
+    let mut inputs = read_file();
+    inputs.sort();
 
     let solution2 = most_frequently_asleep(&inputs);
     println!("solution 2: {:?}", solution2.0 * solution2.1);

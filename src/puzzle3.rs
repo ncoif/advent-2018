@@ -57,35 +57,35 @@ impl fmt::Debug for Area {
     }
 }
 
-pub fn run() {
+pub fn answer1() {
     let inputs = read_file();
 
-    {
-        let mut total_points = HashMap::new();
-        for area in &inputs {
-            for key in area.points.iter() {
-                let count = total_points.entry(key).or_insert(0);
-                *count += 1;
-            }
+    let mut total_points = HashMap::new();
+    for area in &inputs {
+        for key in area.points.iter() {
+            let count = total_points.entry(key).or_insert(0);
+            *count += 1;
         }
-
-        total_points.retain(|_k, v| *v >= 2);
-        println!("Answer1: {}", total_points.len());
     }
 
-    {
-        'candidat: for candidat in &inputs {
-            //println!("evaluating {:?}", candidat);
-            for area in &inputs {
-                if candidat.id != area.id && candidat.intersect(&area) {
-                    //println!("{:?} intersects with {:?}", candidat.id, area.id);
-                    continue 'candidat;
-                }
+    total_points.retain(|_k, v| *v >= 2);
+    println!("Answer1: {}", total_points.len());
+}
+
+pub fn answer2() {
+    let inputs = read_file();
+
+    'candidat: for candidat in &inputs {
+        //println!("evaluating {:?}", candidat);
+        for area in &inputs {
+            if candidat.id != area.id && candidat.intersect(&area) {
+                //println!("{:?} intersects with {:?}", candidat.id, area.id);
+                continue 'candidat;
             }
-            // candidat intersect with no-one
-            println!("Answer2: {:?}", candidat);
-            return;
         }
+        // candidat intersect with no-one
+        println!("Answer2: {:?}", candidat);
+        return;
     }
 }
 

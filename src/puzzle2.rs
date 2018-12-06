@@ -3,43 +3,43 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::Chars;
 
-pub fn run() {
+pub fn answer1() {
     let inputs = read_file();
 
-    {
-        let frequencies: Vec<HashMap<char, u32>> =
-            inputs.iter().map(|s| frequencies(s.chars())).collect();
+    let frequencies: Vec<HashMap<char, u32>> =
+        inputs.iter().map(|s| frequencies(s.chars())).collect();
 
-        let (double, triple) = frequencies
-            .iter()
-            .fold((0, 0), |(mut double, mut triple), freq| {
-                if freq.values().find(|&v| *v == 2).is_some() {
-                    double += 1;
-                }
-                if freq.values().find(|&v| *v == 3).is_some() {
-                    triple += 1;
-                }
-                (double, triple)
-            });
+    let (double, triple) = frequencies
+        .iter()
+        .fold((0, 0), |(mut double, mut triple), freq| {
+            if freq.values().find(|&v| *v == 2).is_some() {
+                double += 1;
+            }
+            if freq.values().find(|&v| *v == 3).is_some() {
+                triple += 1;
+            }
+            (double, triple)
+        });
 
-        println!("Checksum: {}", double * triple);
-    }
+    println!("Checksum: {}", double * triple);
+}
 
-    {
-        let mut result = None;
+pub fn answer2()    {
+    let inputs = read_file();
 
-        'outer: for x in &inputs {
-            for y in &inputs {
-                let common = common_letters(&x, &y);
-                if common.len() == x.len() - 1 {
-                    result = Some(common);
-                    break 'outer;
-                }
+    let mut result = None;
+
+    'outer: for x in &inputs {
+        for y in &inputs {
+            let common = common_letters(&x, &y);
+            if common.len() == x.len() - 1 {
+                result = Some(common);
+                break 'outer;
             }
         }
-
-        println!("Common letter between correct boxes: {:?}", result);
     }
+
+    println!("Common letter between correct boxes: {:?}", result);
 }
 
 fn read_file() -> Vec<String> {

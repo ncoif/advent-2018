@@ -36,12 +36,6 @@ impl Coord {
     }
 }
 
-pub fn run() {
-    let inputs = read_file();
-
-    answer1(&inputs);
-}
-
 fn read_file() -> Vec<Coord> {
     //let filename = "input/input6_debug.txt";
     let filename = "input/input6.txt";
@@ -55,10 +49,13 @@ fn read_file() -> Vec<Coord> {
         .collect()
 }
 
-fn answer1(coords: &Vec<Coord>) {
+
+pub fn answer1() {
+    let coords = read_file();
+
     let (mut min_x, mut max_x, mut min_y, mut max_y) =
         (coords[0].x, coords[0].x, coords[0].y, coords[0].y);
-    for c in coords {
+    for c in coords.iter() {
         if c.x < min_x {
             min_x = c.x
         }

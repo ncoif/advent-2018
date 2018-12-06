@@ -2,7 +2,29 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-pub fn run() {
+pub fn answer1() {
+    let mut current_frequency = 0;
+    let mut seen = HashSet::new();
+    let mut first_seen = None;
+
+    let inputs = read_file();
+    while first_seen.is_none() {
+        for input in &inputs {
+            current_frequency += input;
+
+            if first_seen.is_none() {
+                if seen.contains(&current_frequency) {
+                    first_seen = Some(current_frequency);
+                }
+                seen.insert(current_frequency);
+            }
+        }
+    }
+
+    println!("First seen frequency: {:?}", first_seen);
+}
+
+pub fn answer2() {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
@@ -24,7 +46,6 @@ pub fn run() {
         final_frequency.get_or_insert(current_frequency);
     }
 
-    println!("First seen frequency: {:?}", first_seen);
     println!("Final frequency: {:?}", final_frequency);
 }
 
