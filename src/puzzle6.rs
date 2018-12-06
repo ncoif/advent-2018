@@ -49,10 +49,7 @@ fn read_file() -> Vec<Coord> {
         .collect()
 }
 
-
-pub fn answer1() {
-    let coords = read_file();
-
+fn find_min_max(coords: &Vec<Coord>) -> (i32, i32, i32, i32) {
     let (mut min_x, mut max_x, mut min_y, mut max_y) =
         (coords[0].x, coords[0].x, coords[0].y, coords[0].y);
     for c in coords.iter() {
@@ -70,16 +67,13 @@ pub fn answer1() {
         }
     }
 
-    // max_x, max_y will be use to find the size of the array
-    println!("grid size: ({}x{}) to ({}x{})", min_x, min_y, max_x, max_y);
+    (min_x, max_x, min_y, max_y)
+}
 
-    let mut coords_map = HashMap::new();
-    let mut id = 1;
-    for c in coords.iter() {
-        coords_map.insert(id, c);
-        id += 1;
-    }
-    println!("Number of coords: {}", coords_map.len());
+pub fn answer1() {
+    let coords = read_file();
+
+    let (min_x, max_x, min_y, max_y) = find_min_max(&coords);
 
     // iterate over all x and all y, to compute all distances
     let mut grid = HashMap::new();
@@ -132,3 +126,27 @@ pub fn answer1() {
     let (_, count) = counts.iter().max_by_key(|(_, c)| *c).unwrap();
     println!("Answer1: {}", count);
 }
+
+pub fn answer2() {
+    let coords = read_file();
+    let limit = 10000;
+
+    let (min_x, max_x, min_y, max_y) = find_min_max(&coords);
+
+    let mut nb_points_in_region = 0;
+    for x in min_x..(max_x + 1) {
+        for y in min_y..(max_y+1) {
+            let candidate = Coord { x:x, y:y };
+            let sum = coords.iter().fold(0, |mut sum, c| {
+                sum += candidate.man_distance(c);
+                sum
+            });
+            if sum < limit {
+                nb_points_in_region += 1;
+            }
+        }
+    }
+
+    println!("Answer2: number of coords in region is {}", nb_points_in_region);
+}
+

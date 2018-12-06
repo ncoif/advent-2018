@@ -31,7 +31,7 @@ fn main() {
         42 => puzzle4::answer2(),
 
         61 => puzzle6::answer1(),
-        //62 => puzzle6::answer2(),
+        62 => puzzle6::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
