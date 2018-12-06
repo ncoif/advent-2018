@@ -5,8 +5,11 @@ use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
 
-#[derive(Debug)]
-struct Coord(i32, i32);
+#[derive(PartialEq, Eq, Hash, Debug)]
+struct Coord {
+    x: i32,
+    y: i32,
+}
 
 impl FromStr for Coord {
     type Err = ParseIntError;
@@ -23,13 +26,13 @@ impl FromStr for Coord {
         let x: i32 = c[1].parse().unwrap();
         let y: i32 = c[2].parse().unwrap();
 
-        Ok(Coord(x, y))
+        Ok(Coord { x: x, y: y })
     }
 }
 
 impl Coord {
     fn man_distance(&self, coord: &Coord) -> i32 {
-        (self.0 - coord.0).abs() + (self.1 - coord.1).abs()
+        (self.x - coord.x).abs() + (self.y - coord.y).abs()
     }
 }
 
@@ -40,7 +43,8 @@ pub fn run() {
 }
 
 fn read_file() -> Vec<Coord> {
-    let filename = "input/input6_debug.txt";
+    //let filename = "input/input6_debug.txt";
+    let filename = "input/input6.txt";
     let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
 
@@ -52,10 +56,25 @@ fn read_file() -> Vec<Coord> {
 }
 
 fn answer1(coords: &Vec<Coord>) {
+    let (mut min_x, mut max_x, mut min_y, mut max_y) =
+        (coords[0].x, coords[0].x, coords[0].y, coords[0].y);
+    for c in coords {
+        if c.x < min_x {
+            min_x = c.x
+        }
+        if c.x > max_x {
+            max_x = c.x
+        }
+        if c.y < min_y {
+            min_y = c.y
+        }
+        if c.y > max_y {
+            max_y = c.y
+        }
+    }
+
     // max_x, max_y will be use to find the size of the array
-    let max_x = coords.iter().max_by_key(|c| c.0).unwrap().0;
-    let max_y = coords.iter().max_by_key(|c| c.1).unwrap().1;
-    println!("grid size: {} per {}", max_x, max_y);
+    println!("grid size: ({}x{}) to ({}x{})", min_x, min_y, max_x, max_y);
 
     let mut coords_map = HashMap::new();
     let mut id = 1;
@@ -69,17 +88,18 @@ fn answer1(coords: &Vec<Coord>) {
     let mut grid = HashMap::new();
     let mut closest_coord = None;
     let mut closest_distance = max_x + max_y;
-    for x in 0..(max_x + 1) {
-        for y in 0..(max_y + 1) {
-            let current_coord = Coord(x, y);
-            for id in 1..(coords.len() + 1) {
-                let candidate = coords_map.get(&id).unwrap();
+    for x in min_x..(max_x + 1) {
+        for y in min_y..(max_y + 1) {
+            let current_coord = Coord { x: x, y: y };
+            for candidate in coords.iter() {
+                //for id in 1..(coords.len() + 1) {
+                //let candidate = coords_map.get(&id).unwrap();
                 //println!("evaluating {}, {:?}", id, candidate);
                 let distance = current_coord.man_distance(candidate);
 
                 // myself, not doing anything
                 if distance == 0 {
-                    closest_coord = Some(id);
+                    closest_coord = Some(candidate);
                     closest_distance = 0;
                     continue;
                 }
@@ -93,7 +113,7 @@ fn answer1(coords: &Vec<Coord>) {
                 if distance != 0 && distance < closest_distance {
                     //println!("{} and {:?} are at the same distance of ({}, {})", id, closest_coord, x, y);
                     closest_distance = distance;
-                    closest_coord = Some(id);
+                    closest_coord = Some(candidate);
                 }
             }
 
@@ -101,23 +121,21 @@ fn answer1(coords: &Vec<Coord>) {
 
             if closest_coord.is_some() {
                 let closest = closest_coord.unwrap();
-                grid.insert(format!("{}x{}", x, y), closest);
-                print!("{} ", closest);
-            } else {
-                print!(". ");
+                grid.insert(current_coord, closest);
             }
 
             closest_coord = None;
             closest_distance = max_x + max_y;
         }
-        println!("");
     }
 
     // find the id with the maximum iterations
     let mut counts = HashMap::new();
-    for g in grid.iter() {
-        let c = counts.entry(g.1).or_insert(0);
-        *c += 1;
+    for (_coord, closest) in grid.iter() {
+        if closest.x != min_x && closest.x != max_x && closest.y != min_y && closest.y != max_y {
+            let c = counts.entry(closest).or_insert(0);
+            *c += 1;
+        }
     }
 
     let (_, count) = counts.iter().max_by_key(|(_, c)| *c).unwrap();
