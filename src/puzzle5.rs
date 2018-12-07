@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
@@ -20,9 +21,7 @@ fn char_matches(c1: char, c2: char) -> bool {
         || (c2.is_uppercase() && c1.is_lowercase() && c1.to_ascii_uppercase() == c2)
 }
 
-pub fn answer1() {
-    let poly = read_file();
-
+fn reduce1(poly: String) -> usize {
     let mut current_poly = poly;
     let mut was_modified = true;
     while was_modified {
@@ -48,5 +47,30 @@ pub fn answer1() {
         current_poly = new_poly;
     }
 
-    println!("Answer1: {}", current_poly.len());
+    current_poly.len()
+}
+
+pub fn answer1() {
+    let poly = read_file();
+    let reduce1 = reduce1(poly);
+
+    println!("Answer1: {}", reduce1);
+}
+
+pub fn answer2() {
+    let poly = read_file();
+
+    let mut letters = HashSet::new();
+    for c in poly.chars() {
+        letters.insert(c.to_ascii_uppercase());
+    }
+    let mut minimal_length = poly.len();
+    for l in letters {
+        let current_poly = poly.replace(|a: char| a.to_ascii_uppercase() == l, "");
+        let candidate = reduce1(current_poly);
+        if candidate < minimal_length {
+            minimal_length = candidate;
+        }
+    }
+    println!("Answer2: {}", minimal_length);
 }
