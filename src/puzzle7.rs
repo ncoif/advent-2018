@@ -35,9 +35,27 @@ impl FromStr for Edge {
     }
 }
 
+#[derive(Debug)]
+struct Graph {
+    adj: Box<HashMap<char, Vec<char>>>, // adjacency list
+}
+
+impl Graph {
+
+    fn new() -> Graph {
+        let mut adj = Box::new(HashMap::new());
+        Graph { adj: adj}
+    }
+
+    fn add_edge(&mut self, e: &Edge) {
+        let adj_list = self.adj.entry(e.before).or_insert(Vec::new());
+        adj_list.push(e.after);
+    }
+}
+
 fn read_file() -> Vec<Edge> {
-    //let filename = "input/input6_debug.txt";
-    let filename = "input/input7.txt";
+    let filename = "input/input7_debug.txt";
+    //let filename = "input/input7.txt";
     let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
 
@@ -51,6 +69,7 @@ fn read_file() -> Vec<Edge> {
 pub fn answer1() {
     let edge = read_file();
 
+    let mut graph = Graph::new();
     for e in edge.iter() {
         println!("{:?}", e);
     }
