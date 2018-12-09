@@ -7,6 +7,7 @@ mod puzzle4;
 mod puzzle5;
 mod puzzle6;
 mod puzzle7;
+mod puzzle8;
 
 fn main() {
     let day: u32 = env::args()
@@ -41,6 +42,8 @@ fn main() {
         62 => puzzle6::answer2(),
 
         71 => puzzle7::answer1(),
+
+        81 => puzzle8::answer1(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
