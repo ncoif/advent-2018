@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
@@ -58,6 +58,51 @@ fn instruction_order(prereqs: &mut Vec<Dependency>) -> String {
     output
 }
 
+fn execute_in_parallel(prereqs: &mut Vec<Dependency>, workers: usize, offset: usize) -> usize {
+    let mut steps = BTreeSet::new(); // guarantee that elements will be sorted
+    for p in prereqs.iter() {
+        steps.insert(p.before);
+        steps.insert(p.after);
+    }
+
+    let total_tasks_nb = steps.len();
+
+    // a dirty loop that iterate one second at a time until everything is done
+    let mut started: Vec<(usize, char)> = Vec::new(); //(finish time, task)
+    let mut done = HashSet::new();
+    let mut time = 0;
+    loop {
+        // insert all completed tasks into done, and remove them from the started list
+        for s in &started {
+            if s.0 == time {
+                done.insert(s.1);
+                prereqs.retain(|p| p.before != s.1);
+            }
+        }
+        started.retain(|job| job.0 > time);
+        // if we did everything, then exit
+        if done.len() == total_tasks_nb {
+            break;
+        }
+        // for all available workers, add tasks
+        while started.len() < workers {
+            // find the next task available that is not started, is not finished, and doesn't depends on anything
+            if let Some(&start) = steps.iter().find(|&&t| {
+                // !started.iter().any(|s| s.1 == t) && !done.contains(&t) && !prereqs.iter().any(|prereq| prereq.after == t)
+                !done.contains(&t) && !prereqs.iter().any(|prereq| prereq.after == t)
+            }) {
+                started.push((time + offset + (start as u8 - b'A' + 1) as usize, start));
+                steps.remove(&start);
+            } else {
+                break;
+            }
+        }
+        //println!("time: {} started: {:?} done: {:?}", time, started, done);
+        time += 1;
+    }
+    time
+}
+
 fn read_file() -> Vec<Dependency> {
     //let filename = "input/input7_debug.txt";
     let filename = "input/input7.txt";
@@ -75,4 +120,10 @@ pub fn answer1() {
     let mut dependencies = read_file();
     let order = instruction_order(&mut dependencies);
     println!("answer1: {}", order);
+}
+
+pub fn answer2() {
+    let mut dependencies = read_file();
+    let total_time = execute_in_parallel(&mut dependencies, 5, 60);
+    println!("answer2: {}", total_time);
 }

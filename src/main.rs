@@ -43,6 +43,7 @@ fn main() {
         62 => puzzle6::answer2(),
 
         71 => puzzle7::answer1(),
+        72 => puzzle7::answer2(),
 
         81 => puzzle8::answer1(),
         82 => puzzle8::answer2(),
