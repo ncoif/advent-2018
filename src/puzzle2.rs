@@ -68,35 +68,30 @@ fn common_letters(s1: &String, s2: &String) -> String {
         .collect()
 }
 
-#[cfg(test)]
-mod tests {
-    use puzzle2;
+#[test]
+fn frequencies_no_duplicates() {
+    let frequencies = frequencies("abcdef".chars());
+    assert_eq!(frequencies.get(&'a'), Some(&1));
+    assert_eq!(frequencies.get(&'b'), Some(&1));
+    assert_eq!(frequencies.get(&'g'), None);
+}
 
-    #[test]
-    fn frequencies_no_duplicates() {
-        let frequencies = puzzle2::frequencies("abcdef".chars());
-        assert_eq!(frequencies.get(&'a'), Some(&1));
-        assert_eq!(frequencies.get(&'b'), Some(&1));
-        assert_eq!(frequencies.get(&'g'), None);
-    }
+#[test]
+fn frequencies_with_duplicates() {
+    let frequencies = frequencies("bababc".chars());
+    assert_eq!(frequencies.get(&'a'), Some(&2));
+    assert_eq!(frequencies.get(&'b'), Some(&3));
+    assert_eq!(frequencies.get(&'c'), Some(&1));
+}
 
-    #[test]
-    fn frequencies_with_duplicates() {
-        let frequencies = puzzle2::frequencies("bababc".chars());
-        assert_eq!(frequencies.get(&'a'), Some(&2));
-        assert_eq!(frequencies.get(&'b'), Some(&3));
-        assert_eq!(frequencies.get(&'c'), Some(&1));
-    }
-
-    #[test]
-    fn common_letters() {
-        assert_eq!(
-            puzzle2::common_letters(&String::from("abc"), &String::from("abd")),
-            String::from("ab")
-        );
-        assert_eq!(
-            puzzle2::common_letters(&String::from("abc"), &String::from("bbc")),
-            String::from("bc")
-        );
-    }
+#[test]
+fn common_letters_test() {
+    assert_eq!(
+        common_letters(&String::from("abc"), &String::from("abd")),
+        String::from("ab")
+    );
+    assert_eq!(
+        common_letters(&String::from("abc"), &String::from("bbc")),
+        String::from("bc")
+    );
 }
