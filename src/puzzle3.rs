@@ -63,8 +63,7 @@ pub fn answer1() {
     let mut total_points = HashMap::new();
     for area in &inputs {
         for key in area.points.iter() {
-            let count = total_points.entry(key).or_insert(0);
-            *count += 1;
+            total_points.entry(key).and_modify(|e| *e += 1).or_insert(1);
         }
     }
 

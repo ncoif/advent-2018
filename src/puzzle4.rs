@@ -182,8 +182,7 @@ fn best_minute(events: &Vec<Event>, worst_guard: &Guard) -> u32 {
             Status::WakesUp => {
                 if our_guard {
                     for m in last_sleep_start..e.date.minute {
-                        let nb = asleep_on.entry(m).or_insert(0);
-                        *nb += 1;
+                        asleep_on.entry(m).and_modify(|e| *e += 1).or_insert(1);
                     }
                 }
             }
@@ -205,8 +204,10 @@ fn most_frequently_asleep(events: &Vec<Event>) -> (u32, u32) {
             Status::FallsAsleep => last_sleep_start = e.date.minute,
             Status::WakesUp => {
                 for m in last_sleep_start..e.date.minute {
-                    let nb = asleep_on.entry((current_guard, m)).or_insert(0);
-                    *nb += 1;
+                    asleep_on
+                        .entry((current_guard, m))
+                        .and_modify(|e| *e += 1)
+                        .or_insert(1);
                 }
             }
         }

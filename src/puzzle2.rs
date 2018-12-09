@@ -54,8 +54,7 @@ fn frequencies(s: Chars) -> HashMap<char, u32> {
     let mut frequencies = HashMap::new();
 
     for c in s {
-        let count = frequencies.entry(c).or_insert(0);
-        *count += 1;
+        frequencies.entry(c).and_modify(|e| *e += 1).or_insert(1);
     }
 
     frequencies
