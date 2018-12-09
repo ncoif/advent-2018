@@ -50,22 +50,27 @@ fn read_file() -> Vec<Coord> {
 }
 
 fn find_min_max(coords: &Vec<Coord>) -> (i32, i32, i32, i32) {
-    let (mut min_x, mut max_x, mut min_y, mut max_y) =
-        (coords[0].x, coords[0].x, coords[0].y, coords[0].y);
-    for c in coords.iter() {
-        if c.x < min_x {
-            min_x = c.x
-        }
-        if c.x > max_x {
-            max_x = c.x
-        }
-        if c.y < min_y {
-            min_y = c.y
-        }
-        if c.y > max_y {
-            max_y = c.y
-        }
-    }
+    let min_x = coords
+        .iter()
+        .map(|c| c.x)
+        .min_by(|x1, x2| x1.cmp(x2))
+        .unwrap();
+    let max_x = coords
+        .iter()
+        .map(|c| c.x)
+        .max_by(|x1, x2| x1.cmp(x2))
+        .unwrap();
+
+    let min_y = coords
+        .iter()
+        .map(|c| c.y)
+        .min_by(|y1, y2| y1.cmp(y2))
+        .unwrap();
+    let max_y = coords
+        .iter()
+        .map(|c| c.y)
+        .max_by(|y1, y2| y1.cmp(y2))
+        .unwrap();
 
     (min_x, max_x, min_y, max_y)
 }
@@ -118,8 +123,7 @@ pub fn answer1() {
     let mut counts = HashMap::new();
     for (_coord, closest) in grid.iter() {
         if closest.x != min_x && closest.x != max_x && closest.y != min_y && closest.y != max_y {
-            let c = counts.entry(closest).or_insert(0);
-            *c += 1;
+            counts.entry(closest).and_modify(|e| *e += 1).or_insert(1);
         }
     }
 
