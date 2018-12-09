@@ -2,6 +2,7 @@ use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::iter::FromIterator;
 use std::num::ParseIntError;
 use std::str::FromStr;
 
@@ -43,8 +44,8 @@ struct Graph {
 
 impl Graph {
     fn new() -> Graph {
-        let mut list = Box::new(HashSet::new());
-        let mut adj = Box::new(HashMap::new());
+        let list = Box::new(HashSet::new());
+        let adj = Box::new(HashMap::new());
         Graph {
             list: list,
             adj: adj,
@@ -58,7 +59,6 @@ impl Graph {
         adj_list.push(d.after);
     }
 
-    /// find the node without dependency, throw error if multiple of them
     fn find_starting_node(&self) -> char {
         let mut nodes = self.list.clone();
         for vect in self.adj.values() {
@@ -71,6 +71,57 @@ impl Graph {
             .next()
             .ok_or("expected single valid starting node")
             .unwrap()
+    }
+
+    fn find_deps(&self, v: &char) -> Vec<char> {
+        self.adj.get(v).unwrap_or(&Vec::new()).to_vec()
+    }
+
+    // return true if all dep for this letter have been seen
+    fn all_seen(&self, v: &char, visited: &HashSet<char>) -> bool {
+        let mut dependencies: HashSet<_> =
+            HashSet::from_iter(self.adj.get(v).unwrap().iter().clone());
+        for current in visited {
+            dependencies.remove(&current);
+        }
+        dependencies.is_empty()
+    }
+
+    fn scan_graph_alphabetically(&self) -> Vec<char> {
+        let mut candidates = Vec::new();
+        let mut visited = HashSet::new();
+        let mut response = Vec::new();
+
+        let starting_node = self.find_starting_node();
+        response.push(starting_node);
+        visited.insert(starting_node);
+        for deps in self.find_deps(&starting_node) {
+            candidates.push(deps);
+        }
+
+        while !candidates.is_empty() {
+            // sort candidates alphabetically
+            candidates.sort_by(|a, b| b.cmp(a));
+            println!("{:?}", candidates);
+            println!("{:?}", visited);
+
+            let current_node_option = candidates.pop();
+            if current_node_option.is_some() {
+                let current_node = current_node_option.unwrap();
+
+                println!("all_seen: {:?}", self.all_seen(&current_node, &visited));
+
+                if self.all_seen(&current_node, &visited) {
+                    response.push(current_node);
+                    visited.insert(current_node);
+                    for deps in self.find_deps(&current_node) {
+                        candidates.push(deps);
+                    }
+                }
+            }
+        }
+
+        response
     }
 }
 
@@ -98,4 +149,11 @@ pub fn answer1() {
 
     let starting_node = graph.find_starting_node();
     println!("starting node: {}", starting_node);
+
+    let response = graph.scan_graph_alphabetically();
+    print!("answer1: ");
+    for c in response {
+        print!("{}", c);
+    }
+    println!("")
 }
