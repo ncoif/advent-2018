@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, LinkedList};
 use std::fs::File;
 use std::io::{BufReader, Read};
 
@@ -17,37 +17,26 @@ fn read_file() -> String {
 }
 
 fn char_matches(c1: char, c2: char) -> bool {
-    (c1.is_uppercase() && c2.is_lowercase() && c2.to_ascii_uppercase() == c1)
-        || (c2.is_uppercase() && c1.is_lowercase() && c1.to_ascii_uppercase() == c2)
+    c1.eq_ignore_ascii_case(&c2) && c1 != c2
 }
 
 fn reduce1(poly: String) -> usize {
-    let mut current_poly = poly;
-    let mut was_modified = true;
-    while was_modified {
-        was_modified = false;
-        let mut new_poly = String::new();
-        let mut last_char = ' ';
-        for c in current_poly.chars() {
-            if last_char == ' ' {
-                last_char = c;
+    let mut tail = poly.chars().collect::<LinkedList<_>>();
+    let mut head: LinkedList<char> = LinkedList::new();
+
+    while let Some(unit1) = tail.pop_front() {
+        if let Some(unit2) = head.back() {
+            if char_matches(unit1, *unit2) {
+                head.pop_back();
             } else {
-                if !char_matches(c, last_char) {
-                    new_poly.push(last_char);
-                    last_char = c;
-                } else {
-                    was_modified = true;
-                    last_char = ' ';
-                }
+                head.push_back(unit1);
             }
+        } else {
+            head.push_back(unit1);
         }
-        if last_char != ' ' {
-            new_poly.push(last_char)
-        }
-        current_poly = new_poly;
     }
 
-    current_poly.len()
+    head.len()
 }
 
 pub fn answer1() {

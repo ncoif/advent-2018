@@ -146,7 +146,7 @@ fn sleep_times(events: &Vec<Event>) -> Guard {
             Status::ShiftStart(g) => current_guard = g.0,
             Status::FallsAsleep => last_sleep_start = &e.date,
             Status::WakesUp => {
-                let mut sleep_time = sleep_times_per_guards.entry(current_guard).or_insert(0);
+                let sleep_time = sleep_times_per_guards.entry(current_guard).or_insert(0);
                 *sleep_time += e.date.duration_since(&last_sleep_start);
             }
         }
@@ -171,14 +171,18 @@ fn best_minute(events: &Vec<Event>, worst_guard: &Guard) -> u32 {
     let mut our_guard = false;
     for e in events {
         match &e.status {
-            Status::ShiftStart(g) => if g.0 == worst_guard.0 {
-                our_guard = true
-            } else {
-                our_guard = false
-            },
-            Status::FallsAsleep => if our_guard {
-                last_sleep_start = e.date.minute
-            },
+            Status::ShiftStart(g) => {
+                if g.0 == worst_guard.0 {
+                    our_guard = true
+                } else {
+                    our_guard = false
+                }
+            }
+            Status::FallsAsleep => {
+                if our_guard {
+                    last_sleep_start = e.date.minute
+                }
+            }
             Status::WakesUp => {
                 if our_guard {
                     for m in last_sleep_start..e.date.minute {
