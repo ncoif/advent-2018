@@ -1,6 +1,7 @@
 use std::env;
 
 mod puzzle1;
+mod puzzle10;
 mod puzzle2;
 mod puzzle3;
 mod puzzle4;
@@ -50,6 +51,8 @@ fn main() {
 
         91 => puzzle9::answer1(),
         92 => puzzle9::answer2(),
+
+        101 => puzzle10::answer1(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
