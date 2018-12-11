@@ -49,11 +49,15 @@ pub fn answer2() {
     let grid_size = 300;
     let serial = 7689;
 
-    let access = |x, y| ((x - 1) + grid_size * (y - 1)) as usize;
-    let mut grid = vec![0; (grid_size * grid_size) as usize];
-    for x in 1..=grid_size {
-        for y in 1..=grid_size {
-            grid[access(x, y)] = cell_power(x, y, serial);
+    // https://en.wikipedia.org/wiki/Viola%E2%80%93Jones_object_detection_framework
+    // https://en.wikipedia.org/wiki/Summed-area_table
+    // for optimisation, compute an integral image
+    let mut integral = vec![vec![0i32; 301]; 301]; // 301 because the first row/colum is 0
+    for y in 1..=300 {
+        let mut s = 0;
+        for x in 1..=300 {
+            s += cell_power(x, y, serial);
+            integral[y][x] = integral[y - 1][x] + s;
         }
     }
 
@@ -64,23 +68,20 @@ pub fn answer2() {
     let mut max_size = 0;
 
     for s in 3..=300 {
-        let edge = (s / 2) + 1;
-        for x in (edge + 1)..=(grid_size - edge + 1) {
-            for y in (edge + 1)..=(grid_size - edge + 1) {
-                let mut sum = 0;
-
-                for offset_x in 0..s {
-                    for offset_y in 0..s {
-                        let temp_x = (x as i32 - edge as i32 + offset_x as i32) as usize;
-                        let temp_y = (y as i32 - edge as i32 + offset_y as i32) as usize;
-                        sum += grid[access(temp_x, temp_y)];
-                    }
-                }
+        // (x,y) is the corner of the square
+        for x in 1..=(grid_size - s) {
+            for y in 1..=(grid_size - s) {
+                // now the sum is just the smaller squares
+                let sum = integral[y + s - 1][x + s - 1]
+                    - integral[y + s - 1][x - 1]
+                    - integral[y - 1][x + s - 1]
+                    + integral[y - 1][x - 1];
+                //println!("{}: {}x{} sum: {}", s, x, y, sum);
 
                 if sum > max_sum {
                     max_sum = sum;
-                    result_x = x - edge;
-                    result_y = y - edge;
+                    result_x = x;
+                    result_y = y;
                     max_size = s;
                 }
             }
