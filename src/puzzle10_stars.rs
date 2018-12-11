@@ -73,30 +73,10 @@ impl Field {
     }
 
     fn display(&mut self) {
-        let min_x = self
-            .stars
-            .iter()
-            .map(|s| s.pos_x)
-            .min_by(|x1, x2| x1.cmp(x2))
-            .unwrap();
-        let max_x = self
-            .stars
-            .iter()
-            .map(|s| s.pos_x)
-            .max_by(|x1, x2| x1.cmp(x2))
-            .unwrap();
-        let min_y = self
-            .stars
-            .iter()
-            .map(|s| s.pos_y)
-            .min_by(|y1, y2| y1.cmp(y2))
-            .unwrap();
-        let max_y = self
-            .stars
-            .iter()
-            .map(|s| s.pos_y)
-            .max_by(|y1, y2| y1.cmp(y2))
-            .unwrap();
+        let min_x = self.stars.iter().map(|s| s.pos_x).min().unwrap();
+        let max_x = self.stars.iter().map(|s| s.pos_x).max().unwrap();
+        let min_y = self.stars.iter().map(|s| s.pos_y).min().unwrap();
+        let max_y = self.stars.iter().map(|s| s.pos_y).max().unwrap();
 
         // only display images of reasonable size
         if (max_x - min_x) < 100 && (max_y - min_y) < 30 {
