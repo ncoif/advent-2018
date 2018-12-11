@@ -62,32 +62,25 @@ pub fn answer2() {
     let mut result_x = 1;
     let mut result_y = 1;
     let mut max_size = 0;
+
     for s in 3..=300 {
-        //let offset_s = s as i32;
-        //let neg_offset_s = (offset_s * -1) as i32;
-        //println!("looking a {} neighbourds: {}, {}", s, offset_s, neg_offset_s);
-        let edge = (s / 2) +1;
-        println!("looking a {} neighbourds", s);
-        for x in (edge+1)..=(grid_size - edge + 1) {
-            for y in (edge+1)..=(grid_size - edge + 1) {
+        let edge = (s / 2) + 1;
+        for x in (edge + 1)..=(grid_size - edge + 1) {
+            for y in (edge + 1)..=(grid_size - edge + 1) {
                 let mut sum = 0;
 
                 for offset_x in 0..s {
                     for offset_y in 0..s {
                         let temp_x = (x as i32 - edge as i32 + offset_x as i32) as usize;
                         let temp_y = (y as i32 - edge as i32 + offset_y as i32) as usize;
-                        //let access_coods = access(temp_x, temp_y);
-                        //println!("temp: {}x{} -> {}", temp_x, temp_y, access_coods);
                         sum += grid[access(temp_x, temp_y)];
                     }
                 }
 
-                //return;
-
                 if sum > max_sum {
                     max_sum = sum;
-                    result_x = x - s;
-                    result_y = y - s;
+                    result_x = x - edge;
+                    result_y = y - edge;
                     max_size = s;
                 }
             }
@@ -96,10 +89,7 @@ pub fn answer2() {
 
     println!(
         "answer2: {}x{} (size {}): max {}",
-        result_x,
-        result_y,
-        max_size,
-        max_sum
+        result_x, result_y, max_size, max_sum
     );
 }
 
