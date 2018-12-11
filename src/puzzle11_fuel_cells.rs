@@ -6,9 +6,18 @@ fn cell_power(x: usize, y: usize, serial: i32) -> i32 {
 }
 
 pub fn answer1() {
+    let grid_size = 200;
+    let serial = 8;
 
-    // time: 10036
-    // JJXZHKFP
+    let access = |x, y| ((x - 1) + grid_size * (y - 1)) as usize;
+    let mut grid = vec![0; grid_size * grid_size];
+    for x in 1..=grid_size {
+        for y in 1..=grid_size {
+            grid[access(x, y)] = cell_power(x, y, serial);
+        }
+    }
+
+    println!("{}", grid[access(3, 5)]);
 }
 
 #[test]
