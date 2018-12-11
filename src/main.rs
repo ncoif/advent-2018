@@ -56,6 +56,7 @@ fn main() {
         101 => puzzle10_stars::answer1(),
 
         111 => puzzle11_fuel_cells::answer1(),
+        112 => puzzle11_fuel_cells::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }

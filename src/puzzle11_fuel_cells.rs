@@ -45,6 +45,61 @@ pub fn answer1() {
     println!("answer1: {}x{}: max {}", result_x, result_y, max_sum);
 }
 
+pub fn answer2() {
+    let grid_size = 300;
+    let serial = 7689;
+
+    let access = |x, y| ((x - 1) + grid_size * (y - 1)) as usize;
+    let mut grid = vec![0; (grid_size * grid_size) as usize];
+    for x in 1..=grid_size {
+        for y in 1..=grid_size {
+            grid[access(x, y)] = cell_power(x, y, serial);
+        }
+    }
+
+    // for all grid sizes
+    let mut max_sum = 0;
+    let mut result_x = 1;
+    let mut result_y = 1;
+    let mut max_size = 0;
+    for s in 1..=1 {
+        //let offset_s = s as i32;
+        //let neg_offset_s = (offset_s * -1) as i32;
+        //println!("looking a {} neighbourds: {}, {}", s, offset_s, neg_offset_s);
+        println!("looking a {} neighbourds", s);
+        for x in s..=(grid_size - s) {
+            for y in s..=(grid_size - s) {
+                let mut sum = 0;
+
+                for offset_x in 0..=s {
+                    for offset_y in 0..=s {
+                        let temp_x = (x as i32 + s as i32 + offset_x as i32 + 1) as usize;
+                        let temp_y = (y as i32 + s as i32 + offset_y as i32 + 1) as usize;
+                        let access_coods = access(temp_x, temp_y);
+                        println!("temp: {}x{} -> {}", temp_x, temp_y, access_coods);
+                        sum += grid[access(temp_x, temp_y)];
+                    }
+                }
+
+                if sum > max_sum {
+                    max_sum = sum;
+                    result_x = x - s;
+                    result_y = y - s;
+                    max_size = s;
+                }
+            }
+        }
+    }
+
+    println!(
+        "answer2: {}x{} (size {}): max {}",
+        result_x,
+        result_y,
+        max_size * 2 + 1,
+        max_sum
+    );
+}
+
 #[test]
 fn cell_power_test() {
     assert_eq!(cell_power(3, 5, 8), 4);
