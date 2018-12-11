@@ -6,8 +6,8 @@ fn cell_power(x: usize, y: usize, serial: i32) -> i32 {
 }
 
 pub fn answer1() {
-    let grid_size = 200;
-    let serial = 8;
+    let grid_size = 300;
+    let serial = 7689;
 
     let access = |x, y| ((x - 1) + grid_size * (y - 1)) as usize;
     let mut grid = vec![0; grid_size * grid_size];
@@ -17,7 +17,32 @@ pub fn answer1() {
         }
     }
 
-    println!("{}", grid[access(3, 5)]);
+    // for all 3x3 grid centers
+    let mut max_sum = 0;
+    let mut result_x = 1;
+    let mut result_y = 1;
+    for x in 2..=(grid_size - 1) {
+        for y in 2..=(grid_size - 1) {
+            let mut sum = 0;
+            sum += grid[access(x - 1, y - 1)];
+            sum += grid[access(x, y - 1)];
+            sum += grid[access(x + 1, y - 1)];
+            sum += grid[access(x - 1, y)];
+            sum += grid[access(x, y)];
+            sum += grid[access(x + 1, y)];
+            sum += grid[access(x - 1, y + 1)];
+            sum += grid[access(x, y + 1)];
+            sum += grid[access(x + 1, y + 1)];
+
+            if sum > max_sum {
+                max_sum = sum;
+                result_x = x - 1;
+                result_y = y - 1;
+            }
+        }
+    }
+
+    println!("answer1: {}x{}: max {}", result_x, result_y, max_sum);
 }
 
 #[test]
