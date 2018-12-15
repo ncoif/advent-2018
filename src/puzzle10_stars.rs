@@ -79,7 +79,7 @@ impl Field {
         let max_y = self.stars.iter().map(|s| s.pos_y).max().unwrap();
 
         // only display images of reasonable size
-        if (max_x - min_x) < 100 && (max_y - min_y) < 30 {
+        if (max_x - min_x) < 100 && (max_y - min_y) < 15 {
             println!("{}: {}x{}: {}x{}", self.time, min_x, max_x, min_y, max_y);
 
             let mut pic = vec![false; ((max_x - min_x + 1) * (max_y - min_y + 1)) as usize];
