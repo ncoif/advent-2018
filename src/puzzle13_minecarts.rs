@@ -11,16 +11,29 @@ struct Cart {
     x: usize,
     y: usize,
     dir: Dir,
-    rot: Dir,
+    rot: u8, // i.e, how many intersections the cart has visited so far
     crashed: bool,
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[repr(u8)] // to be able to transmute it
+#[derive(Debug, Copy, Clone)]
 enum Dir {
-    LEFT,
+    RIGHT = 0,
     UP,
-    RIGHT,
+    LEFT,
     DOWN,
+}
+
+impl Cart {
+    fn new(x: usize, y: usize, dir: Dir) -> Cart {
+        Cart {
+            x,
+            y,
+            dir,
+            rot: 0,
+            crashed: false,
+        }
+    }
 }
 
 impl World {
@@ -31,38 +44,14 @@ impl World {
             .map(|s| format!("{}", s).as_bytes().to_vec())
             .collect();
 
-        let mut carts = Vec::new();
+        let mut carts = vec![];
         for (y, line) in lines.iter().enumerate() {
             for (x, char) in line.iter().enumerate() {
                 let cart = match char {
-                    b'>' => Some(Cart {
-                        x,
-                        y,
-                        dir: Dir::RIGHT,
-                        rot: Dir::LEFT,
-                        crashed: false,
-                    }),
-                    b'<' => Some(Cart {
-                        x,
-                        y,
-                        dir: Dir::LEFT,
-                        rot: Dir::LEFT,
-                        crashed: false,
-                    }),
-                    b'^' => Some(Cart {
-                        x,
-                        y,
-                        dir: Dir::UP,
-                        rot: Dir::LEFT,
-                        crashed: false,
-                    }),
-                    b'v' => Some(Cart {
-                        x,
-                        y,
-                        dir: Dir::DOWN,
-                        rot: Dir::LEFT,
-                        crashed: false,
-                    }),
+                    b'>' => Some(Cart::new(x, y, Dir::RIGHT)),
+                    b'<' => Some(Cart::new(x, y, Dir::LEFT)),
+                    b'^' => Some(Cart::new(x, y, Dir::UP)),
+                    b'v' => Some(Cart::new(x, y, Dir::DOWN)),
                     _ => None,
                 };
 
@@ -80,6 +69,64 @@ impl World {
         }
 
         World { lines, carts }
+    }
+
+    // return crashed carts
+    fn step(&mut self) -> Vec<Cart> {
+        self.carts.sort_by_key(|c| (c.y, c.x));
+
+        for i in 0..self.carts.len() {
+            // move the cart
+            match self.carts[i].dir {
+                Dir::UP => self.carts[i].y -= 1,
+                Dir::DOWN => self.carts[i].y += 1,
+                Dir::LEFT => self.carts[i].x -= 1,
+                Dir::RIGHT => self.carts[i].x += 1,
+            }
+
+            // is there any chars with the same coords?
+            if let Some((idx, _)) = self
+                .carts
+                .iter()
+                .enumerate()
+                .find(|(idx, c)| *idx != i && c.x == self.carts[i].x && c.y == self.carts[i].y)
+            {
+                self.carts[idx].crashed = true;
+                self.carts[i].crashed = true;
+            }
+
+            // find the next direction for the cart
+            let (x, y) = (self.carts[i].x, self.carts[i].y);
+            let dir = match (self.carts[i].dir, self.lines[y][x]) {
+                (Dir::UP, b'/') => Dir::RIGHT,
+                (Dir::RIGHT, b'/') => Dir::UP,
+                (Dir::LEFT, b'/') => Dir::DOWN,
+                (Dir::DOWN, b'/') => Dir::LEFT,
+                (Dir::UP, b'\\') => Dir::LEFT,
+                (Dir::LEFT, b'\\') => Dir::UP,
+                (Dir::DOWN, b'\\') => Dir::RIGHT,
+                (Dir::RIGHT, b'\\') => Dir::DOWN,
+                (d, b'+') => {
+                    // use rotation to compute next direction
+                    let next_d = (5 - self.carts[i].rot + d as u8) % 4;
+                    self.carts[i].rot = (self.carts[i].rot + 1) % 3;
+                    // convert a u8 into a dir
+                    unsafe { std::mem::transmute(next_d) }
+                }
+                (d, _) => d,
+            };
+            self.carts[i].dir = dir;
+        }
+
+        let mut crashed = vec![];
+        for i in (0..self.carts.len()).rev() {
+            // .rev() to remove the elements without index out of bound
+            if self.carts[i].crashed {
+                crashed.insert(0, self.carts.remove(i));
+            }
+        }
+
+        crashed
     }
 }
 
@@ -108,20 +155,29 @@ impl fmt::Display for World {
     }
 }
 
-fn simulate(s: &str) -> (usize, usize) {
-    let w = World::parse(s);
-    println!("{}", w);
+fn simulate1(s: &str) -> (usize, usize) {
+    let mut w = World::parse(s);
+    //println!("{}", w);
 
-    (0, 0)
+    let crashed = loop {
+        let crashed = w.step();
+        //println!("{}", w);
+        //println!("crashed: {:?}", crashed);
+        if !crashed.is_empty() {
+            break crashed;
+        }
+    };
+
+    (crashed[0].x, crashed[0].y)
 }
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
-    println!("answer1: {:?}", simulate(&s));
+    println!("answer1: {:?}", simulate1(&s));
 }
 
 #[test]
 fn test() {
     let s = std::fs::read_to_string("input/input13_debug.txt").expect("cannot read file");
-    assert_eq!(simulate(&s), (7, 3));
+    assert_eq!(simulate1(&s), (7, 3));
 }
