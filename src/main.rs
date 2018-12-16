@@ -11,6 +11,7 @@ mod puzzle08_tree;
 mod puzzle09_marble;
 mod puzzle10_stars;
 mod puzzle11_fuel_cells;
+mod puzzle12_game_of_life;
 
 fn main() {
     let day: u32 = env::args()
@@ -57,6 +58,8 @@ fn main() {
 
         111 => puzzle11_fuel_cells::answer1(),
         112 => puzzle11_fuel_cells::answer2(),
+
+        121 => puzzle12_game_of_life::answer1(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
