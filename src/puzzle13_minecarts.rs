@@ -177,7 +177,7 @@ fn simulate2(s: &str) -> (usize, usize) {
     loop {
         w.step();
         if w.carts.len() == 1 {
-            break
+            break;
         }
     }
 
