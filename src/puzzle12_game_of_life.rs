@@ -65,6 +65,47 @@ pub fn answer1() {
     println!("answer1: {}", generations(&s));
 }
 
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input12.txt").expect("cannot read file");
+
+    let mut lines = s.split("\n");
+    let mut state = lines.next().unwrap().split(" ").nth(2).unwrap().to_string();
+
+    // add 4 . on each side
+    state.insert_str(0, "....");
+    state.push_str("....");
+
+    lines.next(); // skip blank line
+    let rules: HashSet<String> = lines
+        .filter(|l| l.ends_with(" => #")) // onyl rule that produce alive elements
+        .map(|s| s.split(" ").next().unwrap().parse::<String>().unwrap())
+        .collect();
+
+    let mut current = Plantation { state, offset: 4 }; // the center is at offset 4 because we added 4 characters
+    let mut i = 0;
+
+    let result = loop {
+        println!(
+            "{}: {}, {} -> {}",
+            i,
+            current.state,
+            current.offset,
+            current.sum()
+        );
+        let next = current.step(&rules);
+        // if the state is indentical (but the offset might change), then we are stable and we break
+        if next.state == current.state {
+            let diff = next.sum() - current.sum();
+            // rust is awsome, you can return a value in a break!!!
+            break (50_000_000_000 - i) * diff + current.sum();
+        }
+        i += 1;
+        current = next;
+    };
+
+    println!("answer2: {}", result);
+}
+
 #[test]
 fn test_step() {
     let p = Plantation {
