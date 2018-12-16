@@ -171,9 +171,27 @@ fn simulate1(s: &str) -> (usize, usize) {
     (crashed[0].x, crashed[0].y)
 }
 
+fn simulate2(s: &str) -> (usize, usize) {
+    let mut w = World::parse(s);
+
+    loop {
+        w.step();
+        if w.carts.len() == 1 {
+            break
+        }
+    }
+
+    (w.carts[0].x, w.carts[0].y)
+}
+
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
     println!("answer1: {:?}", simulate1(&s));
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
+    println!("answer2: {:?}", simulate2(&s));
 }
 
 #[test]

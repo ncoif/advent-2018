@@ -64,6 +64,7 @@ fn main() {
         122 => puzzle12_game_of_life::answer2(),
 
         131 => puzzle13_minecarts::answer1(),
+        132 => puzzle13_minecarts::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
