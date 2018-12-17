@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fmt;
 
 #[derive(Debug)]
@@ -54,6 +55,13 @@ impl State {
         State { walls, units }
     }
 
+    fn unit_at(&self, n: &Node) -> &Unit {
+        self.units
+            .iter()
+            .find(|u| u.x == n.0 && u.y == n.1)
+            .unwrap()
+    }
+
     fn around(n: Node) -> impl Iterator<Item = Node> {
         [(-1isize, 0isize), (1, 0), (0, -1), (0, 1)]
             .iter()
@@ -70,6 +78,24 @@ impl State {
                 .is_none()
     }
 
+    fn in_range(&self, n: &Node) -> Vec<Node> {
+        let is_elf = self.unit_at(n).elf;
+        let mut set = HashSet::new();
+        for gob in self.units.iter() {
+            if gob.elf == is_elf {
+                continue; // skip units in the same
+            }
+
+            set.extend(Self::around(Node(gob.x, gob.y)).filter(|n| self.is_free(n))); // i.e addAll(iterator)
+        }
+
+        let mut vec: Vec<_> = set.into_iter().collect();
+        // sort units by turn order
+        vec.sort_by_key(|n| (n.1, n.0));
+
+        vec
+    }
+
     // use dijkstra_all to find the best node
     fn find_target(&self, start: &Node) -> Option<Node> {
         let all_reachables = pathfinding::directed::dijkstra::dijkstra_all(start, |n| {
@@ -81,6 +107,27 @@ impl State {
                 .map(|n| (n, 1)) // cost of 1
         });
         println!("all_reachables: {:?}", all_reachables);
+
+        // for all enemis, find all in_reach nodes that are also in all_reachables
+        //FIXME
+        println!("in_range: {:?}", self.in_range(start));
+        let mut possible_targets: Vec<_> = self
+            .in_range(start)
+            .iter()
+            .filter_map(|n| all_reachables.get(n))
+            .collect();
+        println!("possible_targets: {:?}", possible_targets);
+
+        // find the closest one, and then unit turn order
+        //possible_targets.sort_by_key(|(n,_c)| (n.1, n.0));
+        //let min_distance = possible_targets.iter().min_by_key(|(_n, c)| c);
+        //println!("min_distance: {:?}", min_distance);
+
+        // return if let Some((n, _c)) = min_distance {
+        //     Some(n.clone())
+        // } else {
+        //     None
+        // }
         None
     }
 }
