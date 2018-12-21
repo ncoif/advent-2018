@@ -477,6 +477,59 @@ fn test_step_move_unit() {
 }
 
 #[test]
+fn test_hps() {
+    let mut state = State::parse(
+        r#"
+#######
+#.G...#
+#...EG#
+#.#.#G#
+#..G#E#
+#.....#
+#######"#,
+    );
+    println!("Initial: {:?}", state);
+
+    let mut expected_state1 = State::parse(
+        r#"
+#######
+#..G..#
+#...EG#
+#.#G#G#
+#...#E#
+#.....#
+#######"#,
+    );
+    expected_state1.unit_at_mut(&Node(4, 2)).hp = 197;
+    expected_state1.unit_at_mut(&Node(5, 2)).hp = 197;
+    expected_state1.unit_at_mut(&Node(5, 3)).hp = 197;
+    expected_state1.unit_at_mut(&Node(5, 4)).hp = 197;
+
+    state.step();
+    println!("Rouund 1: {:?}", state);
+    assert_eq!(expected_state1, state);
+
+    let mut expected_state2 = State::parse(
+        r#"
+#######
+#...G.#
+#..GEG#
+#.#.#G#
+#...#E#
+#.....#
+#######"#,
+    );
+    expected_state2.unit_at_mut(&Node(4, 2)).hp = 188;
+    expected_state2.unit_at_mut(&Node(5, 2)).hp = 194;
+    expected_state2.unit_at_mut(&Node(5, 3)).hp = 194;
+    expected_state2.unit_at_mut(&Node(5, 4)).hp = 194;
+
+    state.step();
+    println!("Round 2: {:?}", state);
+    assert_eq!(expected_state2, state);
+}
+
+#[test]
 fn test_combat_1() {
     let mut state = State::parse(
         r#"
@@ -490,7 +543,6 @@ fn test_combat_1() {
     );
 
     assert_eq!(state.to_death(), 47);
-    println!("{:?}", state);
     assert_eq!(state.remaining_hp(), 590);
 }
 
@@ -508,6 +560,5 @@ fn test_combat_2() {
     );
 
     assert_eq!(state.to_death(), 46);
-    println!("{:?}", state);
     assert_eq!(state.remaining_hp(), 859);
 }
