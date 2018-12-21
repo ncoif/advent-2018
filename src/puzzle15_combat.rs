@@ -253,10 +253,10 @@ impl fmt::Debug for State {
 }
 
 fn combat1(s: &str) -> u32 {
-    let state = State::parse(s);
+    let mut state = State::parse(s);
     println!("{:?}", state);
 
-    0
+    state.to_death()
 }
 
 pub fn answer1() {
@@ -464,4 +464,20 @@ fn test_step_move_unit() {
 
     state.step();
     assert_eq!(expected_state3, state);
+}
+
+#[test]
+fn test_to_death() {
+    let mut state = State::parse(
+        r#"
+#######
+#.G...#
+#...EG#
+#.#.#G#
+#..G#E#
+#.....#
+#######"#,
+    );
+
+    assert_eq!(state.to_death(), 47);
 }
