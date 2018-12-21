@@ -62,6 +62,13 @@ impl State {
             .unwrap()
     }
 
+    fn unit_at_mut(&mut self, n: &Node) -> &mut Unit {
+        self.units
+            .iter_mut()
+            .find(|u| u.x == n.0 && u.y == n.1)
+            .unwrap()
+    }
+
     fn around(n: Node) -> impl Iterator<Item = Node> {
         [(-1isize, 0isize), (1, 0), (0, -1), (0, 1)]
             .iter()
@@ -127,6 +134,30 @@ impl State {
             .iter()
             .find(|n| in_range.iter().any(|in_range| in_range == *n))
             .cloned()
+    }
+
+    // move the unit in direction of the given target
+    fn move_unit(&mut self, start: &Node, target: &Node) {
+        let shortest_path = pathfinding::directed::dijkstra::dijkstra(
+            start,
+            |n| {
+                // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
+                // or else "temporary value moved while borrowing" error
+                Self::around(n.clone())
+                    .filter(|n| self.is_free(n))
+                    .map(|n| n.clone())
+                    .map(|n| (n, 1)) // cost of 1
+            },
+            |n| *n == *target,
+        )
+        .unwrap();
+        println!("{:?}", shortest_path);
+
+        // safe to unwrap because there is always a node
+        let next_node = shortest_path.0.get(1).unwrap();
+        let mut unit = self.unit_at_mut(start);
+        unit.x = next_node.0;
+        unit.y = next_node.1;
     }
 }
 
@@ -249,4 +280,56 @@ fn test_find_target() {
 
     let target = state.find_target(&Node(1, 1));
     assert_eq!(target, Some(Node(3, 1)));
+}
+
+#[test]
+fn test_target_elf_only() {
+    let state = State::parse(
+        r#"
+#######
+#E..E.#
+#...#.#
+#.E.#E#
+#######"#,
+    );
+    println!("{:?}", state);
+
+    let target = state.find_target(&Node(1, 1));
+    assert_eq!(target, None);
+}
+
+#[test]
+fn test_target_no_target() {
+    let state = State::parse(
+        r#"
+#######
+#E....#
+#...#.#
+#...#.#
+#######"#,
+    );
+    println!("{:?}", state);
+
+    let target = state.find_target(&Node(1, 1));
+    assert_eq!(target, None);
+}
+
+#[test]
+fn test_move_unit() {
+    let mut state = State::parse(
+        r#"
+#######
+#.E...#
+#.....#
+#...G.#
+#######"#,
+    );
+    println!("{:?}", state);
+    assert_eq!(state.unit_at(&Node(2, 1)).elf, true);
+    assert_eq!(state.is_free(&Node(3, 1)), true);
+
+    state.move_unit(&Node(2, 1), &Node(4, 2));
+    println!("{:?}", state);
+    assert_eq!(state.is_free(&Node(2, 1)), true);
+    assert_eq!(state.unit_at(&Node(3, 1)).elf, true);
 }
