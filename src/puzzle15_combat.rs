@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 struct Unit {
     x: usize,
     y: usize,
@@ -15,6 +15,7 @@ impl Unit {
     }
 }
 
+#[derive(PartialEq, Eq)]
 struct State {
     walls: Vec<Vec<bool>>,
     units: Vec<Unit>,
@@ -55,11 +56,8 @@ impl State {
         State { walls, units }
     }
 
-    fn unit_at(&self, n: &Node) -> &Unit {
-        self.units
-            .iter()
-            .find(|u| u.x == n.0 && u.y == n.1)
-            .unwrap()
+    fn unit_at(&self, n: &Node) -> Option<&Unit> {
+        self.units.iter().find(|u| u.x == n.0 && u.y == n.1)
     }
 
     fn unit_at_mut(&mut self, n: &Node) -> &mut Unit {
@@ -87,7 +85,7 @@ impl State {
 
     // all node from opposite side that are in range of the given one
     fn in_range(&self, n: &Node) -> Vec<Node> {
-        let is_elf = self.unit_at(n).elf;
+        let is_elf = self.unit_at(n).unwrap().elf;
         let mut set = HashSet::new();
         for gob in self.units.iter() {
             if gob.elf == is_elf {
@@ -178,8 +176,25 @@ impl State {
         unit.y = next_node.1;
     }
 
+    fn step_unit(&mut self, n: &Node) {
+        // TODO check if there is an ennemy arround me
+        let target = self.find_target(n);
+        if target.is_some() {
+            self.move_unit(n, &target.unwrap());
+        }
+    }
+
     fn step(&mut self) {
-        for unit in &self.units {}
+        let units_at_start = self.units.clone();
+        for unit in units_at_start {
+            let unit_node = Node(unit.x, unit.y);
+            if self.unit_at(&unit_node).is_none() {
+                continue; //not a unit, skip it
+            }
+            self.step_unit(&unit_node);
+        }
+        // sort again the units
+        self.units.sort_by_key(|u| (u.y, u.x));
     }
 }
 
@@ -347,13 +362,13 @@ fn test_move_unit() {
 #######"#,
     );
     println!("{:?}", state);
-    assert_eq!(state.unit_at(&Node(2, 1)).elf, true);
+    assert_eq!(state.unit_at(&Node(2, 1)).unwrap().elf, true);
     assert_eq!(state.is_free(&Node(3, 1)), true);
 
     state.move_unit(&Node(2, 1), &Node(4, 2));
     println!("{:?}", state);
     assert_eq!(state.is_free(&Node(2, 1)), true);
-    assert_eq!(state.unit_at(&Node(3, 1)).elf, true);
+    assert_eq!(state.unit_at(&Node(3, 1)).unwrap().elf, true);
 }
 
 #[test]
@@ -371,9 +386,22 @@ fn test_step_move_unit() {
 #########"#,
     );
 
+    let expected_state = State::parse(
+        r#"
+#########
+#.G...G.#
+#...G...#
+#...E..G#
+#.G.....#
+#.......#
+#G..G..G#
+#.......#
+#########"#,
+    );
+
     println!("{:?}", state);
     state.step();
     println!("{:?}", state);
 
-    //assert_eq!(false, true);
+    assert_eq!(expected_state, state);
 }
