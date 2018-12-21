@@ -109,7 +109,11 @@ impl State {
         });
 
         let mut reachables_nodes: Vec<_> = reachables.iter().map(|(k, v)| (*k, v.1)).collect();
-        reachables_nodes.sort_by_key(|e| (e.1, (e.0).1, (e.0).0));
+        reachables_nodes.sort_by_key(|e| {
+            let distance = e.1;
+            let node = e.0;
+            (distance, node.1, node.0)
+        });
 
         reachables_nodes.iter().map(|e| e.0).collect()
     }
