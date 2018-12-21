@@ -136,10 +136,9 @@ impl State {
             .cloned()
     }
 
-    // move the unit in direction of the given target
-    fn move_unit(&mut self, start: &Node, target: &Node) {
+    fn path_cost_to(&self, n: &Node, to_n: &Node) -> Option<usize> {
         let shortest_path = pathfinding::directed::dijkstra::dijkstra(
-            start,
+            n,
             |n| {
                 // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
                 // or else "temporary value moved while borrowing" error
@@ -148,16 +147,39 @@ impl State {
                     .map(|n| n.clone())
                     .map(|n| (n, 1)) // cost of 1
             },
-            |n| *n == *target,
-        )
-        .unwrap();
-        println!("{:?}", shortest_path);
+            |n| *n == *to_n,
+        );
 
-        // safe to unwrap because there is always a node
-        let next_node = shortest_path.0.get(1).unwrap();
+        if shortest_path.is_some() {
+            Some(shortest_path.unwrap().1)
+        } else {
+            None
+        }
+    }
+
+    fn find_move_toward(&self, start: &Node, target: &Node) -> Node {
+        // what is the cost of all my neighbourds?
+        let moves_and_costs: Vec<_> = Self::around(*start)
+            .filter(|n| self.is_free(n))
+            .filter_map(|n| self.path_cost_to(&n, target).map(|c| (n, c)))
+            .collect();
+        let next_move = moves_and_costs
+            .iter()
+            .min_by_key(|(n, c)| (c, n.1, n.0))
+            .unwrap();
+        (*next_move).0
+    }
+
+    // move the unit in direction of the given target
+    fn move_unit(&mut self, start: &Node, target: &Node) {
+        let next_node = self.find_move_toward(start, target);
         let mut unit = self.unit_at_mut(start);
         unit.x = next_node.0;
         unit.y = next_node.1;
+    }
+
+    fn step(&mut self) {
+        for unit in &self.units {}
     }
 }
 
@@ -332,4 +354,26 @@ fn test_move_unit() {
     println!("{:?}", state);
     assert_eq!(state.is_free(&Node(2, 1)), true);
     assert_eq!(state.unit_at(&Node(3, 1)).elf, true);
+}
+
+#[test]
+fn test_step_move_unit() {
+    let mut state = State::parse(
+        r#"
+#########
+#G..G..G#
+#.......#
+#.......#
+#G..E..G#
+#.......#
+#.......#
+#G..G..G#
+#########"#,
+    );
+
+    println!("{:?}", state);
+    state.step();
+    println!("{:?}", state);
+
+    //assert_eq!(false, true);
 }
