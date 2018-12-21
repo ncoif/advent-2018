@@ -78,6 +78,7 @@ impl State {
                 .is_none()
     }
 
+    // all node from opposite side that are in range of the given one
     fn in_range(&self, n: &Node) -> Vec<Node> {
         let is_elf = self.unit_at(n).elf;
         let mut set = HashSet::new();
@@ -94,6 +95,23 @@ impl State {
         vec.sort_by_key(|n| (n.1, n.0));
 
         vec
+    }
+
+    // all reachable nodes from the given one
+    fn reachable(&self, n: &Node) -> Vec<Node> {
+        let reachables = pathfinding::directed::dijkstra::dijkstra_all(n, |n| {
+            // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
+            // or else "temporary value moved while borrowing" error
+            Self::around(n.clone())
+                .filter(|n| self.is_free(n))
+                .map(|n| n.clone())
+                .map(|n| (n, 1)) // cost of 1
+        });
+
+        let mut reachables_nodes: Vec<_> = reachables.iter().map(|(k, _v)| *k).collect();
+        reachables_nodes.sort_by_key(|n| (n.1, n.0));
+
+        reachables_nodes
     }
 
     // use dijkstra_all to find the best node
@@ -206,6 +224,31 @@ fn test_in_range() {
         Node(5, 1),
         Node(2, 2),
         Node(5, 2),
+        Node(1, 3),
+        Node(3, 3),
+    ];
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_reacheable() {
+    let state = State::parse(
+        r#"
+#######
+#E..G.#
+#...#.#
+#.G.#G#
+#######"#,
+    );
+    println!("{:?}", state);
+
+    let actual = state.reachable(&Node(1, 1));
+    let expected = vec![
+        Node(2, 1),
+        Node(3, 1),
+        Node(1, 2),
+        Node(2, 2),
+        Node(3, 2),
         Node(1, 3),
         Node(3, 3),
     ];
