@@ -223,6 +223,10 @@ impl State {
             r += 1;
         }
     }
+
+    fn remaining_hp(&self) -> u32 {
+        self.units.iter().map(|u| u.hp).sum()
+    }
 }
 
 impl fmt::Debug for State {
@@ -252,16 +256,22 @@ impl fmt::Debug for State {
     }
 }
 
-fn combat1(s: &str) -> u32 {
+fn combat1(s: &str) -> (u32, u32) {
     let mut state = State::parse(s);
     println!("{:?}", state);
 
-    state.to_death()
+    let rounds = state.to_death();
+    let hps = state.remaining_hp();
+    println!("{:?}", state);
+
+    (rounds, hps)
 }
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
-    println!("answer1: {:?}", combat1(&s));
+
+    let result = combat1(&s);
+    println!("answer1: {:?}: {:?}", result, result.0 * result.1);
 }
 
 #[test]
@@ -467,7 +477,7 @@ fn test_step_move_unit() {
 }
 
 #[test]
-fn test_to_death() {
+fn test_combat_1() {
     let mut state = State::parse(
         r#"
 #######
@@ -480,4 +490,24 @@ fn test_to_death() {
     );
 
     assert_eq!(state.to_death(), 47);
+    println!("{:?}", state);
+    assert_eq!(state.remaining_hp(), 590);
+}
+
+#[test]
+fn test_combat_2() {
+    let mut state = State::parse(
+        r#"
+#######
+#E..EG#
+#.#G.E#
+#E.##E#
+#G..#.#
+#..E#.#
+#######"#,
+    );
+
+    assert_eq!(state.to_death(), 46);
+    println!("{:?}", state);
+    assert_eq!(state.remaining_hp(), 859);
 }
