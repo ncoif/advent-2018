@@ -97,7 +97,7 @@ impl State {
         vec
     }
 
-    // all reachable nodes from the given one
+    // all reachable nodes from the given one, ordered by distance, and then per units turn order
     fn reachable(&self, n: &Node) -> Vec<Node> {
         let reachables = pathfinding::directed::dijkstra::dijkstra_all(n, |n| {
             // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
@@ -108,10 +108,10 @@ impl State {
                 .map(|n| (n, 1)) // cost of 1
         });
 
-        let mut reachables_nodes: Vec<_> = reachables.iter().map(|(k, _v)| *k).collect();
-        reachables_nodes.sort_by_key(|n| (n.1, n.0));
+        let mut reachables_nodes: Vec<_> = reachables.iter().map(|(k, v)| (*k, v.1)).collect();
+        reachables_nodes.sort_by_key(|e| (e.1, (e.0).1, (e.0).0));
 
-        reachables_nodes
+        reachables_nodes.iter().map(|e| e.0).collect()
     }
 
     // use dijkstra_all to find the best node
@@ -245,11 +245,11 @@ fn test_reacheable() {
     let actual = state.reachable(&Node(1, 1));
     let expected = vec![
         Node(2, 1),
-        Node(3, 1),
         Node(1, 2),
+        Node(3, 1),
         Node(2, 2),
-        Node(3, 2),
         Node(1, 3),
+        Node(3, 2),
         Node(3, 3),
     ];
     assert_eq!(actual, expected);
