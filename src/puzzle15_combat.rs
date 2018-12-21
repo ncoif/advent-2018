@@ -83,7 +83,7 @@ impl State {
         let mut set = HashSet::new();
         for gob in self.units.iter() {
             if gob.elf == is_elf {
-                continue; // skip units in the same
+                continue; // skip units in the same side
             }
 
             set.extend(Self::around(Node(gob.x, gob.y)).filter(|n| self.is_free(n))); // i.e addAll(iterator)
@@ -186,6 +186,30 @@ fn test_parse() {
     assert_eq!(state.units.len(), 4);
     assert_eq!(state.walls.len(), 5);
     assert_eq!(state.walls[0].len(), 7);
+}
+
+#[test]
+fn test_in_range() {
+    let state = State::parse(
+        r#"
+#######
+#E..G.#
+#...#.#
+#.G.#G#
+#######"#,
+    );
+    println!("{:?}", state);
+
+    let actual = state.in_range(&Node(1, 1));
+    let expected = vec![
+        Node(3, 1),
+        Node(5, 1),
+        Node(2, 2),
+        Node(5, 2),
+        Node(1, 3),
+        Node(3, 3),
+    ];
+    assert_eq!(actual, expected);
 }
 
 #[test]
