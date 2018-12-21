@@ -7,11 +7,12 @@ struct Unit {
     y: usize,
     elf: bool,
     hp: u32,
+    ap: u32,
 }
 
 impl Unit {
-    fn new(x: usize, y: usize, elf: bool, hp: u32) -> Unit {
-        Unit { x, y, elf, hp }
+    fn new(x: usize, y: usize, elf: bool, hp: u32, ap: u32) -> Unit {
+        Unit { x, y, elf, hp, ap }
     }
 }
 
@@ -38,11 +39,11 @@ impl State {
                     '.' => wall.push(false),
                     'G' => {
                         wall.push(false);
-                        units.push(Unit::new(x, y, false, 200));
+                        units.push(Unit::new(x, y, false, 200, 3));
                     }
                     'E' => {
                         wall.push(false);
-                        units.push(Unit::new(x, y, true, 200));
+                        units.push(Unit::new(x, y, true, 200, 3));
                     }
                     _ => panic!("Unexpected token"),
                 }
@@ -177,10 +178,24 @@ impl State {
     }
 
     fn step_unit(&mut self, n: &Node) {
-        // TODO check if there is an ennemy arround me
-        let target = self.find_target(n);
-        if target.is_some() {
-            self.move_unit(n, &target.unwrap());
+        let me = self.unit_at(n).unwrap().clone();
+        // if no enemy around me
+        if !Self::around(*n).any(|n| self.unit_at(&n).map(|u| u.elf != me.elf).unwrap_or(false)) {
+            if let Some(chosen) = self.find_target(n) {
+                self.move_unit(n, &chosen);
+            }
+        }
+        // if enemy around me
+        if let Some(t) = Self::around(*n)
+            .filter_map(|n| self.unit_at(&n).filter(|u| u.elf != me.elf))
+            .min_by_key(|p| (p.hp, p.y, p.x))
+        {
+            let target = self.unit_at_mut(&Node(t.x, t.y));
+            // saturating_sub cap to 0 instead of overflowing
+            target.hp = target.hp.saturating_sub(me.ap);
+            if target.hp == 0 {
+                self.units.retain(|u| u.hp > 0);
+            }
         }
     }
 
@@ -195,6 +210,18 @@ impl State {
         }
         // sort again the units
         self.units.sort_by_key(|u| (u.y, u.x));
+    }
+
+    // return the number of rounds
+    fn to_death(&mut self) -> u32 {
+        let mut r = 0;
+        loop {
+            self.step();
+            if self.units.iter().all(|u| u.elf) || self.units.iter().all(|u| !u.elf) {
+                return r;
+            }
+            r += 1;
+        }
     }
 }
 
@@ -386,7 +413,7 @@ fn test_step_move_unit() {
 #########"#,
     );
 
-    let expected_state = State::parse(
+    let expected_state1 = State::parse(
         r#"
 #########
 #.G...G.#
@@ -399,9 +426,42 @@ fn test_step_move_unit() {
 #########"#,
     );
 
-    println!("{:?}", state);
     state.step();
-    println!("{:?}", state);
+    assert_eq!(expected_state1, state);
 
-    assert_eq!(expected_state, state);
+    let mut expected_state2 = State::parse(
+        r#"
+#########
+#..G.G..#
+#...G...#
+#.G.E.G.#
+#.......#
+#G..G..G#
+#.......#
+#.......#
+#########"#,
+    );
+    expected_state2.unit_at_mut(&Node(4, 2)).hp = 197;
+    expected_state2.unit_at_mut(&Node(4, 3)).hp = 197;
+
+    state.step();
+    assert_eq!(expected_state2, state);
+
+    let mut expected_state3 = State::parse(
+        r#"
+#########
+#.......#
+#..GGG..#
+#..GEG..#
+#G..G...#
+#......G#
+#.......#
+#.......#
+#########"#,
+    );
+    expected_state3.unit_at_mut(&Node(4, 2)).hp = 194;
+    expected_state3.unit_at_mut(&Node(4, 3)).hp = 194;
+
+    state.step();
+    assert_eq!(expected_state3, state);
 }
