@@ -72,6 +72,7 @@ fn main() {
         142 => puzzle14_chocolate_receipt::answer2(),
 
         151 => puzzle15_combat::answer1(),
+        152 => puzzle15_combat::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }

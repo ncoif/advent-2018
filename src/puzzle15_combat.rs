@@ -26,7 +26,7 @@ struct State {
 struct Node(usize, usize); // (x,y)
 
 impl State {
-    fn parse(s: &str) -> State {
+    fn parse(s: &str, ap_elf: u32, ap_gob: u32) -> State {
         let lines = s.split("\n");
 
         let mut units = vec![];
@@ -39,11 +39,11 @@ impl State {
                     '.' => wall.push(false),
                     'G' => {
                         wall.push(false);
-                        units.push(Unit::new(x, y, false, 200, 3));
+                        units.push(Unit::new(x, y, false, 200, ap_gob));
                     }
                     'E' => {
                         wall.push(false);
-                        units.push(Unit::new(x, y, true, 200, 3));
+                        units.push(Unit::new(x, y, true, 200, ap_elf));
                     }
                     _ => panic!("Unexpected token"),
                 }
@@ -169,20 +169,12 @@ impl State {
         (*next_move).0
     }
 
-    // move the unit in direction of the given target
-    fn move_unit(&mut self, start: &Node, target: &Node) {
-        let next_node = self.find_move_toward(start, target);
-        let mut unit = self.unit_at_mut(start);
-        unit.x = next_node.0;
-        unit.y = next_node.1;
-    }
-
     fn step_unit(&mut self, n: &mut Node) {
         let me = self.unit_at(n).unwrap().clone();
         // if no enemy around me
         if !Self::around(*n).any(|n| self.unit_at(&n).map(|u| u.elf != me.elf).unwrap_or(false)) {
             if let Some(chosen) = self.find_target(n) {
-                println!("{:?} moving to {:?}", n, chosen);
+                //println!("{:?} moving to {:?}", n, chosen);
                 let next_node = self.find_move_toward(n, &chosen);
                 let mut unit = self.unit_at_mut(n);
                 unit.x = next_node.0;
@@ -196,7 +188,7 @@ impl State {
             .filter_map(|n| self.unit_at(&n).filter(|u| u.elf != me.elf))
             .min_by_key(|p| (p.hp, p.y, p.x))
         {
-            println!("{:?} attacking {:?}", n, t);
+            //println!("{:?} attacking {:?}", n, t);
             let target = self.unit_at_mut(&Node(t.x, t.y));
             // saturating_sub cap to 0 instead of overflowing
             target.hp = target.hp.saturating_sub(me.ap);
@@ -265,21 +257,46 @@ impl fmt::Debug for State {
 }
 
 fn combat1(s: &str) -> (u32, u32) {
-    let mut state = State::parse(s);
-    println!("{:?}", state);
+    let mut state = State::parse(s, 3, 3);
 
     let rounds = state.to_death();
     let hps = state.remaining_hp();
-    println!("{:?}", state);
 
     (rounds, hps)
+}
+
+fn combat2(s: &str) -> (u32, u32) {
+    'outer: for e in 3.. {
+        let mut s = State::parse(s, e, 3);
+        let elves = s.units.iter().filter(|u| u.elf).count();
+        let mut i = 0;
+        loop {
+            s.step();
+            if s.units.iter().filter(|u| u.elf).count() < elves {
+                continue 'outer;
+            }
+            if s.units.len() == elves {
+                let remain = s.units.iter().map(|u| u.hp).sum::<u32>();
+                return (i, remain);
+            }
+            i += 1;
+        }
+    }
+    panic!()
 }
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
 
     let result = combat1(&s);
-    println!("answer1: {:?}: {:?}", result, result.0 * result.1);
+    println!("BeverageBandits (1/2): {:?}", result.0 * result.1);
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
+
+    let result = combat2(&s);
+    println!("BeverageBandits (2/2): {:?}", result.0 * result.1);
 }
 
 #[test]
@@ -291,6 +308,8 @@ fn test_parse() {
 #...#.#
 #.G.#G#
 #######"#,
+        3,
+        3,
     );
     println!("{:?}", state);
 
@@ -308,6 +327,8 @@ fn test_in_range() {
 #...#.#
 #.G.#G#
 #######"#,
+        3,
+        3,
     );
     println!("{:?}", state);
 
@@ -332,6 +353,8 @@ fn test_reacheables() {
 #...#.#
 #.G.#G#
 #######"#,
+        3,
+        3,
     );
     println!("{:?}", state);
 
@@ -357,6 +380,8 @@ fn test_find_target() {
 #...#.#
 #.G.#G#
 #######"#,
+        3,
+        3,
     );
     println!("{:?}", state);
 
@@ -373,6 +398,8 @@ fn test_target_elf_only() {
 #...#.#
 #.E.#E#
 #######"#,
+        3,
+        3,
     );
     println!("{:?}", state);
 
@@ -389,31 +416,13 @@ fn test_target_no_target() {
 #...#.#
 #...#.#
 #######"#,
+        3,
+        3,
     );
     println!("{:?}", state);
 
     let target = state.find_target(&Node(1, 1));
     assert_eq!(target, None);
-}
-
-#[test]
-fn test_move_unit() {
-    let mut state = State::parse(
-        r#"
-#######
-#.E...#
-#.....#
-#...G.#
-#######"#,
-    );
-    println!("{:?}", state);
-    assert_eq!(state.unit_at(&Node(2, 1)).unwrap().elf, true);
-    assert_eq!(state.is_free(&Node(3, 1)), true);
-
-    state.move_unit(&Node(2, 1), &Node(4, 2));
-    println!("{:?}", state);
-    assert_eq!(state.is_free(&Node(2, 1)), true);
-    assert_eq!(state.unit_at(&Node(3, 1)).unwrap().elf, true);
 }
 
 #[test]
@@ -429,9 +438,11 @@ fn test_step_move_unit() {
 #.......#
 #G..G..G#
 #########"#,
+        0,
+        0,
     );
 
-    let mut expected_state1 = State::parse(
+    let expected_state1 = State::parse(
         r#"
 #########
 #.G...G.#
@@ -442,12 +453,14 @@ fn test_step_move_unit() {
 #G..G..G#
 #.......#
 #########"#,
+        0,
+        0,
     );
 
     state.step();
-    //assert_eq!(expected_state1, state);
+    assert_eq!(expected_state1, state);
 
-    let mut expected_state2 = State::parse(
+    let expected_state2 = State::parse(
         r#"
 #########
 #..G.G..#
@@ -458,14 +471,14 @@ fn test_step_move_unit() {
 #.......#
 #.......#
 #########"#,
+        0,
+        0,
     );
-    expected_state2.unit_at_mut(&Node(4, 2)).hp = 197;
-    expected_state2.unit_at_mut(&Node(4, 3)).hp = 197;
 
     state.step();
-    //assert_eq!(expected_state2, state);
+    assert_eq!(expected_state2, state);
 
-    let mut expected_state3 = State::parse(
+    let expected_state3 = State::parse(
         r#"
 #########
 #.......#
@@ -476,12 +489,12 @@ fn test_step_move_unit() {
 #.......#
 #.......#
 #########"#,
+        0,
+        0,
     );
-    expected_state3.unit_at_mut(&Node(4, 2)).hp = 194;
-    expected_state3.unit_at_mut(&Node(4, 3)).hp = 194;
 
     state.step();
-    //assert_eq!(expected_state3, state);
+    assert_eq!(expected_state3, state);
 }
 
 #[test]
@@ -495,6 +508,8 @@ fn test_hps() {
 #..G#E#
 #.....#
 #######"#,
+        3,
+        3,
     );
     println!("Initial: {:?}", state);
 
@@ -507,6 +522,8 @@ fn test_hps() {
 #...#E#
 #.....#
 #######"#,
+        3,
+        3,
     );
     expected_state1.unit_at_mut(&Node(4, 2)).hp = 197;
     expected_state1.unit_at_mut(&Node(5, 2)).hp = 197;
@@ -526,6 +543,8 @@ fn test_hps() {
 #...#E#
 #.....#
 #######"#,
+        3,
+        3,
     );
     expected_state2.unit_at_mut(&Node(4, 2)).hp = 188;
     expected_state2.unit_at_mut(&Node(5, 2)).hp = 194;
@@ -548,6 +567,8 @@ fn test_combat_1() {
 #..G#E#
 #.....#
 #######"#,
+        3,
+        3,
     );
 
     assert_eq!(state.to_death(), 46);
@@ -565,6 +586,8 @@ fn test_combat_2() {
 #G..#.#
 #..E#.#
 #######"#,
+        3,
+        3,
     );
 
     assert_eq!(state.to_death(), 46);
