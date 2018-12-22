@@ -1,14 +1,16 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
-use std::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 // represent a single entry, for example #1 @ 1,3: 4x4
+#[derive(Debug)]
 pub struct Area {
-    id: u64,
-    points: Box<HashSet<String>>,
+    id: usize,
+    left: usize,
+    top: usize,
+    width: usize,
+    height: usize,
 }
 
 lazy_static! {
@@ -20,72 +22,72 @@ lazy_static! {
 impl Area {
     pub fn from_str(text: &str) -> Self {
         for caps in RE.captures_iter(text) {
-            let id = caps["id"].parse::<u64>().unwrap();
-            let x = caps["x"].parse::<u64>().unwrap();
-            let y = caps["y"].parse::<u64>().unwrap();
-            let width = caps["width"].parse::<u64>().unwrap();
-            let length = caps["length"].parse::<u64>().unwrap();
-
-            let mut points = Box::new(HashSet::new());
-            for i in 0..width {
-                for j in 0..length {
-                    points.insert(format!("{}x{}", x + i, y + j));
-                }
-            }
+            let id = caps["id"].parse::<usize>().unwrap();
+            let x = caps["x"].parse::<usize>().unwrap();
+            let y = caps["y"].parse::<usize>().unwrap();
+            let width = caps["width"].parse::<usize>().unwrap();
+            let length = caps["length"].parse::<usize>().unwrap();
 
             return Area {
                 id: id,
-                points: points,
+                left: x,
+                top: y,
+                width: width,
+                height: length,
             };
         }
         unreachable!();
     }
-
-    pub fn intersect(&self, area: &Area) -> bool {
-        let intersect_set: HashSet<_> = self.points.intersection(&area.points).collect();
-        !intersect_set.is_empty()
-    }
-}
-
-impl fmt::Debug for Area {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "Area {{ id: {}, number of points: {} }}",
-            self.id,
-            self.points.len()
-        )
-    }
 }
 
 pub fn answer1() {
-    let inputs = read_file();
+    let areas = read_file();
 
-    let mut total_points = HashMap::new();
-    for area in &inputs {
-        for key in area.points.iter() {
-            total_points.entry(key).and_modify(|e| *e += 1).or_insert(1);
+    let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
+    let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
+    let mut claims = vec![vec!(0usize, width); height];
+    for p in &areas {
+        for x in p.left..p.left + p.width {
+            for y in p.top..p.top + p.height {
+                claims[y][x] += 1;
+            }
         }
     }
 
-    total_points.retain(|_k, v| *v >= 2);
-    println!("No Matter How You Slice It (1/2): {}", total_points.len());
+    let conflicts = claims
+        .iter()
+        .map(|v| v.iter().filter(|&c| *c > 1).count())
+        .sum::<usize>();
+
+    println!("No Matter How You Slice It (1/2): {}", conflicts);
 }
 
 pub fn answer2() {
-    let inputs = read_file();
+    let areas = read_file();
 
-    'candidat: for candidat in &inputs {
-        //println!("evaluating {:?}", candidat);
-        for area in &inputs {
-            if candidat.id != area.id && candidat.intersect(&area) {
-                //println!("{:?} intersects with {:?}", candidat.id, area.id);
-                continue 'candidat;
+    let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
+    let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
+    let mut claims = vec![vec!(0usize, width); height];
+    for p in &areas {
+        for x in p.left..p.left + p.width {
+            for y in p.top..p.top + p.height {
+                claims[y][x] += 1;
             }
         }
-        // candidat intersect with no-one
-        println!("No Matter How You Slice It (2/2): {:?}", candidat.id);
-        return;
+    }
+
+    for p in &areas {
+        let mut ok = true;
+        for x in p.left..p.left + p.width {
+            for y in p.top..p.top + p.height {
+                if claims[y][x] > 1 {
+                    ok = false;
+                }
+            }
+        }
+        if ok {
+            println!("No Matter How You Slice It (2/2): {:?}", p.id);
+        }
     }
 }
 
