@@ -42,7 +42,7 @@ pub fn answer1() {
         }
     }
 
-    println!("answer1: {}x{}: max {}", result_x, result_y, max_sum);
+    println!("Chronal Charge (1/2): {},{}", result_x, result_y);
 }
 
 pub fn answer2() {
@@ -89,8 +89,8 @@ pub fn answer2() {
     }
 
     println!(
-        "answer2: {}x{} (size {}): max {}",
-        result_x, result_y, max_size, max_sum
+        "Chronal Charge (2/2): {},{},{}",
+        result_x, result_y, max_size
     );
 }
 

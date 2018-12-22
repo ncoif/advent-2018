@@ -289,14 +289,14 @@ pub fn answer1() {
     let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
 
     let result = combat1(&s);
-    println!("BeverageBandits (1/2): {:?}", result.0 * result.1);
+    println!("Beverage Bandits (1/2): {:?}", result.0 * result.1);
 }
 
 pub fn answer2() {
     let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
 
     let result = combat2(&s);
-    println!("BeverageBandits (2/2): {:?}", result.0 * result.1);
+    println!("Beverage Bandits (2/2): {:?}", result.0 * result.1);
 }
 
 #[test]

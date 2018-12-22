@@ -41,11 +41,11 @@ fn play(players: usize, points: usize) -> usize {
 }
 
 pub fn answer1() {
-    println!("Answer1: {}", play(486, 70833));
+    println!("Marble Mania (1/2): {}", play(486, 70833));
 }
 
 pub fn answer2() {
-    println!("Answer2: {}", play(486, 70833 * 100));
+    println!("Marble Mania (2/2): {}", play(486, 70833 * 100));
 }
 
 #[test]

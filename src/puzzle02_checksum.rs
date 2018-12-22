@@ -21,7 +21,7 @@ pub fn answer1() {
             (double, triple)
         });
 
-    println!("Checksum: {}", double * triple);
+    println!("Inventory Management System (1/2): {}", double * triple);
 }
 
 pub fn answer2() {
@@ -39,7 +39,7 @@ pub fn answer2() {
         }
     }
 
-    println!("Common letter between correct boxes: {:?}", result);
+    println!("Inventory Management System (2/2): {:?}", result.unwrap());
 }
 
 fn read_file() -> Vec<String> {

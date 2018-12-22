@@ -69,7 +69,7 @@ pub fn answer1() {
     }
 
     total_points.retain(|_k, v| *v >= 2);
-    println!("Answer1: {}", total_points.len());
+    println!("No Matter How You Slice It (1/2): {}", total_points.len());
 }
 
 pub fn answer2() {
@@ -84,7 +84,7 @@ pub fn answer2() {
             }
         }
         // candidat intersect with no-one
-        println!("Answer2: {:?}", candidat);
+        println!("No Matter How You Slice It (2/2): {:?}", candidat.id);
         return;
     }
 }

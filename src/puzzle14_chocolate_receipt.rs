@@ -42,7 +42,6 @@ fn simulate2(input: &[u8]) -> usize {
         elf2: 1,
     };
 
-    let mut steps_count = input.len();
     loop {
         let slice = if s.list.len() > 10 {
             // only check the latest 10 elements
@@ -54,11 +53,6 @@ fn simulate2(input: &[u8]) -> usize {
             break;
         }
         s.step();
-
-        steps_count += 1;
-        if steps_count % 1000_000 == 0 {
-            println!("Tried {} steps so far", steps_count);
-        }
     }
 
     s.list
@@ -68,11 +62,14 @@ fn simulate2(input: &[u8]) -> usize {
 }
 
 pub fn answer1() {
-    println!("answer1: {:?}", simulate1(580741));
+    println!("Chocolate Charts (1/2): {:?}", simulate1(580741));
 }
 
 pub fn answer2() {
-    println!("answer1: {:?}", simulate2(&vec![5, 8, 0, 7, 4, 1]));
+    println!(
+        "Chocolate Charts (2/2): {:?}",
+        simulate2(&vec![5, 8, 0, 7, 4, 1])
+    );
 }
 
 #[test]

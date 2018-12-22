@@ -118,6 +118,9 @@ fn read_file() -> Vec<Star> {
 pub fn answer1() {
     let stars = read_file();
     let mut field = Field::new(stars);
+
+    println!("The Stars Align:");
+
     for _i in 0..12000 {
         field.step();
         field.display();

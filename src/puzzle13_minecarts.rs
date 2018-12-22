@@ -186,12 +186,14 @@ fn simulate2(s: &str) -> (usize, usize) {
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
-    println!("answer1: {:?}", simulate1(&s));
+    let result = simulate1(&s);
+    println!("Mine Cart Madness (1/2): {},{}", result.0, result.1);
 }
 
 pub fn answer2() {
     let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
-    println!("answer2: {:?}", simulate2(&s));
+    let result = simulate2(&s);
+    println!("Mine Cart Madness (2/2): {},{}", result.0, result.1);
 }
 
 #[test]

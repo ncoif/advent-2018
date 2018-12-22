@@ -43,7 +43,7 @@ pub fn answer1() {
     let poly = read_file();
     let reduce1 = reduce1(poly);
 
-    println!("Answer1: {}", reduce1);
+    println!("Alchemical Reduction (1/2): {}", reduce1);
 }
 
 pub fn answer2() {
@@ -61,5 +61,5 @@ pub fn answer2() {
             minimal_length = candidate;
         }
     }
-    println!("Answer2: {}", minimal_length);
+    println!("Alchemical Reduction (2/2): {}", minimal_length);
 }

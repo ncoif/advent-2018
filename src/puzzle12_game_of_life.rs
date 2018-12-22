@@ -62,7 +62,7 @@ fn generations(s: &str) -> isize {
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input12.txt").expect("cannot read file");
-    println!("answer1: {}", generations(&s));
+    println!("Subterranean Sustainability (1/2): {}", generations(&s));
 }
 
 pub fn answer2() {
@@ -85,13 +85,6 @@ pub fn answer2() {
     let mut i = 0;
 
     let result = loop {
-        println!(
-            "{}: {}, {} -> {}",
-            i,
-            current.state,
-            current.offset,
-            current.sum()
-        );
         let next = current.step(&rules);
         // if the state is indentical (but the offset might change), then we are stable and we break
         if next.state == current.state {
@@ -103,7 +96,7 @@ pub fn answer2() {
         current = next;
     };
 
-    println!("answer2: {}", result);
+    println!("Subterranean Sustainability (1/2): {}", result);
 }
 
 #[test]

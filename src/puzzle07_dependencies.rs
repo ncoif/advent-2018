@@ -119,11 +119,11 @@ fn read_file() -> Vec<Dependency> {
 pub fn answer1() {
     let mut dependencies = read_file();
     let order = instruction_order(&mut dependencies);
-    println!("answer1: {}", order);
+    println!("The Sum Of Its Parts (1/2): {}", order);
 }
 
 pub fn answer2() {
     let mut dependencies = read_file();
     let total_time = execute_in_parallel(&mut dependencies, 5, 60);
-    println!("answer2: {}", total_time);
+    println!("The Sum Of Its Parts (2/2): {}", total_time);
 }
