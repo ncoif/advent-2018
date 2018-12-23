@@ -15,6 +15,7 @@ mod puzzle12_game_of_life;
 mod puzzle13_minecarts;
 mod puzzle14_chocolate_receipt;
 mod puzzle15_combat;
+mod puzzle16_opcode;
 
 fn main() {
     let day: u32 = env::args()
