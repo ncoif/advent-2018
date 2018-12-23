@@ -45,3 +45,6 @@ time target/release/aoc 14 2
 
 time target/release/aoc 15 1
 time target/release/aoc 15 2
+
+time target/release/aoc 16 1
+time target/release/aoc 16 2
