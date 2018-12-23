@@ -15,7 +15,7 @@ pub struct Area {
 
 lazy_static! {
     static ref RE: Regex =
-        Regex::new(r"#(?P<id>\d+) @ (?P<x>\d+),(?P<y>\d+): (?P<width>\d+)x(?P<length>\d+)")
+        Regex::new(r"#(?P<id>\d+) @ (?P<left>\d+),(?P<top>\d+): (?P<width>\d+)x(?P<height>\d+)")
             .unwrap();
 }
 
@@ -23,17 +23,17 @@ impl Area {
     pub fn from_str(text: &str) -> Self {
         for caps in RE.captures_iter(text) {
             let id = caps["id"].parse::<usize>().unwrap();
-            let x = caps["x"].parse::<usize>().unwrap();
-            let y = caps["y"].parse::<usize>().unwrap();
+            let left = caps["left"].parse::<usize>().unwrap();
+            let top = caps["top"].parse::<usize>().unwrap();
             let width = caps["width"].parse::<usize>().unwrap();
-            let length = caps["length"].parse::<usize>().unwrap();
+            let height = caps["height"].parse::<usize>().unwrap();
 
             return Area {
-                id: id,
-                left: x,
-                top: y,
-                width: width,
-                height: length,
+                id,
+                left,
+                top,
+                width,
+                height,
             };
         }
         unreachable!();
@@ -45,7 +45,7 @@ pub fn answer1() {
 
     let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
     let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
-    let mut claims = vec![vec!(0usize, width); height];
+    let mut claims = vec![vec![0usize; width]; height];
     for p in &areas {
         for x in p.left..p.left + p.width {
             for y in p.top..p.top + p.height {
@@ -67,7 +67,7 @@ pub fn answer2() {
 
     let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
     let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
-    let mut claims = vec![vec!(0usize, width); height];
+    let mut claims = vec![vec![0usize; width]; height];
     for p in &areas {
         for x in p.left..p.left + p.width {
             for y in p.top..p.top + p.height {

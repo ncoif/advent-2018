@@ -96,7 +96,7 @@ pub fn answer2() {
         current = next;
     };
 
-    println!("Subterranean Sustainability (1/2): {}", result);
+    println!("Subterranean Sustainability (2/2): {}", result);
 }
 
 #[test]

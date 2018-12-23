@@ -80,8 +80,6 @@ impl Field {
 
         // only display images of reasonable size
         if (max_x - min_x) < 100 && (max_y - min_y) < 15 {
-            println!("{}: {}x{}: {}x{}", self.time, min_x, max_x, min_y, max_y);
-
             let mut pic = vec![false; ((max_x - min_x + 1) * (max_y - min_y + 1)) as usize];
             let access = |x, y| (x - min_x + (max_x - min_x + 1) * (y - min_y)) as usize;
 
@@ -89,6 +87,7 @@ impl Field {
                 pic[access(star.pos_x, star.pos_y)] = true;
             }
 
+            println!("The Stars Align (1/2):");
             for y in min_y..=max_y {
                 for x in min_x..=max_x {
                     match pic[access(x, y)] {
@@ -98,6 +97,7 @@ impl Field {
                 }
                 println!("");
             }
+            println!("The Stars Align (2/2): {}", self.time);
         }
     }
 }
@@ -118,8 +118,6 @@ fn read_file() -> Vec<Star> {
 pub fn answer1() {
     let stars = read_file();
     let mut field = Field::new(stars);
-
-    println!("The Stars Align:");
 
     for _i in 0..12000 {
         field.step();
