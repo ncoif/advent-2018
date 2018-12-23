@@ -75,6 +75,8 @@ fn main() {
         151 => puzzle15_combat::answer1(),
         152 => puzzle15_combat::answer2(),
 
+        161 => puzzle16_opcode::answer1(),
+
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
 }

@@ -40,6 +40,66 @@ impl Opcode {
     }
 }
 
+struct Sample {
+    before: [usize; 4],
+    input: [usize; 4],
+    after: [usize; 4],
+}
+
+impl Sample {
+    fn from_slice(v: &[usize]) -> [usize; 4] {
+        let mut array = [0; 4];
+        array.copy_from_slice(v);
+        array
+    }
+
+    fn parse(s: &str) -> Vec<Sample> {
+        let mut lines = s.split("\n");
+
+        let mut samples = vec![];
+        while let Some(before_line) = &lines.next() {
+            // skip blank lines
+            if *before_line == "" {
+                continue;
+            }
+            let before_vec: Vec<usize> = before_line[9..]
+                .trim_right_matches("]")
+                .split(", ")
+                .map(|t| t.parse::<usize>().unwrap())
+                .collect();
+
+            let input_line = &lines.next().unwrap();
+            let input_vec: Vec<usize> = input_line[..]
+                .split(" ")
+                .map(|t| t.parse::<usize>().unwrap())
+                .collect();
+
+            let after_line = &lines.next().unwrap();
+            let after_vec: Vec<usize> = after_line[9..]
+                .trim_right_matches("]")
+                .split(", ")
+                .map(|t| t.parse::<usize>().unwrap())
+                .collect();
+
+            samples.push(Sample {
+                before: Sample::from_slice(&before_vec),
+                input: Sample::from_slice(&input_vec),
+                after: Sample::from_slice(&after_vec),
+            });
+        }
+
+        samples
+    }
+}
+
+pub fn answer1() {
+    let s = std::fs::read_to_string("input/input16_q1.txt").expect("cannot read file");
+
+    let samples = Sample::parse(&s);
+
+    println!("Chronal Classification (1/2): {:?}", 0);
+}
+
 #[test]
 fn test_addi() {
     let inputs = vec![2, 1, 2];
