@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Opcode {
     Addr,
     Addi,
@@ -18,6 +21,27 @@ enum Opcode {
 }
 
 impl Opcode {
+    fn all() -> &'static [Opcode] {
+        &[
+            Opcode::Addr,
+            Opcode::Addi,
+            Opcode::Mulr,
+            Opcode::Muli,
+            Opcode::Banr,
+            Opcode::Bani,
+            Opcode::Borr,
+            Opcode::Bori,
+            Opcode::Setr,
+            Opcode::Seti,
+            Opcode::Gtir,
+            Opcode::Gtri,
+            Opcode::Gtrr,
+            Opcode::Eqir,
+            Opcode::Eqri,
+            Opcode::Eqrr,
+        ]
+    }
+
     fn apply(&self, i: &[usize], r: &mut [usize]) {
         match self {
             Opcode::Addr => r[i[2]] = r[i[0]] + r[i[1]],
@@ -90,14 +114,72 @@ impl Sample {
 
         samples
     }
+
+    fn probe_ops(&self, ops: impl Iterator<Item = Opcode>) -> Vec<Opcode> {
+        ops.filter(|op| {
+            let mut regs = self.before.clone();
+            op.apply(&self.input[1..4] as _, &mut regs);
+            regs == self.after
+        })
+        .collect()
+    }
+
+    fn opcode(&self) -> usize {
+        self.input[0]
+    }
 }
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input16_q1.txt").expect("cannot read file");
-
     let samples = Sample::parse(&s);
 
-    println!("Chronal Classification (1/2): {:?}", 0);
+    let mut triple_candidates = 0;
+    for sample in samples.iter() {
+        let candidates = sample.probe_ops(Opcode::all().to_vec().iter().cloned());
+        if candidates.len() >= 3 {
+            triple_candidates += 1;
+        }
+    }
+
+    println!("Chronal Classification (1/2): {:?}", triple_candidates);
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input16_q1.txt").expect("cannot read file");
+    let samples = Sample::parse(&s);
+
+    let mut to_map = Opcode::all().to_vec();
+    let mut mapped: HashMap<usize, Opcode> = HashMap::new();
+    for sample in samples.iter().cycle() {
+        if mapped.contains_key(&sample.opcode()) {
+            continue;
+        }
+        let candidates = sample.probe_ops(to_map.iter().cloned());
+        if candidates.len() == 1 {
+            let op = candidates[0];
+            to_map.retain(|&tm| tm != op);
+            mapped.insert(sample.opcode(), op);
+        }
+        if to_map.len() == 0 {
+            break;
+        }
+    }
+
+    let prog = std::fs::read_to_string("input/input16_q2.txt").expect("cannot read file");
+    let mut reg = [0; 4];
+    for inst in prog.split("\n").filter(|l| l.len() > 0) {
+        let mut tokens = inst.split(" ").map(|s| s.parse::<usize>().unwrap());
+        let opcode = tokens.next().unwrap() as usize;
+        let op = mapped[&opcode];
+        let args = [
+            tokens.next().unwrap(),
+            tokens.next().unwrap(),
+            tokens.next().unwrap(),
+        ];
+        op.apply(&args, &mut reg);
+    }
+
+    println!("Chronal Classification (2/2): {:?}", reg[0]);
 }
 
 #[test]
