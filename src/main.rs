@@ -16,6 +16,7 @@ mod puzzle13_minecarts;
 mod puzzle14_chocolate_receipt;
 mod puzzle15_combat;
 mod puzzle16_opcode;
+mod puzzle17_water;
 
 fn main() {
     let day: u32 = env::args()
@@ -77,6 +78,8 @@ fn main() {
 
         161 => puzzle16_opcode::answer1(),
         162 => puzzle16_opcode::answer2(),
+
+        171 => puzzle17_water::answer1(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
