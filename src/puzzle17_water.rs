@@ -152,7 +152,7 @@ impl Ground {
     fn count_water(&self) -> u32 {
         let mut water_count = 0;
         for y in 0..=self.y_max {
-            for x in self.x_min..=self.x_max {
+            for x in self.x_min - 1..=self.x_max + 1 {
                 if self.field[y][x] == Still || self.field[y][x] == Flow {
                     water_count += 1;
                 }
