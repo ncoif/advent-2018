@@ -66,7 +66,7 @@ struct Ground {
     field: Vec<Vec<State>>,
     x_min: usize,
     x_max: usize,
-    y_min: usize,
+    //y_min: usize,
     y_max: usize,
 }
 
@@ -74,10 +74,10 @@ impl Ground {
     fn from_veins(veins: &Vec<Vein>) -> Ground {
         let x_min = veins.iter().map(|v| min(v.x_start, v.x_end)).min().unwrap() as usize;
         let x_max = veins.iter().map(|v| max(v.x_start, v.x_end)).max().unwrap() as usize;
-        let y_min = veins.iter().map(|v| min(v.y_start, v.y_end)).min().unwrap() as usize;
+        //let y_min = veins.iter().map(|v| min(v.y_start, v.y_end)).min().unwrap() as usize;
         let y_max = veins.iter().map(|v| max(v.y_start, v.y_end)).max().unwrap() as usize;
 
-        let mut field = vec![vec![State::Sand; x_max + 1]; y_max + 1];
+        let mut field = vec![vec![State::Sand; x_max + 2]; y_max + 1];
         for vein in veins {
             for x in vein.x_start..=vein.x_end {
                 for y in vein.y_start..=vein.y_end {
@@ -90,15 +90,15 @@ impl Ground {
             field,
             x_min,
             x_max,
-            y_min,
+            //y_min,
             y_max,
         }
     }
 
     // Recursively fill the grid in given direction, starting at given point.
     fn fill(&mut self, x: usize, y: usize, flow: Flow) {
-        println!("fill: x={}, y={}, flow={:?}", x, y, flow);
-        println!("{}", self);
+        //println!("fill: x={}, y={}, flow={:?}", x, y, flow);
+        //println!("{}", self);
         match flow {
             Flow::Down => {
                 for dy in 1.. {
@@ -148,6 +148,19 @@ impl Ground {
             }
         }
     }
+
+    fn count_water(&self) -> u32 {
+        let mut water_count = 0;
+        for y in 0..=self.y_max {
+            for x in self.x_min..=self.x_max {
+                if self.field[y][x] == Still || self.field[y][x] == Flow {
+                    water_count += 1;
+                }
+            }
+        }
+
+        water_count
+    }
 }
 
 impl fmt::Display for State {
@@ -165,7 +178,7 @@ impl fmt::Display for Ground {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "Ground:")?;
         for y in 0..=self.y_max {
-            for x in self.x_min..=self.x_max {
+            for x in self.x_min - 1..=self.x_max + 1 {
                 write!(f, "{}", self.field[y][x])?;
             }
             writeln!(f, "")?;
@@ -188,9 +201,12 @@ fn read_file(filename: &str) -> Vec<Vein> {
 
 pub fn answer1() {
     let veins = read_file("input/input17.txt");
-    println!("veins: {:?}", veins);
 
-    println!("Reservoir Research (1/2): {}", 0);
+    let mut ground = Ground::from_veins(&veins);
+    ground.fill(500, 0, Flow::Down);
+    //println!("{}", ground);
+
+    println!("Reservoir Research (1/2): {}", ground.count_water());
 }
 
 #[test]
@@ -202,7 +218,7 @@ fn test_parse() {
     println!("{}", field);
     assert_eq!(495, field.x_min);
     assert_eq!(506, field.x_max);
-    assert_eq!(1, field.y_min);
+    //assert_eq!(1, field.y_min);
     assert_eq!(13, field.y_max);
 }
 
@@ -215,5 +231,5 @@ fn test_fill() {
 
     ground.fill(500, 0, Flow::Down);
     println!("{}", ground);
-    assert_eq!(false, true);
+    assert_eq!(57, ground.count_water());
 }
