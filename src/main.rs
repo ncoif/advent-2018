@@ -80,6 +80,7 @@ fn main() {
         162 => puzzle16_opcode::answer2(),
 
         171 => puzzle17_water::answer1(),
+        172 => puzzle17_water::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }

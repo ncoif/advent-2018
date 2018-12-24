@@ -66,7 +66,7 @@ struct Ground {
     field: Vec<Vec<State>>,
     x_min: usize,
     x_max: usize,
-    //y_min: usize,
+    y_min: usize,
     y_max: usize,
 }
 
@@ -74,7 +74,7 @@ impl Ground {
     fn from_veins(veins: &Vec<Vein>) -> Ground {
         let x_min = veins.iter().map(|v| min(v.x_start, v.x_end)).min().unwrap() as usize;
         let x_max = veins.iter().map(|v| max(v.x_start, v.x_end)).max().unwrap() as usize;
-        //let y_min = veins.iter().map(|v| min(v.y_start, v.y_end)).min().unwrap() as usize;
+        let y_min = veins.iter().map(|v| min(v.y_start, v.y_end)).min().unwrap() as usize;
         let y_max = veins.iter().map(|v| max(v.y_start, v.y_end)).max().unwrap() as usize;
 
         let mut field = vec![vec![State::Sand; x_max + 2]; y_max + 1];
@@ -90,7 +90,7 @@ impl Ground {
             field,
             x_min,
             x_max,
-            //y_min,
+            y_min,
             y_max,
         }
     }
@@ -149,17 +149,20 @@ impl Ground {
         }
     }
 
-    fn count_water(&self) -> u32 {
-        let mut water_count = 0;
-        for y in 0..=self.y_max {
+    fn count_water(&self) -> (u32, u32) {
+        let mut still_count = 0;
+        let mut flow_count = 0;
+        for y in self.y_min..=self.y_max {
             for x in self.x_min - 1..=self.x_max + 1 {
-                if self.field[y][x] == Still || self.field[y][x] == Flow {
-                    water_count += 1;
+                if self.field[y][x] == Still {
+                    still_count += 1;
+                } else if self.field[y][x] == Flow {
+                    flow_count += 1;
                 }
             }
         }
 
-        water_count
+        (still_count, flow_count)
     }
 }
 
@@ -206,7 +209,18 @@ pub fn answer1() {
     ground.fill(500, 0, Flow::Down);
     //println!("{}", ground);
 
-    println!("Reservoir Research (1/2): {}", ground.count_water());
+    let count = ground.count_water();
+    println!("Reservoir Research (1/2): {}", count.0 + count.1);
+}
+
+pub fn answer2() {
+    let veins = read_file("input/input17.txt");
+
+    let mut ground = Ground::from_veins(&veins);
+    ground.fill(500, 0, Flow::Down);
+
+    let count = ground.count_water();
+    println!("Reservoir Research (2/2): {}", count.0);
 }
 
 #[test]
@@ -231,5 +245,5 @@ fn test_fill() {
 
     ground.fill(500, 0, Flow::Down);
     println!("{}", ground);
-    assert_eq!(57, ground.count_water());
+    assert_eq!((29, 28), ground.count_water());
 }
