@@ -1,3 +1,4 @@
+use self::State::*;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::cmp::{max, min};
@@ -47,12 +48,13 @@ impl Vein {
     }
 }
 
+#[derive(Debug)]
 enum Flow {
     Down,
     Side,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum State {
     Sand,
     Clay,
@@ -94,7 +96,58 @@ impl Ground {
     }
 
     // Recursively fill the grid in given direction, starting at given point.
-    fn fill(&mut self, x: usize, y: usize, flow: Flow) {}
+    fn fill(&mut self, x: usize, y: usize, flow: Flow) {
+        println!("fill: x={}, y={}, flow={:?}", x, y, flow);
+        println!("{}", self);
+        match flow {
+            Flow::Down => {
+                for dy in 1.. {
+                    if y + dy > self.y_max {
+                        break; // stop at the bottom of the grid
+                    }
+                    match self.field[y + dy][x] {
+                        Sand => self.field[y + dy][x] = Flow,
+                        Flow => break,
+                        Clay | Still => {
+                            self.fill(x, y + dy - 1, Flow::Side);
+                            break;
+                        }
+                    }
+                }
+            }
+            Flow::Side => {
+                self.field[y][x] = Flow;
+                let mut limit = [0, 0];
+                // dir == 0 try left, dir == 1, try right
+                for dir in 0..=1 {
+                    for dx in 1.. {
+                        let new_x = if dir == 0 { x - dx } else { x + dx };
+                        match self.field[y][new_x] {
+                            Clay | Still => {
+                                limit[dir] = new_x;
+                                break;
+                            }
+                            Flow | Sand => {
+                                self.field[y][new_x] = Flow;
+                                if self.field[y + 1][new_x] == Sand {
+                                    // if there is a space under me
+                                    self.fill(new_x, y, Flow::Down);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                // if we reached both side, make it still, and flow from the level above
+                if limit[0] > 0 && limit[1] > 0 {
+                    for cur_x in limit[0] + 1..limit[1] {
+                        self.field[y][cur_x] = Still;
+                    }
+                    self.fill(x, y - 1, Flow::Side);
+                }
+            }
+        }
+    }
 }
 
 impl fmt::Display for State {
@@ -111,7 +164,7 @@ impl fmt::Display for State {
 impl fmt::Display for Ground {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "Ground:")?;
-        for y in self.y_min..=self.y_max {
+        for y in 0..=self.y_max {
             for x in self.x_min..=self.x_max {
                 write!(f, "{}", self.field[y][x])?;
             }
@@ -151,4 +204,16 @@ fn test_parse() {
     assert_eq!(506, field.x_max);
     assert_eq!(1, field.y_min);
     assert_eq!(13, field.y_max);
+}
+
+#[test]
+fn test_fill() {
+    let veins = read_file("input/input17_debug.txt");
+
+    let mut ground = Ground::from_veins(&veins);
+    println!("{}", ground);
+
+    ground.fill(500, 0, Flow::Down);
+    println!("{}", ground);
+    assert_eq!(false, true);
 }
