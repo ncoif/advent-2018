@@ -92,6 +92,7 @@ fn main() {
         192 => puzzle19_opcode_jumps::answer2(),
 
         201 => puzzle20_rooms::answer1(),
+        202 => puzzle20_rooms::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }

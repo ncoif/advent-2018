@@ -76,6 +76,7 @@ fn distances(expr: &Hir, dists: &mut Distances, c: Coord) -> Result<Coord> {
 
 fn build_distances(s: &str) -> Result<Distances> {
     // use regex-syntax to build a high-level intermediate representation ("HIR") of regular expression
+    // https://docs.rs/regex-syntax/0.6.4/regex_syntax/
     let expr = ParserBuilder::new()
         .nest_limit(1000)
         .build()
@@ -100,6 +101,14 @@ pub fn answer1() {
     let result = max_distance(&dists);
 
     println!("A Regular Map (1/2): {:?}", result);
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input20.txt").expect("cannot read file");
+    let dists = build_distances(&s).unwrap();
+    let rooms = dists.values().filter(|&&d| d >= 1000).count();
+
+    println!("A Regular Map (2/2): {:?}", rooms);
 }
 
 #[test]
