@@ -19,6 +19,7 @@ mod puzzle16_opcode;
 mod puzzle17_water;
 mod puzzle18_trees;
 mod puzzle19_opcode_jumps;
+mod puzzle20_rooms;
 
 fn main() {
     let day: u32 = env::args()
@@ -89,6 +90,8 @@ fn main() {
 
         191 => puzzle19_opcode_jumps::answer1(),
         192 => puzzle19_opcode_jumps::answer2(),
+
+        201 => puzzle20_rooms::answer1(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
