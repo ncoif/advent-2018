@@ -1,5 +1,6 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::collections::HashSet;
 use std::str::FromStr;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -142,6 +143,56 @@ impl Prog {
             }
         }
     }
+
+    fn run_get_first_ip30(&self, reg: &mut [usize]) -> usize {
+        let ip = self.ip;
+
+        loop {
+            if reg[ip] == 30 {
+                break;
+            }
+
+            let cur = &self.instructions[reg[ip]];
+            cur.op.apply(&cur.args, reg);
+            reg[ip] += 1;
+
+            if reg[ip] >= self.instructions.len() {
+                break;
+            }
+        }
+
+        reg[4]
+    }
+
+    // run the program in a loop, and collect all values in R4 for instructions 30, trying to find a cycle
+    // return the max if a cycle is found
+    fn run_with_ip30_cycle(&self, reg: &mut [usize]) -> usize {
+        let mut candidates = HashSet::new();
+        let mut cycle = vec![];
+        let ip = self.ip;
+
+        loop {
+            if reg[ip] == 30 {
+                let r4 = reg[4];
+                if candidates.contains(&r4) {
+                    break;
+                } else {
+                    candidates.insert(r4);
+                    cycle.push(r4);
+                }
+            }
+
+            let cur = &self.instructions[reg[ip]];
+            cur.op.apply(&cur.args, reg);
+            reg[ip] += 1;
+
+            if reg[ip] >= self.instructions.len() {
+                break;
+            }
+        }
+
+        *cycle.last().unwrap()
+    }
 }
 
 pub fn answer1() {
@@ -152,8 +203,27 @@ pub fn answer1() {
     //ip=30, reg = [0, 30, 1, 1, 15823996, 0]
     // so trying to see if using R0 15823996 halts
     let mut reg = [0; 6];
-    reg[0] = 15823996;
+    let r0 = prog.run_get_first_ip30(&mut reg); //15823996
+
+    let mut reg = [0; 6];
+    reg[0] = r0;
     prog.run(&mut reg);
 
     println!("Go With The Flow (1/2): {:?}", reg[0]);
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input21.txt").expect("cannot read file");
+    let prog = Prog::from_str(&s).unwrap();
+
+    // look for all possible values of R4 for ip30 when running a program, and break once we found a cycle
+    let mut reg = [0; 6];
+    let r0 = prog.run_with_ip30_cycle(&mut reg);
+
+    // using this r0, run the program to confirm that it halts
+    let mut reg = [0; 6];
+    reg[0] = r0;
+    prog.run(&mut reg);
+
+    println!("Go With The Flow (2/2): {:?}", reg[0]);
 }
