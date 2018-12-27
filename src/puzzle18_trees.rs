@@ -151,10 +151,36 @@ impl World {
     fn height(&self) -> usize {
         self.grid.len()
     }
+
+    fn count_resources(&self) -> (u32, u32) {
+        let (mut wooded, mut lumber) = (0, 0);
+
+        for y in 0..self.height() {
+            for x in 0..self.width() {
+                if self.grid[y][x] == Acre::Trees {
+                    wooded += 1;
+                }
+                if self.grid[y][x] == Acre::Lumberyard {
+                    lumber += 1;
+                }
+            }
+        }
+
+        (wooded, lumber)
+    }
 }
 
 pub fn answer1() {
-    println!("Settlers of The North Pole (1/2): {}", 0);
+    let s = std::fs::read_to_string("input/input18.txt").expect("cannot read file");
+    let mut world = World::from_str(&s).expect("failed to parse world");
+
+    (0..10).for_each(|_| world.step());
+    let resources = world.count_resources();
+
+    println!(
+        "Settlers of The North Pole (1/2): {}",
+        resources.0 * resources.1
+    );
 }
 
 #[test]
@@ -214,4 +240,25 @@ fn test_step() {
     .unwrap();
 
     assert_eq!(expected, world);
+}
+
+#[test]
+fn test_count_resources() {
+    let mut world = World::from_str(
+        r#"
+.#.#...|#.
+.....#|##|
+.|..|...#.
+..|#.....#
+#.#|||#|#|
+...#.||...
+.|....|...
+||...#|.#|
+|.||||..|.
+...#.|..|."#,
+    )
+    .unwrap();
+    (0..10).for_each(|_| world.step());
+
+    assert_eq!((37, 31), world.count_resources());
 }
