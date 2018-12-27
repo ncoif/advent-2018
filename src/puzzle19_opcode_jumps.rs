@@ -50,27 +50,6 @@ impl FromStr for Opcode {
 }
 
 impl Opcode {
-    fn all() -> &'static [Opcode] {
-        &[
-            Opcode::Addr,
-            Opcode::Addi,
-            Opcode::Mulr,
-            Opcode::Muli,
-            Opcode::Banr,
-            Opcode::Bani,
-            Opcode::Borr,
-            Opcode::Bori,
-            Opcode::Setr,
-            Opcode::Seti,
-            Opcode::Gtir,
-            Opcode::Gtri,
-            Opcode::Gtrr,
-            Opcode::Eqir,
-            Opcode::Eqri,
-            Opcode::Eqrr,
-        ]
-    }
-
     fn apply(&self, i: &[usize], r: &mut [usize]) {
         match self {
             Opcode::Addr => r[i[2]] = r[i[0]] + r[i[1]],
