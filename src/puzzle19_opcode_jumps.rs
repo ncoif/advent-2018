@@ -133,14 +133,29 @@ impl Prog {
         let ip = self.ip;
 
         loop {
-            let cur = &self.instructions[reg[ip]];
-            cur.op.apply(&cur.args, reg);
-            reg[ip] += 1;
+            if reg[ip] == 3 {
+                self.fast(reg);
+            } else {
+                let cur = &self.instructions[reg[ip]];
+                cur.op.apply(&cur.args, reg);
+                reg[ip] += 1;
 
-            if reg[ip] >= self.instructions.len() {
-                break;
+                if reg[ip] >= self.instructions.len() {
+                    break;
+                }
             }
         }
+    }
+
+    fn fast(&self, reg: &mut [usize]) {
+        // From lines 3 to 11 apreas to be a be a very inefficient way of determining whether R3 divides R2
+
+        if reg[2] % reg[3] == 0 {
+            reg[0] = reg[0] + reg[3];
+        }
+        reg[1] = reg[2];
+        reg[4] = 0;
+        reg[5] = 12;
     }
 }
 
