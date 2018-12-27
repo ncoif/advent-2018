@@ -149,9 +149,28 @@ impl FromStr for Prog {
     }
 }
 
+impl Prog {
+    fn run(&self, reg: &mut [usize]) {
+        let ip = self.ip;
+
+        loop {
+            let cur = &self.instructions[reg[ip]];
+            cur.op.apply(&cur.args, reg);
+            reg[ip] += 1;
+
+            if reg[ip] >= self.instructions.len() {
+                break;
+            }
+        }
+    }
+}
+
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input19.txt").expect("cannot read file");
-    let mut reg = [0; 4];
+    let prog = Prog::from_str(&s).unwrap();
+
+    let mut reg = [0; 6];
+    prog.run(&mut reg);
 
     println!("Go With The Flow (1/2): {:?}", reg[0]);
 }
@@ -184,4 +203,25 @@ seti 9 0 5"#,
 
     assert_eq!(0, p.ip);
     assert_eq!(7, p.instructions.len());
+}
+
+#[test]
+fn test_run_prog() {
+    let p = Prog::from_str(
+        r#"#ip 0
+seti 5 0 1
+seti 6 0 2
+addi 0 1 0
+addr 1 2 3
+setr 1 0 0
+seti 8 0 4
+seti 9 0 5"#,
+    )
+    .unwrap();
+    println!("{:?}", p);
+
+    let mut reg = [0; 6];
+    p.run(&mut reg);
+
+    assert_eq!(6 + 1, reg[0]);
 }
