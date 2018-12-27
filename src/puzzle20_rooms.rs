@@ -1,6 +1,15 @@
-use regex_syntax::hir::{Hir, HirKind};
+use regex_syntax::hir::{self, Hir, HirKind};
 use regex_syntax::ParserBuilder;
+use std::cmp;
 use std::collections::HashMap;
+use std::error::Error;
+use std::result;
+
+type Result<T> = result::Result<T, Box<Error>>;
+
+macro_rules! err {
+    ($($tt:tt)*) => { Err(Box::<Error>::from(format!($($tt)*))) }
+}
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct Coord {
@@ -9,7 +18,7 @@ struct Coord {
 }
 
 impl Coord {
-    fn mv(self, direction: char) -> Result<Coord, ()> {
+    fn mv(self, direction: char) -> Result<Coord> {
         match direction {
             'N' => Ok(Coord {
                 x: self.x,
@@ -27,7 +36,7 @@ impl Coord {
                 x: self.x + 1,
                 y: self.y,
             }),
-            _ => Err(()),
+            _ => err!("unexpected character"),
         }
     }
 }
@@ -35,23 +44,50 @@ impl Coord {
 // discovering some kind of type alias in rust
 type Distances = HashMap<Coord, usize>;
 
-fn distances(expr: &Hir, dists: &mut Distances, c: Coord) {}
+// TODO: trying a proper Result response, so it seems I must return something, so I'm returning something meaningless
+fn distances(expr: &Hir, dists: &mut Distances, c: Coord) -> Result<Coord> {
+    match *expr.kind() {
+        HirKind::Literal(hir::Literal::Unicode(ch)) => {
+            let nextc = c.mv(ch)?;
+            let mut dist = dists[&c] + 1;
+            if dists.contains_key(&nextc) {
+                dist = cmp::min(dist, dists[&nextc])
+            }
+            dists.insert(nextc, dist);
+            Ok(nextc)
+        }
+        HirKind::Group(ref g) => distances(&g.hir, dists, c),
+        HirKind::Concat(ref exprs) => {
+            let mut nextc = c;
+            for e in exprs {
+                nextc = distances(e, dists, nextc)?;
+            }
+            Ok(nextc)
+        }
+        HirKind::Alternation(ref exprs) => {
+            for e in exprs {
+                distances(e, dists, c)?;
+            }
+            Ok(c)
+        }
+        _ => Ok(c), // we don't care
+    }
+}
 
-fn build_distances(s: &str) -> Distances {
+fn build_distances(s: &str) -> Result<Distances> {
     // use regex-syntax to build a high-level intermediate representation ("HIR") of regular expression
     let expr = ParserBuilder::new()
         .nest_limit(1000)
         .build()
-        .parse(s.trim())
-        .unwrap();
+        .parse(s.trim())?;
 
     let mut dists = Distances::new();
     let origin = Coord { x: 0, y: 0 };
     dists.insert(origin, 0);
 
-    distances(&expr, &mut dists, origin);
+    distances(&expr, &mut dists, origin)?;
 
-    dists
+    Ok(dists)
 }
 
 fn max_distance(dists: &Distances) -> usize {
@@ -60,14 +96,16 @@ fn max_distance(dists: &Distances) -> usize {
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input20.txt").expect("cannot read file");
+    let dists = build_distances(&s).unwrap();
+    let result = max_distance(&dists);
 
-    println!("A Regular Map (1/2): {:?}", 0);
+    println!("A Regular Map (1/2): {:?}", result);
 }
 
 #[test]
 fn test_distance_1() {
     let s = "^WNE$";
-    let dists = build_distances(s);
+    let dists = build_distances(&s).unwrap();
     let result = max_distance(&dists);
 
     assert_eq!(3, result);
@@ -76,7 +114,7 @@ fn test_distance_1() {
 #[test]
 fn test_distance_2() {
     let s = "^ENWWW(NEEE|SSE(EE|N))$";
-    let dists = build_distances(s);
+    let dists = build_distances(&s).unwrap();
     let result = max_distance(&dists);
 
     assert_eq!(10, result);
@@ -85,7 +123,7 @@ fn test_distance_2() {
 #[test]
 fn test_distance_3() {
     let s = "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$";
-    let dists = build_distances(s);
+    let dists = build_distances(&s).unwrap();
     let result = max_distance(&dists);
 
     assert_eq!(18, result);
