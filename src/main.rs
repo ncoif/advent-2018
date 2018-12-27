@@ -84,6 +84,7 @@ fn main() {
         172 => puzzle17_water::answer2(),
 
         181 => puzzle18_trees::answer1(),
+        182 => puzzle18_trees::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }

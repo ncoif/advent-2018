@@ -1,16 +1,18 @@
 use itertools::Itertools;
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use std::fmt;
 use std::mem;
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 enum Acre {
     Open,
     Trees,
     Lumberyard,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
 struct World {
     grid: Vec<Vec<Acre>>,
 }
@@ -179,6 +181,48 @@ pub fn answer1() {
 
     println!(
         "Settlers of The North Pole (1/2): {}",
+        resources.0 * resources.1
+    );
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input18.txt").expect("cannot read file");
+    let mut world = World::from_str(&s).expect("failed to parse world");
+
+    let mut seen = HashMap::new();
+
+    let mut i = 0;
+    let (mut current_i, period) = loop {
+        match seen.entry(world.clone()) {
+            Entry::Occupied(o) => {
+                let prev_i = *o.get();
+                let period = i - prev_i;
+                break (i, period);
+            }
+            Entry::Vacant(v) => {
+                v.insert(i);
+            }
+        }
+
+        world.step();
+        i += 1;
+    };
+
+    let target_i = 1000000000u64;
+    let target_modulo = target_i % period as u64;
+
+    let mut current_mod = current_i % period as u64;
+    while current_mod != target_modulo {
+        world.step();
+        current_i += 1;
+        current_mod = current_i % period;
+    }
+
+    //println!("period: {}, target_modulo: {}, final_i: {}", period, target_modulo, current_i);
+
+    let resources = world.count_resources();
+    println!(
+        "Settlers of The North Pole (2/2): {}",
         resources.0 * resources.1
     );
 }
