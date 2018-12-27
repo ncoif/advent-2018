@@ -120,6 +120,34 @@ impl FromStr for Instruction {
         Ok(Instruction { op, args })
     }
 }
+#[derive(Debug)]
+struct Prog {
+    ip: usize,
+    instructions: Vec<Instruction>,
+}
+
+impl FromStr for Prog {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut lines = s.split("\n");
+        let ip_s = lines.next().unwrap();
+        let re_ip = Regex::new(r"#ip (\d)").unwrap();
+        let ip_a = re_ip
+            .captures(ip_s)
+            .ok_or_else(|| format!("cannot parse ip {:?}", s))
+            .unwrap();
+
+        let ip: usize = ip_a[1].parse().unwrap();
+
+        let mut instructions = vec![];
+        for line in lines.filter(|l| *l != "") {
+            instructions.push(Instruction::from_str(line).unwrap());
+        }
+
+        Ok(Prog { ip, instructions })
+    }
+}
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input19.txt").expect("cannot read file");
@@ -137,4 +165,23 @@ fn test_parse_instruction() {
     assert_eq!(5, i.args[0]);
     assert_eq!(0, i.args[1]);
     assert_eq!(1, i.args[2]);
+}
+
+#[test]
+fn test_parse_prog() {
+    let p = Prog::from_str(
+        r#"#ip 0
+seti 5 0 1
+seti 6 0 2
+addi 0 1 0
+addr 1 2 3
+setr 1 0 0
+seti 8 0 4
+seti 9 0 5"#,
+    )
+    .unwrap();
+    println!("{:?}", p);
+
+    assert_eq!(0, p.ip);
+    assert_eq!(7, p.instructions.len());
 }
