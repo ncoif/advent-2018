@@ -154,6 +154,17 @@ pub fn answer1() {
     println!("Go With The Flow (1/2): {:?}", reg[0]);
 }
 
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input19.txt").expect("cannot read file");
+    let prog = Prog::from_str(&s).unwrap();
+
+    let mut reg = [0; 6];
+    reg[0] = 1;
+    prog.run(&mut reg);
+
+    println!("Go With The Flow (2/2): {:?}", reg[0]);
+}
+
 #[test]
 fn test_parse_instruction() {
     let i = Instruction::from_str(r#"seti 5 0 1"#).unwrap();

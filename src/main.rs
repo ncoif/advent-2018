@@ -88,6 +88,7 @@ fn main() {
         182 => puzzle18_trees::answer2(),
 
         191 => puzzle19_opcode_jumps::answer1(),
+        192 => puzzle19_opcode_jumps::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
