@@ -35,6 +35,12 @@ impl FromStr for Nanobot {
     }
 }
 
+impl Nanobot {
+    fn distance_to(&self, other: &Nanobot) -> u64 {
+        ((self.x - other.x).abs() + (self.y - other.y).abs() + (self.z - other.z).abs()) as u64
+    }
+}
+
 fn read_file() -> Vec<Nanobot> {
     let filename = "input/input23.txt";
     let file = File::open(filename).expect("cannot open file");
@@ -51,10 +57,41 @@ fn read_file() -> Vec<Nanobot> {
 pub fn answer1() {
     let nanobots = read_file();
 
-    println!("nanobots {:?}", nanobots);
-
     println!(
         "Experimental Emergency Teleportation (1/2): {:?}",
         nanobots.len()
     );
+}
+
+#[test]
+fn test_nanobot_distance() {
+    let origin = Nanobot {
+        x: 0,
+        y: 0,
+        z: 0,
+        r: 0,
+    };
+    let n = Nanobot {
+        x: 1,
+        y: 0,
+        z: 0,
+        r: 0,
+    };
+    assert_eq!(1, origin.distance_to(&n));
+
+    let n = Nanobot {
+        x: 1,
+        y: 1,
+        z: 1,
+        r: 0,
+    };
+    assert_eq!(3, origin.distance_to(&n));
+
+    let n = Nanobot {
+        x: 1,
+        y: 3,
+        z: 1,
+        r: 0,
+    };
+    assert_eq!(5, origin.distance_to(&n));
 }
