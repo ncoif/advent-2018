@@ -71,7 +71,6 @@ struct Node {
 }
 
 struct Cave {
-    _depth: usize,
     target: Coord,
     bound: Coord,
     regions: Vec<Vec<Option<Region>>>,
@@ -80,13 +79,12 @@ struct Cave {
 impl Cave {
     fn new(target: &Coord, depth: usize) -> Cave {
         let index_bound = Coord {
-            x: (target.x + target.y) * 10,
-            y: (target.x + target.y) * 10,
+            x: (target.x + target.y) * 2,
+            y: (target.x + target.y) * 2,
         };
         let regions = Cave::compute_geo_indices(&index_bound, target, depth);
 
         Cave {
-            _depth: depth,
             target: target.clone(),
             bound: index_bound,
             regions: regions,
@@ -136,56 +134,70 @@ impl Cave {
         risk
     }
 
-    fn around(&self, n: Node) -> Vec<Node> {
+    fn around(&self, n: Node) -> Vec<(Node, u64)> {
         let mut arounds = vec![];
-        for t in [Tool::NEITHER, Tool::CLIMBING, Tool::TORCH].iter() {
-            for (dx, dy) in [(-1isize, 0isize), (1, 0), (0, -1), (0, 1), (0, 0)].iter() {
-                let new_x = n.x as isize + dx;
-                let new_y = n.y as isize + dy;
 
-                if new_x < 0 || new_y < 0 {
-                    continue;
-                }
+        // add all the neighbours
+        for (dx, dy) in [(-1isize, 0isize), (1, 0), (0, -1), (0, 1), (0, 0)].iter() {
+            let new_x = n.x as isize + dx;
+            let new_y = n.y as isize + dy;
 
-                if new_x > (self.bound.x as isize - 1) || new_y > (self.bound.y as isize - 1) {
-                    continue;
-                }
+            if new_x < 0 || new_y < 0 {
+                continue;
+            }
 
-                if !self.regions[new_y as usize][new_x as usize]
-                    .expect("bound too small")
-                    .can_equip(&t)
-                {
-                    continue;
-                }
+            if new_x > (self.bound.x as isize - 1) || new_y > (self.bound.y as isize - 1) {
+                continue;
+            }
 
-                arounds.push(Node {
+            if !self.regions[new_y as usize][new_x as usize]
+                .expect("bound too small")
+                .can_equip(&n.t)
+            {
+                continue;
+            }
+
+            arounds.push((
+                Node {
                     x: new_x as usize,
                     y: new_y as usize,
-                    t: t.clone(),
-                });
+                    t: n.t,
+                },
+                1,
+            ));
+        }
+
+        // also consider changing gear
+        for t in [Tool::NEITHER, Tool::CLIMBING, Tool::TORCH].iter() {
+            if *t == n.t {
+                continue;
             }
+
+            if !self.regions[n.y][n.x]
+                .expect("bound too small")
+                .can_equip(t)
+            {
+                continue;
+            }
+
+            arounds.push((
+                Node {
+                    x: n.x,
+                    y: n.y,
+                    t: *t,
+                },
+                7,
+            ));
         }
 
         arounds
     }
 
-    fn cost(n1: Node, n2: Node) -> u64 {
-        if n1.t != n2.t {
-            7
-        } else {
-            1
-        }
-    }
-
     // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
     // or else "temporary value moved while borrowing" error
     fn successors(&self, n: Node) -> impl Iterator<Item = (Node, u64)> {
-        let successors: Vec<_> = self
-            .around(n.clone())
-            .iter()
-            .map(move |cur| (cur.clone(), Self::cost(n, *cur)))
-            .collect();
-        println!("successors of {:?} are {:?}", n, successors);
+        let successors: Vec<_> = self.around(n.clone());
+        //println!("successors of {:?} are {:?}", n, successors);
 
         successors.into_iter()
     }
