@@ -5,6 +5,13 @@ enum RegionType {
     NARROW,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum Tool {
+    NEITHER,
+    CLIMBING,
+    TORCH,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Region {
     geological_index: usize,
@@ -36,6 +43,18 @@ impl Region {
             RegionType::NARROW => 2,
         }
     }
+
+    fn can_equip(&self, tool: &Tool) -> bool {
+        match (self.region_type, tool) {
+            (RegionType::ROCKY, Tool::CLIMBING) => true,
+            (RegionType::ROCKY, Tool::TORCH) => true,
+            (RegionType::WET, Tool::CLIMBING) => true,
+            (RegionType::WET, Tool::NEITHER) => true,
+            (RegionType::NARROW, Tool::TORCH) => true,
+            (RegionType::NARROW, Tool::NEITHER) => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,25 +63,32 @@ struct Coord {
     y: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+struct Node {
+    x: usize,
+    y: usize,
+    t: Tool,
+}
+
 struct Cave {
     _depth: usize,
     target: Coord,
-    _bound: Coord,
+    bound: Coord,
     regions: Vec<Vec<Option<Region>>>,
 }
 
 impl Cave {
     fn new(target: &Coord, depth: usize) -> Cave {
         let index_bound = Coord {
-            x: target.x + target.y,
-            y: target.x + target.y,
+            x: (target.x + target.y) * 10,
+            y: (target.x + target.y) * 10,
         };
         let regions = Cave::compute_geo_indices(&index_bound, target, depth);
 
         Cave {
             _depth: depth,
             target: target.clone(),
-            _bound: index_bound,
+            bound: index_bound,
             regions: regions,
         }
     }
@@ -109,6 +135,81 @@ impl Cave {
 
         risk
     }
+
+    fn around(&self, n: Node) -> Vec<Node> {
+        let mut arounds = vec![];
+        for t in [Tool::NEITHER, Tool::CLIMBING, Tool::TORCH].iter() {
+            for (dx, dy) in [(-1isize, 0isize), (1, 0), (0, -1), (0, 1), (0, 0)].iter() {
+                let new_x = n.x as isize + dx;
+                let new_y = n.y as isize + dy;
+
+                if new_x < 0 || new_y < 0 {
+                    continue;
+                }
+
+                if new_x > (self.bound.x as isize - 1) || new_y > (self.bound.y as isize - 1) {
+                    continue;
+                }
+
+                if !self.regions[new_y as usize][new_x as usize]
+                    .expect("bound too small")
+                    .can_equip(&t)
+                {
+                    continue;
+                }
+
+                arounds.push(Node {
+                    x: new_x as usize,
+                    y: new_y as usize,
+                    t: t.clone(),
+                });
+            }
+        }
+
+        arounds
+    }
+
+    fn cost(n1: Node, n2: Node) -> u64 {
+        if n1.t != n2.t {
+            7
+        } else {
+            1
+        }
+    }
+
+    // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
+    // or else "temporary value moved while borrowing" error
+    fn successors(&self, n: Node) -> impl Iterator<Item = (Node, u64)> {
+        let successors: Vec<_> = self
+            .around(n.clone())
+            .iter()
+            .map(move |cur| (cur.clone(), Self::cost(n, *cur)))
+            .collect();
+        println!("successors of {:?} are {:?}", n, successors);
+
+        successors.into_iter()
+    }
+
+    fn shortest_path(&self) -> u64 {
+        let start = Node {
+            x: 0,
+            y: 0,
+            t: Tool::TORCH,
+        };
+        let target = Node {
+            x: self.target.x,
+            y: self.target.y,
+            t: Tool::TORCH,
+        };
+
+        let shortest_path = pathfinding::directed::dijkstra::dijkstra(
+            &start,
+            |n| self.successors(n.clone()),
+            |n| *n == target,
+        );
+
+        shortest_path.expect("no path found").1
+    }
 }
 
 pub fn answer1() {
@@ -116,8 +217,19 @@ pub fn answer1() {
     println!("Mode Maze (1/2): {:?}", cave.risk_level());
 }
 
+pub fn answer2() {
+    let cave = Cave::new(&Coord { x: 6, y: 770 }, 4845);
+    println!("Mode Maze (2/2): {:?}", cave.shortest_path());
+}
+
 #[test]
-fn test_distance_2() {
+fn test_answer1() {
     let cave = Cave::new(&Coord { x: 10, y: 10 }, 510);
     assert_eq!(114, cave.risk_level());
+}
+
+#[test]
+fn test_answer2() {
+    let cave = Cave::new(&Coord { x: 10, y: 10 }, 510);
+    assert_eq!(45, cave.shortest_path());
 }

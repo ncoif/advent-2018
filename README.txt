@@ -22,3 +22,4 @@ Rust questions:
 - compare & and * with c syntax
 - PartialEq vs Eq, PartialOrd vs Ord
 - clone vs copy
+- iter() vs into_iter()

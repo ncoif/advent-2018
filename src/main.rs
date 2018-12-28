@@ -100,6 +100,7 @@ fn main() {
         212 => puzzle21_opcode_halt::answer2(),
 
         221 => puzzle22_cave::answer1(),
+        222 => puzzle22_cave::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
