@@ -7,6 +7,19 @@ enum Element {
     RADIATION,
 }
 
+impl Element {
+    fn parse(s: &str) -> Element {
+        match s {
+            "radiation" => Element::RADIATION,
+            "bludgeoning" => Element::BLUDGEONING,
+            "fire" => Element::FIRE,
+            "cold" => Element::COLD,
+            "slashing" => Element::SLASHING,
+            s => panic!("{:?} is not an element", s),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Army {
     size: u64,
@@ -19,6 +32,55 @@ struct Army {
 }
 
 impl Army {
+    fn parse(s: &str) -> Army {
+        let tokens: Vec<&str> = s.split(" ").collect();
+        let size = tokens[0].parse::<u64>().unwrap();
+        let hit_points = tokens[4].parse::<u64>().unwrap();
+        let initiative = tokens[tokens.len() - 1].parse::<u64>().unwrap();
+        let attack = tokens[tokens.len() - 6].parse::<u64>().unwrap();
+        let attack_type = Element::parse(tokens[tokens.len() - 5]);
+
+        let mut immune = vec![];
+        let mut weak = vec![];
+        if s.contains('(') {
+            let spec: String = s
+                .chars()
+                .skip_while(|&c| c != '(')
+                .take_while(|&c| c != ')')
+                .collect();
+            for sub in spec.split("; ") {
+                let elements: Vec<_> = sub
+                    .split(" ")
+                    .skip(2)
+                    .map(|e| Element::parse(e.trim_end_matches(|x| ";),".contains(x))))
+                    .collect();
+                if sub.trim_start_matches("(").starts_with("weak") {
+                    weak = elements;
+                } else {
+                    immune = elements;
+                }
+            }
+        }
+
+        Army {
+            size,
+            hit_points,
+            immune,
+            weak,
+            attack,
+            attack_type,
+            initiative,
+        }
+    }
+
+    fn parse_army(s: &str) -> Vec<Army> {
+        s.split("\n")
+            .filter(|l| l.len() > 0)
+            .skip(1)
+            .map(Army::parse)
+            .collect()
+    }
+
     fn effective_power(&self) -> u64 {
         self.size * self.attack
     }
@@ -41,6 +103,14 @@ impl Army {
         other.size = other.size.saturating_sub(unit_killed);
         println!("{:?} deals {} damage to {:?}", self, damage, other);
     }
+}
+
+fn parse_armies(s: &str) -> (Vec<Army>, Vec<Army>) {
+    let mut teams = s.split("\n\n");
+    let s = Army::parse_army(teams.next().unwrap());
+    let i = Army::parse_army(teams.next().unwrap());
+
+    (s, i)
 }
 
 fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> usize {
@@ -169,8 +239,22 @@ pub fn answer1() {
 }
 
 #[test]
+fn test_parse() {
+    let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
+    let (s, i) = parse_armies(&s);
+
+    println!("s: {:?}", s);
+    println!("i: {:?}", i);
+
+    assert_eq!(2, s.len());
+    assert_eq!(2, i.len());
+}
+
+#[test]
 fn test_targeting() {
-    let (mut s, mut i) = debug_army();
+    let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
+    let (mut s, mut i) = parse_armies(&s);
+
     s.sort_by_key(|a| (a.effective_power(), a.initiative));
     i.sort_by_key(|a| (a.effective_power(), a.initiative));
 
@@ -185,7 +269,8 @@ fn test_targeting() {
 
 #[test]
 fn test_combat_turn() {
-    let (mut s, mut i) = debug_army();
+    let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
+    let (mut s, mut i) = parse_armies(&s);
 
     combat_turn(&mut s, &mut i);
 
@@ -195,7 +280,8 @@ fn test_combat_turn() {
 
 #[test]
 fn test_combat_to_death() {
-    let (mut s, mut i) = debug_army();
+    let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
+    let (mut s, mut i) = parse_armies(&s);
 
     assert_eq!(2, combat_to_death(&mut s, &mut i));
 
