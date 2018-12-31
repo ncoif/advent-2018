@@ -100,8 +100,11 @@ impl Army {
     fn deal_damage(&self, other: &mut Army) {
         let damage = self.damage_to(&other);
         let unit_killed: u64 = damage / other.hit_points;
+        println!(
+            "{:?} deals {} damage (kill {:?} units) to {:?}",
+            self, damage, unit_killed, other
+        );
         other.size = other.size.saturating_sub(unit_killed);
-        println!("{:?} deals {} damage to {:?}", self, damage, other);
     }
 }
 
@@ -113,7 +116,7 @@ fn parse_armies(s: &str) -> (Vec<Army>, Vec<Army>) {
     (s, i)
 }
 
-fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> usize {
+fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> u64 {
     loop {
         combat_turn(s, i);
         if s.len() == 0 || i.len() == 0 {
@@ -121,7 +124,10 @@ fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> usize {
         }
     }
 
-    s.len().max(i.len())
+    let score_s: u64 = s.iter().map(|a| a.size).sum();
+    let score_i: u64 = i.iter().map(|a| a.size).sum();
+
+    score_s.max(score_i)
 }
 
 fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
@@ -131,10 +137,10 @@ fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
         let candidate_idx = to
             .iter()
             .enumerate()
-            .filter(|(_, a)| army.damage_to(&a) > 0)
             // don't attack the same target twice
             .filter(|(idx, _)| !attack_targets.contains(&Some(*idx)))
-            .max_by_key(|(_, a)| army.damage_to(&a))
+            .filter(|(_, a)| army.damage_to(&a) > 0)
+            .max_by_key(|(_, a)| (army.damage_to(&a), a.effective_power(), a.initiative))
             .map(|(idx, _)| idx);
 
         println!("{:?} will target {:?}", army, candidate_idx);
@@ -146,8 +152,9 @@ fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
 
 fn combat_turn(s: &mut Vec<Army>, i: &mut Vec<Army>) {
     // targeting order
-    s.sort_by_key(|a| (a.effective_power(), a.initiative));
-    i.sort_by_key(|a| (a.effective_power(), a.initiative));
+    //TODO don't modify the list, instead keep a list of indexes properly ordered
+    s.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
+    i.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
 
     let attack_target_s = combat_target(s, i);
     let attack_target_i = combat_target(i, s);
@@ -167,7 +174,7 @@ fn combat_turn(s: &mut Vec<Army>, i: &mut Vec<Army>) {
         .collect();
 
     // combat order
-    attacks.sort_by_key(|&(_is_system, _at, _def, ini)| ini);
+    attacks.sort_by_key(|&(_is_system, _at, _def, ini)| -(ini as i64));
 
     for attack in attacks {
         let (at, def) = if attack.0 == true {
@@ -176,66 +183,22 @@ fn combat_turn(s: &mut Vec<Army>, i: &mut Vec<Army>) {
             (&mut i[attack.1], &mut s[attack.2])
         };
 
-        at.deal_damage(def);
+        if at.size > 0 {
+            at.deal_damage(def);
+        }
     }
 
     s.retain(|a| a.size > 0);
     i.retain(|a| a.size > 0);
-
-    println!("system: {:?}", s);
-    println!("infection: {:?}", i);
-}
-
-fn debug_army() -> (Vec<Army>, Vec<Army>) {
-    use self::Element::*;
-    let mut system = vec![];
-    let mut infection = vec![];
-
-    system.push(Army {
-        size: 17,
-        hit_points: 5390,
-        immune: vec![],
-        weak: vec![RADIATION, BLUDGEONING],
-        attack: 4507,
-        attack_type: FIRE,
-        initiative: 2,
-    });
-
-    system.push(Army {
-        size: 989,
-        hit_points: 1274,
-        immune: vec![FIRE],
-        weak: vec![BLUDGEONING, SLASHING],
-        attack: 25,
-        attack_type: SLASHING,
-        initiative: 3,
-    });
-
-    infection.push(Army {
-        size: 801,
-        hit_points: 4706,
-        immune: vec![],
-        weak: vec![RADIATION],
-        attack: 116,
-        attack_type: BLUDGEONING,
-        initiative: 1,
-    });
-
-    infection.push(Army {
-        size: 4485,
-        hit_points: 2961,
-        immune: vec![RADIATION],
-        weak: vec![FIRE, COLD],
-        attack: 12,
-        attack_type: SLASHING,
-        initiative: 4,
-    });
-
-    (system, infection)
 }
 
 pub fn answer1() {
-    println!("Immune System Simulator 20XX (1/2): {:?}", 0);
+    let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
+    let (mut s, mut i) = parse_armies(&s);
+
+    let result = combat_to_death(&mut s, &mut i);
+
+    println!("Immune System Simulator 20XX (1/2): {:?}", result);
 }
 
 #[test]
@@ -255,8 +218,8 @@ fn test_targeting() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
     let (mut s, mut i) = parse_armies(&s);
 
-    s.sort_by_key(|a| (a.effective_power(), a.initiative));
-    i.sort_by_key(|a| (a.effective_power(), a.initiative));
+    s.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
+    i.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
 
     let target_s = combat_target(&mut s, &mut i);
     assert_eq!(Some(1), target_s[0]);
@@ -283,7 +246,7 @@ fn test_combat_to_death() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
     let (mut s, mut i) = parse_armies(&s);
 
-    assert_eq!(2, combat_to_death(&mut s, &mut i));
+    assert_eq!(782 + 4434, combat_to_death(&mut s, &mut i));
 
     assert_eq!(0, s.len());
     assert_eq!(2, i.len());
