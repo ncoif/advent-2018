@@ -107,6 +107,7 @@ fn main() {
         231 => puzzle23_nanobots::answer1(),
 
         241 => puzzle24_army::answer1(),
+        242 => puzzle24_army::answer2(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }

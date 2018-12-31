@@ -100,10 +100,10 @@ impl Army {
     fn deal_damage(&self, other: &mut Army) {
         let damage = self.damage_to(&other);
         let unit_killed: u64 = damage / other.hit_points;
-        println!(
-            "{:?} deals {} damage (kill {:?} units) to {:?}",
-            self, damage, unit_killed, other
-        );
+        // println!(
+        //     "{:?} deals {} damage (kill {:?} units) to {:?}",
+        //     self, damage, unit_killed, other
+        // );
         other.size = other.size.saturating_sub(unit_killed);
     }
 }
@@ -116,18 +116,22 @@ fn parse_armies(s: &str) -> (Vec<Army>, Vec<Army>) {
     (s, i)
 }
 
-fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> u64 {
+fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> (u64, u64) {
+    let mut previous_state = None;
     loop {
         combat_turn(s, i);
-        if s.len() == 0 || i.len() == 0 {
-            break;
+
+        let score_s: u64 = s.iter().map(|a| a.size).sum();
+        let score_i: u64 = i.iter().map(|a| a.size).sum();
+
+        let current_state = (score_s, score_i);
+
+        if Some(current_state) == previous_state || score_s == 0 || score_i == 0 {
+            return (score_s, score_i); //break if dead lock, or if there is a winner
         }
+
+        previous_state = Some(current_state);
     }
-
-    let score_s: u64 = s.iter().map(|a| a.size).sum();
-    let score_i: u64 = i.iter().map(|a| a.size).sum();
-
-    score_s.max(score_i)
 }
 
 fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
@@ -143,7 +147,7 @@ fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
             .max_by_key(|(_, a)| (army.damage_to(&a), a.effective_power(), a.initiative))
             .map(|(idx, _)| idx);
 
-        println!("{:?} will target {:?}", army, candidate_idx);
+        //println!("{:?} will target {:?}", army, candidate_idx);
         attack_targets[i] = candidate_idx;
     }
 
@@ -196,9 +200,32 @@ pub fn answer1() {
     let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
     let (mut s, mut i) = parse_armies(&s);
 
-    let result = combat_to_death(&mut s, &mut i);
+    let (score_s, score_i) = combat_to_death(&mut s, &mut i);
 
-    println!("Immune System Simulator 20XX (1/2): {:?}", result);
+    println!(
+        "Immune System Simulator 20XX (1/2): {:?}",
+        score_s.max(score_i)
+    );
+}
+
+pub fn answer2() {
+    let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
+    let (s, i) = parse_armies(&s);
+
+    for boost in 0.. {
+        //println!("trying boost {}", boost);
+        let mut sys = s.clone();
+        let mut inf = i.clone();
+        for mut g in &mut sys {
+            g.attack += boost;
+        }
+        let (score_s, score_i) = combat_to_death(&mut sys, &mut inf);
+        if score_i == 0 {
+            println!("Immune System Simulator 20XX (2/2): {:?}", score_s);
+            return;
+        }
+    }
+    unreachable!()
 }
 
 #[test]
@@ -246,7 +273,7 @@ fn test_combat_to_death() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
     let (mut s, mut i) = parse_armies(&s);
 
-    assert_eq!(782 + 4434, combat_to_death(&mut s, &mut i));
+    assert_eq!((0, 782 + 4434), combat_to_death(&mut s, &mut i));
 
     assert_eq!(0, s.len());
     assert_eq!(2, i.len());
