@@ -98,13 +98,15 @@ impl Army {
     }
 
     fn deal_damage(&self, other: &mut Army) {
-        let damage = self.damage_to(&other);
-        let unit_killed: u64 = damage / other.hit_points;
-        // println!(
-        //     "{:?} deals {} damage (kill {:?} units) to {:?}",
-        //     self, damage, unit_killed, other
-        // );
-        other.size = other.size.saturating_sub(unit_killed);
+        if self.size > 0 {
+            let damage = self.damage_to(&other);
+            let unit_killed: u64 = damage / other.hit_points;
+            // println!(
+            //     "{:?} deals {} damage (kill {:?} units) to {:?}",
+            //     self, damage, unit_killed, other
+            // );
+            other.size = other.size.saturating_sub(unit_killed);
+        }
     }
 }
 
@@ -137,29 +139,30 @@ fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> (u64, u64) {
 fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
     let mut attack_targets = vec![None; from.len()];
 
-    for (i, army) in from.iter().enumerate() {
+    let mut orders: Vec<usize> = (0..=from.len() - 1).collect();
+    orders.sort_by_key(|&idx| {
+        let a = &from[idx];
+        (-(a.effective_power() as i64), -(a.initiative as i64))
+    });
+
+    for o in orders {
         let candidate_idx = to
             .iter()
             .enumerate()
             // don't attack the same target twice
             .filter(|(idx, _)| !attack_targets.contains(&Some(*idx)))
-            .filter(|(_, a)| army.damage_to(&a) > 0)
-            .max_by_key(|(_, a)| (army.damage_to(&a), a.effective_power(), a.initiative))
+            .filter(|(_, a)| from[o].damage_to(&a) > 0)
+            .max_by_key(|(_, a)| (from[o].damage_to(&a), a.effective_power(), a.initiative))
             .map(|(idx, _)| idx);
 
         //println!("{:?} will target {:?}", army, candidate_idx);
-        attack_targets[i] = candidate_idx;
+        attack_targets[o] = candidate_idx;
     }
 
     attack_targets
 }
 
 fn combat_turn(s: &mut Vec<Army>, i: &mut Vec<Army>) {
-    // targeting order
-    //TODO don't modify the list, instead keep a list of indexes properly ordered
-    s.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
-    i.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
-
     let attack_target_s = combat_target(s, i);
     let attack_target_i = combat_target(i, s);
 
@@ -187,9 +190,7 @@ fn combat_turn(s: &mut Vec<Army>, i: &mut Vec<Army>) {
             (&mut i[attack.1], &mut s[attack.2])
         };
 
-        if at.size > 0 {
-            at.deal_damage(def);
-        }
+        at.deal_damage(def);
     }
 
     s.retain(|a| a.size > 0);
