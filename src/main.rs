@@ -24,6 +24,7 @@ mod puzzle21_opcode_halt;
 mod puzzle22_cave;
 mod puzzle23_nanobots;
 mod puzzle24_army;
+mod puzzle25_constellation;
 
 fn main() {
     let day: u32 = env::args()
@@ -108,6 +109,8 @@ fn main() {
 
         241 => puzzle24_army::answer1(),
         242 => puzzle24_army::answer2(),
+
+        251 => puzzle25_constellation::answer1(),
 
         _ => panic!("Invalid problem day: {}, {}", day, problem),
     }
