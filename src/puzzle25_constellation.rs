@@ -37,19 +37,24 @@ impl Point {
     }
 }
 
-pub fn answer1() {
-    let points = read_file("input/input25.txt");
-
+fn neighbours(points: &Vec<Point>) -> Vec<Vec<usize>> {
     let mut neighbours = vec![vec![]];
-    for p1 in &points {
-        let ns = points
-            .iter()
+    for p1 in points {
+        let ns: Vec<usize> = points
+            .into_iter()
             .enumerate()
             .filter(|(_, p2)| p1.distance_to(&p2) <= 3)
             .map(|(ix, _)| ix)
             .collect();
         neighbours.push(ns);
     }
+
+    neighbours
+}
+
+pub fn answer1() {
+    let points = read_file("input/input25.txt");
+    let neighbours = neighbours(&points);
 
     // https://docs.rs/pathfinding/1.1.10/pathfinding/undirected/connected_components/fn.components.html
     let constellations = pathfinding::undirected::connected_components::components(&neighbours);
@@ -70,4 +75,13 @@ fn read_file(filename: &str) -> Vec<Point> {
         .map(|s| Point::from_str(&s))
         .filter_map(|result| result.ok())
         .collect()
+}
+
+#[test]
+fn test_constellations() {
+    let points = read_file("input/input25_debug.txt");
+    let neighbours = neighbours(&points);
+    let constellations = pathfinding::undirected::connected_components::components(&neighbours);
+
+    assert_eq!(4, constellations.len());
 }
