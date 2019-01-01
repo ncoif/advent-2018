@@ -205,7 +205,7 @@ pub fn answer1() {
     let (score_s, score_i) = combat_to_death(&mut armies);
 
     println!(
-        "Immune System Simulator 20XX (1/2): {:?}",
+        "Day 24: Immune System Simulator 20XX (1/2): {:?}",
         score_s.max(score_i)
     );
 }
@@ -221,7 +221,7 @@ pub fn answer2() {
 
         let (score_s, score_i) = combat_to_death(&mut boostest_armies);
         if score_i == 0 {
-            println!("Immune System Simulator 20XX (2/2): {:?}", score_s);
+            println!("Day 24: Immune System Simulator 20XX (2/2): {:?}", score_s);
             return;
         }
     }

@@ -180,7 +180,7 @@ pub fn answer1() {
     let resources = world.count_resources();
 
     println!(
-        "Settlers of The North Pole (1/2): {}",
+        "Day 18: Settlers of The North Pole (1/2): {}",
         resources.0 * resources.1
     );
 }
@@ -222,7 +222,7 @@ pub fn answer2() {
 
     let resources = world.count_resources();
     println!(
-        "Settlers of The North Pole (2/2): {}",
+        "Day 18: Settlers of The North Pole (2/2): {}",
         resources.0 * resources.1
     );
 }

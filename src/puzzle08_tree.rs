@@ -53,7 +53,7 @@ pub fn answer1() {
     let nodes = read_file("input/input8.txt".to_string());
 
     let answer1 = Node::parse(&mut nodes.into_iter());
-    println!("Memory Maneuver (1/2): {}", answer1.metadata_count());
+    println!("Day 08: Memory Maneuver (1/2): {}", answer1.metadata_count());
 }
 
 pub fn answer2() {
@@ -61,5 +61,5 @@ pub fn answer2() {
     let nodes = read_file("input/input8.txt".to_string());
 
     let answer2 = Node::parse(&mut nodes.into_iter());
-    println!("Memory Maneuver (2/2): {}", answer2.answer2_count());
+    println!("Day 08: Memory Maneuver (2/2): {}", answer2.answer2_count());
 }

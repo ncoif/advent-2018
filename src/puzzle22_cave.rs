@@ -226,12 +226,12 @@ impl Cave {
 
 pub fn answer1() {
     let cave = Cave::new(&Coord { x: 6, y: 770 }, 4845);
-    println!("Mode Maze (1/2): {:?}", cave.risk_level());
+    println!("Day 22: Mode Maze (1/2): {:?}", cave.risk_level());
 }
 
 pub fn answer2() {
     let cave = Cave::new(&Coord { x: 6, y: 770 }, 4845);
-    println!("Mode Maze (2/2): {:?}", cave.shortest_path());
+    println!("Day 22: Mode Maze (2/2): {:?}", cave.shortest_path());
 }
 
 #[test]

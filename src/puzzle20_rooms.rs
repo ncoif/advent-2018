@@ -100,7 +100,7 @@ pub fn answer1() {
     let dists = build_distances(&s).unwrap();
     let result = max_distance(&dists);
 
-    println!("A Regular Map (1/2): {:?}", result);
+    println!("Day 20: A Regular Map (1/2): {:?}", result);
 }
 
 pub fn answer2() {
@@ -108,7 +108,7 @@ pub fn answer2() {
     let dists = build_distances(&s).unwrap();
     let rooms = dists.values().filter(|&&d| d >= 1000).count();
 
-    println!("A Regular Map (2/2): {:?}", rooms);
+    println!("Day 20: A Regular Map (2/2): {:?}", rooms);
 }
 
 #[test]

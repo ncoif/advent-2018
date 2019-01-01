@@ -191,8 +191,6 @@ impl Prog {
             }
         }
 
-        println!("candidates: {}", candidates.len());
-
         last.unwrap()
     }
 }
@@ -211,7 +209,7 @@ pub fn answer1() {
     reg[0] = r0;
     prog.run(&mut reg);
 
-    println!("Go With The Flow (1/2): {:?}", reg[0]);
+    println!("Day 21: Go With The Flow (1/2): {:?}", reg[0]);
 }
 
 pub fn answer2() {
@@ -222,7 +220,7 @@ pub fn answer2() {
     let mut reg = [0; 6];
     let r0 = prog.run_with_ip30_cycle(&mut reg);
 
-    println!("Go With The Flow (2/2): {:?}", r0);
+    println!("Day 21: Go With The Flow (2/2): {:?}", r0);
 
     // using this r0, run the program to confirm that it halts
     // let mut reg = [0; 6];

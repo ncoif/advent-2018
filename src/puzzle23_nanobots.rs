@@ -69,7 +69,7 @@ pub fn answer1() {
     let in_range = max_radius_nanobot.in_range(&nanobots);
 
     println!(
-        "Experimental Emergency Teleportation (1/2): {:?}",
+        "Day 23: Experimental Emergency Teleportation (1/2): {:?}",
         in_range.len()
     );
 }

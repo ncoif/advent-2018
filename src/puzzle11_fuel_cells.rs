@@ -42,7 +42,7 @@ pub fn answer1() {
         }
     }
 
-    println!("Chronal Charge (1/2): {},{}", result_x, result_y);
+    println!("Day 11: Chronal Charge (1/2): {},{}", result_x, result_y);
 }
 
 pub fn answer2() {
@@ -89,7 +89,7 @@ pub fn answer2() {
     }
 
     println!(
-        "Chronal Charge (2/2): {},{},{}",
+        "Day 11: Chronal Charge (2/2): {},{},{}",
         result_x, result_y, max_size
     );
 }

@@ -87,7 +87,7 @@ impl Field {
                 pic[access(star.pos_x, star.pos_y)] = true;
             }
 
-            println!("The Stars Align (1/2):");
+            println!("Day 10: The Stars Align (1/2):");
             for y in min_y..=max_y {
                 for x in min_x..=max_x {
                     match pic[access(x, y)] {
@@ -97,7 +97,7 @@ impl Field {
                 }
                 println!("");
             }
-            println!("The Stars Align (2/2): {}", self.time);
+            println!("Day 10: The Stars Align (2/2): {}", self.time);
         }
     }
 }

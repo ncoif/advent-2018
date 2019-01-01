@@ -141,7 +141,7 @@ pub fn answer1() {
         }
     }
 
-    println!("Chronal Classification (1/2): {:?}", triple_candidates);
+    println!("Day 16: Chronal Classification (1/2): {:?}", triple_candidates);
 }
 
 pub fn answer2() {
@@ -179,7 +179,7 @@ pub fn answer2() {
         op.apply(&args, &mut reg);
     }
 
-    println!("Chronal Classification (2/2): {:?}", reg[0]);
+    println!("Day 16: Chronal Classification (2/2): {:?}", reg[0]);
 }
 
 #[test]

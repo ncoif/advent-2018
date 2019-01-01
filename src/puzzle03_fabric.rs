@@ -59,7 +59,7 @@ pub fn answer1() {
         .map(|v| v.iter().filter(|&c| *c > 1).count())
         .sum::<usize>();
 
-    println!("No Matter How You Slice It (1/2): {}", conflicts);
+    println!("Day 03: No Matter How You Slice It (1/2): {}", conflicts);
 }
 
 pub fn answer2() {
@@ -86,7 +86,7 @@ pub fn answer2() {
             }
         }
         if ok {
-            println!("No Matter How You Slice It (2/2): {:?}", p.id);
+            println!("Day 03: No Matter How You Slice It (2/2): {:?}", p.id);
         }
     }
 }

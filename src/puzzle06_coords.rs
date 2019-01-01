@@ -129,7 +129,7 @@ pub fn answer1() {
     }
 
     let (_, count) = counts.iter().max_by_key(|(_, c)| *c).unwrap();
-    println!("Chronal Coordinates (1/2): {}", count);
+    println!("Day 06: Chronal Coordinates (1/2): {}", count);
 }
 
 pub fn answer2() {
@@ -152,5 +152,5 @@ pub fn answer2() {
         }
     }
 
-    println!("Chronal Coordinates (2/2): {}", nb_points_in_region);
+    println!("Day 06: Chronal Coordinates (2/2): {}", nb_points_in_region);
 }
