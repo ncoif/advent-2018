@@ -123,9 +123,10 @@ pub fn answer1() {
 pub fn answer2() {
     let nanobots = read_file("input/input23.txt");
 
+    // z3 requires ~60s and 350M of RAM to optimize the solution
     let sum = opmitize_solver(&nanobots);
 
-    println!("Experimental Emergency Teleportation (2/2): {:?}", sum);
+    println!("Day 23: Experimental Emergency Teleportation (2/2): {:?}", sum);
 }
 
 #[test]
