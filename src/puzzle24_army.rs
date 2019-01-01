@@ -22,6 +22,7 @@ impl Element {
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Army {
+    infection: bool,
     size: u64,
     hit_points: u64,
     immune: Vec<Element>,
@@ -32,7 +33,7 @@ struct Army {
 }
 
 impl Army {
-    fn parse(s: &str) -> Army {
+    fn parse(s: &str, infection: bool) -> Army {
         let tokens: Vec<&str> = s.split(" ").collect();
         let size = tokens[0].parse::<u64>().unwrap();
         let hit_points = tokens[4].parse::<u64>().unwrap();
@@ -63,6 +64,7 @@ impl Army {
         }
 
         Army {
+            infection,
             size,
             hit_points,
             immune,
@@ -73,11 +75,11 @@ impl Army {
         }
     }
 
-    fn parse_army(s: &str) -> Vec<Army> {
+    fn parse_army(s: &str, is_infection: bool) -> Vec<Army> {
         s.split("\n")
             .filter(|l| l.len() > 0)
             .skip(1)
-            .map(Army::parse)
+            .map(|l| Army::parse(l, is_infection))
             .collect()
     }
 
@@ -108,23 +110,27 @@ impl Army {
             other.size = other.size.saturating_sub(unit_killed);
         }
     }
+
+    fn boost_damage(&mut self, boost: u64) {
+        self.attack += boost;
+    }
 }
 
-fn parse_armies(s: &str) -> (Vec<Army>, Vec<Army>) {
+fn parse_armies(s: &str) -> Vec<Army> {
     let mut teams = s.split("\n\n");
-    let s = Army::parse_army(teams.next().unwrap());
-    let i = Army::parse_army(teams.next().unwrap());
+    let mut armies = Army::parse_army(teams.next().unwrap(), false);
+    armies.extend(Army::parse_army(teams.next().unwrap(), true).into_iter());
 
-    (s, i)
+    armies
 }
 
-fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> (u64, u64) {
+fn combat_to_death(armies: &mut Vec<Army>) -> (u64, u64) {
     let mut previous_state = None;
     loop {
-        combat_turn(s, i);
+        combat_turn(armies);
 
-        let score_s: u64 = s.iter().map(|a| a.size).sum();
-        let score_i: u64 = i.iter().map(|a| a.size).sum();
+        let score_s: u64 = armies.iter().filter(|a| !a.infection).map(|a| a.size).sum();
+        let score_i: u64 = armies.iter().filter(|a| a.infection).map(|a| a.size).sum();
 
         let current_state = (score_s, score_i);
 
@@ -136,72 +142,67 @@ fn combat_to_death(s: &mut Vec<Army>, i: &mut Vec<Army>) -> (u64, u64) {
     }
 }
 
-fn combat_target(from: &Vec<Army>, to: &Vec<Army>) -> Vec<Option<usize>> {
-    let mut attack_targets = vec![None; from.len()];
+fn combat_target(armies: &Vec<Army>) -> Vec<Option<usize>> {
+    let mut attack_targets = vec![None; armies.len()];
 
-    let mut orders: Vec<usize> = (0..=from.len() - 1).collect();
+    let mut orders: Vec<usize> = (0..=armies.len() - 1).collect();
     orders.sort_by_key(|&idx| {
-        let a = &from[idx];
+        let a = &armies[idx];
         (-(a.effective_power() as i64), -(a.initiative as i64))
     });
 
     for o in orders {
-        let candidate_idx = to
+        let candidate_idx = armies
             .iter()
             .enumerate()
+            // don't attach the same side
+            .filter(|(idx, _)| armies[o].infection != armies[*idx].infection)
             // don't attack the same target twice
             .filter(|(idx, _)| !attack_targets.contains(&Some(*idx)))
-            .filter(|(_, a)| from[o].damage_to(&a) > 0)
-            .max_by_key(|(_, a)| (from[o].damage_to(&a), a.effective_power(), a.initiative))
+            .filter(|(_, a)| armies[o].damage_to(&a) > 0)
+            .max_by_key(|(_, a)| (armies[o].damage_to(&a), a.effective_power(), a.initiative))
             .map(|(idx, _)| idx);
 
-        //println!("{:?} will target {:?}", army, candidate_idx);
+        //println!("{:?} will target {:?}", armies[o], candidate_idx);
         attack_targets[o] = candidate_idx;
     }
 
     attack_targets
 }
 
-fn combat_turn(s: &mut Vec<Army>, i: &mut Vec<Army>) {
-    let attack_target_s = combat_target(s, i);
-    let attack_target_i = combat_target(i, s);
+fn combat_turn(armies: &mut Vec<Army>) {
+    let attack_targets = combat_target(armies);
 
-    let mut attacks: Vec<(bool, usize, usize, u64)> = attack_target_s
+    let mut attacks: Vec<(usize, usize, u64)> = attack_targets
         .iter()
         .enumerate()
         .filter(|(_, t)| t.is_some())
-        .map(|(idx, a)| (true, idx, a.unwrap(), s[idx].initiative))
-        .chain(
-            attack_target_i
-                .iter()
-                .enumerate()
-                .filter(|(_, t)| t.is_some())
-                .map(|(idx, a)| (false, idx, a.unwrap(), i[idx].initiative)),
-        )
+        .map(|(idx, a)| (idx, a.unwrap(), armies[idx].initiative))
         .collect();
 
     // combat order
-    attacks.sort_by_key(|&(_is_system, _at, _def, ini)| -(ini as i64));
-
-    for attack in attacks {
-        let (at, def) = if attack.0 == true {
-            (&mut s[attack.1], &mut i[attack.2])
-        } else {
-            (&mut i[attack.1], &mut s[attack.2])
-        };
-
+    attacks.sort_by_key(|&(_at, _def, ini)| -(ini as i64));
+    attacks.iter_mut().for_each(|&mut (at, def, _)| {
+        let at = armies[at].clone(); // seems dirty...
+        let def = &mut armies[def];
         at.deal_damage(def);
-    }
+    });
 
-    s.retain(|a| a.size > 0);
-    i.retain(|a| a.size > 0);
+    armies.retain(|a| a.size > 0);
+}
+
+fn boost_immune_system(armies: &mut Vec<Army>, boost: u64) {
+    armies
+        .iter_mut()
+        .filter(|a| !a.infection)
+        .for_each(|a| a.boost_damage(boost));
 }
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
-    let (mut s, mut i) = parse_armies(&s);
+    let mut armies = parse_armies(&s);
 
-    let (score_s, score_i) = combat_to_death(&mut s, &mut i);
+    let (score_s, score_i) = combat_to_death(&mut armies);
 
     println!(
         "Immune System Simulator 20XX (1/2): {:?}",
@@ -211,16 +212,14 @@ pub fn answer1() {
 
 pub fn answer2() {
     let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
-    let (s, i) = parse_armies(&s);
+    let armies = parse_armies(&s);
 
     for boost in 0.. {
+        let mut boostest_armies = armies.clone();
         //println!("trying boost {}", boost);
-        let mut sys = s.clone();
-        let mut inf = i.clone();
-        for mut g in &mut sys {
-            g.attack += boost;
-        }
-        let (score_s, score_i) = combat_to_death(&mut sys, &mut inf);
+        boost_immune_system(&mut boostest_armies, boost);
+
+        let (score_s, score_i) = combat_to_death(&mut boostest_armies);
         if score_i == 0 {
             println!("Immune System Simulator 20XX (2/2): {:?}", score_s);
             return;
@@ -232,50 +231,42 @@ pub fn answer2() {
 #[test]
 fn test_parse() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
-    let (s, i) = parse_armies(&s);
 
-    println!("s: {:?}", s);
-    println!("i: {:?}", i);
+    let armies = parse_armies(&s);
+    println!("armies: {:?}", armies);
 
-    assert_eq!(2, s.len());
-    assert_eq!(2, i.len());
+    assert_eq!(4, armies.len());
 }
 
 #[test]
 fn test_targeting() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
-    let (mut s, mut i) = parse_armies(&s);
+    let mut armies = parse_armies(&s);
 
-    s.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
-    i.sort_by_key(|a| (-(a.effective_power() as i64), -(a.initiative as i64)));
+    let targets = combat_target(&mut armies);
+    println!("targets: {:?}", targets);
 
-    let target_s = combat_target(&mut s, &mut i);
-    assert_eq!(Some(1), target_s[0]);
-    assert_eq!(Some(0), target_s[1]);
-
-    let target_i = combat_target(&mut i, &mut s);
-    assert_eq!(Some(0), target_i[0]);
-    assert_eq!(Some(1), target_i[1]);
+    assert_eq!(Some(3), targets[0]);
+    assert_eq!(Some(2), targets[1]);
+    assert_eq!(Some(0), targets[2]);
+    assert_eq!(Some(1), targets[3]);
 }
 
 #[test]
 fn test_combat_turn() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
-    let (mut s, mut i) = parse_armies(&s);
+    let mut armies = parse_armies(&s);
 
-    combat_turn(&mut s, &mut i);
+    combat_turn(&mut armies);
 
-    assert_eq!(1, s.len());
-    assert_eq!(2, i.len());
+    assert_eq!(3, armies.len());
 }
 
 #[test]
 fn test_combat_to_death() {
     let s = std::fs::read_to_string("input/input24_debug.txt").expect("cannot read file");
-    let (mut s, mut i) = parse_armies(&s);
+    let mut armies = parse_armies(&s);
 
-    assert_eq!((0, 782 + 4434), combat_to_death(&mut s, &mut i));
-
-    assert_eq!(0, s.len());
-    assert_eq!(2, i.len());
+    assert_eq!((0, 782 + 4434), combat_to_death(&mut armies));
+    assert_eq!(2, armies.len());
 }
