@@ -60,7 +60,7 @@ pub fn answer1() {
     let constellations = pathfinding::undirected::connected_components::components(&neighbours);
 
     println!(
-        "Four-Dimensional Adventure (1/2): {:?}",
+        "Day 25: Four-Dimensional Adventure (1/1): {:?}",
         constellations.len()
     );
 }

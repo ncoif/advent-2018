@@ -62,12 +62,12 @@ fn simulate2(input: &[u8]) -> usize {
 }
 
 pub fn answer1() {
-    println!("Chocolate Charts (1/2): {:?}", simulate1(580741));
+    println!("Day 14: Chocolate Charts (1/2): {:?}", simulate1(580741));
 }
 
 pub fn answer2() {
     println!(
-        "Chocolate Charts (2/2): {:?}",
+        "Day 14: Chocolate Charts (2/2): {:?}",
         simulate2(&vec![5, 8, 0, 7, 4, 1])
     );
 }

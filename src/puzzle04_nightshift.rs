@@ -233,7 +233,7 @@ pub fn answer1() {
     let best_minute = best_minute(&inputs, &worst_guard);
     //println!("worst_minute: {:?}", best_minute);
 
-    println!("Repose Record (1/2): {:?}", worst_guard.0 * best_minute);
+    println!("Day 04: Repose Record (1/2): {:?}", worst_guard.0 * best_minute);
 }
 
 pub fn answer2() {
@@ -241,7 +241,7 @@ pub fn answer2() {
     inputs.sort();
 
     let solution2 = most_frequently_asleep(&inputs);
-    println!("Repose Record (2/2): {:?}", solution2.0 * solution2.1);
+    println!("Day 04: Repose Record (2/2): {:?}", solution2.0 * solution2.1);
 }
 
 fn read_file<'a>() -> Vec<Event> {

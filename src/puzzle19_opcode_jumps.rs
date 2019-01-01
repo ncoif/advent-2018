@@ -166,7 +166,7 @@ pub fn answer1() {
     let mut reg = [0; 6];
     prog.run(&mut reg);
 
-    println!("Go With The Flow (1/2): {:?}", reg[0]);
+    println!("Day 19: Go With The Flow (1/2): {:?}", reg[0]);
 }
 
 pub fn answer2() {
@@ -177,7 +177,7 @@ pub fn answer2() {
     reg[0] = 1;
     prog.run(&mut reg);
 
-    println!("Go With The Flow (2/2): {:?}", reg[0]);
+    println!("Day 19: Go With The Flow (2/2): {:?}", reg[0]);
 }
 
 #[test]

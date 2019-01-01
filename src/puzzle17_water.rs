@@ -210,7 +210,7 @@ pub fn answer1() {
     //println!("{}", ground);
 
     let count = ground.count_water();
-    println!("Reservoir Research (1/2): {}", count.0 + count.1);
+    println!("Day 17: Reservoir Research (1/2): {}", count.0 + count.1);
 }
 
 pub fn answer2() {
@@ -220,7 +220,7 @@ pub fn answer2() {
     ground.fill(500, 0, Flow::Down);
 
     let count = ground.count_water();
-    println!("Reservoir Research (2/2): {}", count.0);
+    println!("Day 17: Reservoir Research (2/2): {}", count.0);
 }
 
 #[test]
