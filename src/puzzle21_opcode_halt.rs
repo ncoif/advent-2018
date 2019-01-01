@@ -168,7 +168,7 @@ impl Prog {
     // return the max if a cycle is found
     fn run_with_ip30_cycle(&self, reg: &mut [usize]) -> usize {
         let mut candidates = HashSet::new();
-        let mut cycle = vec![];
+        let mut last = None;
         let ip = self.ip;
 
         loop {
@@ -178,7 +178,7 @@ impl Prog {
                     break;
                 } else {
                     candidates.insert(r4);
-                    cycle.push(r4);
+                    last = Some(r4);
                 }
             }
 
@@ -191,7 +191,9 @@ impl Prog {
             }
         }
 
-        *cycle.last().unwrap()
+        println!("candidates: {}", candidates.len());
+
+        last.unwrap()
     }
 }
 
@@ -220,10 +222,10 @@ pub fn answer2() {
     let mut reg = [0; 6];
     let r0 = prog.run_with_ip30_cycle(&mut reg);
 
-    // using this r0, run the program to confirm that it halts
-    let mut reg = [0; 6];
-    reg[0] = r0;
-    prog.run(&mut reg);
+    println!("Go With The Flow (2/2): {:?}", r0);
 
-    println!("Go With The Flow (2/2): {:?}", reg[0]);
+    // using this r0, run the program to confirm that it halts
+    // let mut reg = [0; 6];
+    // reg[0] = r0;
+    // prog.run(&mut reg);
 }
