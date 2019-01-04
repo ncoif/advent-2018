@@ -62,7 +62,10 @@ fn generations(s: &str) -> isize {
 
 pub fn answer1() {
     let s = std::fs::read_to_string("input/input12.txt").expect("cannot read file");
-    println!("Day 12: Subterranean Sustainability (1/2): {}", generations(&s));
+    println!(
+        "Day 12: Subterranean Sustainability (1/2): {}",
+        generations(&s)
+    );
 }
 
 pub fn answer2() {

@@ -21,7 +21,10 @@ pub fn answer1() {
             (double, triple)
         });
 
-    println!("Day 02: Inventory Management System (1/2): {}", double * triple);
+    println!(
+        "Day 02: Inventory Management System (1/2): {}",
+        double * triple
+    );
 }
 
 pub fn answer2() {
@@ -39,7 +42,10 @@ pub fn answer2() {
         }
     }
 
-    println!("Day 02: Inventory Management System (2/2): {:?}", result.unwrap());
+    println!(
+        "Day 02: Inventory Management System (2/2): {:?}",
+        result.unwrap()
+    );
 }
 
 fn read_file() -> Vec<String> {

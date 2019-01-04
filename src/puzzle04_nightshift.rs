@@ -136,7 +136,7 @@ impl PartialOrd for Event {
 }
 
 // find the worst guard, i.e. the one with the longuest sleep
-fn sleep_times(events: &Vec<Event>) -> Guard {
+fn sleep_times(events: &[Event]) -> Guard {
     let mut sleep_times_per_guards = HashMap::new();
     let mut current_guard = 0;
     let mut last_sleep_start = &Date::new();
@@ -166,7 +166,7 @@ fn sleep_times(events: &Vec<Event>) -> Guard {
     Guard(max_guard)
 }
 
-fn best_minute(events: &Vec<Event>, worst_guard: &Guard) -> u32 {
+fn best_minute(events: &[Event], worst_guard: &Guard) -> u32 {
     let mut asleep_on = HashMap::new();
     let mut last_sleep_start = 0;
     let mut our_guard = false;
@@ -199,7 +199,7 @@ fn best_minute(events: &Vec<Event>, worst_guard: &Guard) -> u32 {
     min
 }
 
-fn most_frequently_asleep(events: &Vec<Event>) -> (u32, u32) {
+fn most_frequently_asleep(events: &[Event]) -> (u32, u32) {
     let mut asleep_on = HashMap::new();
     let mut current_guard = 0;
     let mut last_sleep_start = 0;
@@ -233,7 +233,10 @@ pub fn answer1() {
     let best_minute = best_minute(&inputs, &worst_guard);
     //println!("worst_minute: {:?}", best_minute);
 
-    println!("Day 04: Repose Record (1/2): {:?}", worst_guard.0 * best_minute);
+    println!(
+        "Day 04: Repose Record (1/2): {:?}",
+        worst_guard.0 * best_minute
+    );
 }
 
 pub fn answer2() {
@@ -241,7 +244,10 @@ pub fn answer2() {
     inputs.sort();
 
     let solution2 = most_frequently_asleep(&inputs);
-    println!("Day 04: Repose Record (2/2): {:?}", solution2.0 * solution2.1);
+    println!(
+        "Day 04: Repose Record (2/2): {:?}",
+        solution2.0 * solution2.1
+    );
 }
 
 fn read_file<'a>() -> Vec<Event> {

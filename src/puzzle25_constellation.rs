@@ -37,7 +37,7 @@ impl Point {
     }
 }
 
-fn neighbours(points: &Vec<Point>) -> Vec<Vec<usize>> {
+fn neighbours(points: &[Point]) -> Vec<Vec<usize>> {
     let mut neighbours = vec![vec![]];
     for p1 in points {
         let ns: Vec<usize> = points

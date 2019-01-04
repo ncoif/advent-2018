@@ -50,7 +50,7 @@ fn read_file() -> Vec<Coord> {
         .collect()
 }
 
-fn find_min_max(coords: &Vec<Coord>) -> (i32, i32, i32, i32) {
+fn find_min_max(coords: &[Coord]) -> (i32, i32, i32, i32) {
     let min_x = coords
         .iter()
         .map(|c| c.x)

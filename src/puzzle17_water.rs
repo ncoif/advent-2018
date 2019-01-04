@@ -71,7 +71,7 @@ struct Ground {
 }
 
 impl Ground {
-    fn from_veins(veins: &Vec<Vein>) -> Ground {
+    fn from_veins(veins: &[Vein]) -> Ground {
         let x_min = veins.iter().map(|v| min(v.x_start, v.x_end)).min().unwrap() as usize;
         let x_max = veins.iter().map(|v| max(v.x_start, v.x_end)).max().unwrap() as usize;
         let y_min = veins.iter().map(|v| min(v.y_start, v.y_end)).min().unwrap() as usize;

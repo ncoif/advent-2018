@@ -21,7 +21,10 @@ pub fn answer1() {
         }
     }
 
-    println!("Day 01: Chronal Calibration (1/2): {:?}", first_seen.unwrap());
+    println!(
+        "Day 01: Chronal Calibration (1/2): {:?}",
+        first_seen.unwrap()
+    );
 }
 
 pub fn answer2() {
@@ -46,7 +49,10 @@ pub fn answer2() {
         final_frequency.get_or_insert(current_frequency);
     }
 
-    println!("Day 01: Chronal Calibration (2/2): {:?}", final_frequency.unwrap());
+    println!(
+        "Day 01: Chronal Calibration (2/2): {:?}",
+        final_frequency.unwrap()
+    );
 }
 
 fn read_file() -> Vec<i32> {

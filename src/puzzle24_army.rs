@@ -142,7 +142,7 @@ fn combat_to_death(armies: &mut Vec<Army>) -> (u64, u64) {
     }
 }
 
-fn combat_target(armies: &Vec<Army>) -> Vec<Option<usize>> {
+fn combat_target(armies: &[Army]) -> Vec<Option<usize>> {
     let mut attack_targets = vec![None; armies.len()];
 
     let mut orders: Vec<usize> = (0..=armies.len() - 1).collect();

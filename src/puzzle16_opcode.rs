@@ -141,7 +141,10 @@ pub fn answer1() {
         }
     }
 
-    println!("Day 16: Chronal Classification (1/2): {:?}", triple_candidates);
+    println!(
+        "Day 16: Chronal Classification (1/2): {:?}",
+        triple_candidates
+    );
 }
 
 pub fn answer2() {
