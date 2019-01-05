@@ -20,7 +20,7 @@ fn char_matches(c1: char, c2: char) -> bool {
     c1.eq_ignore_ascii_case(&c2) && c1 != c2
 }
 
-fn reduce1(poly: String) -> usize {
+fn reduce1(poly: &str) -> usize {
     let mut tail = poly.chars().collect::<LinkedList<_>>();
     let mut head: LinkedList<char> = LinkedList::new();
 
@@ -41,7 +41,7 @@ fn reduce1(poly: String) -> usize {
 
 pub fn answer1() {
     let poly = read_file();
-    let reduce1 = reduce1(poly);
+    let reduce1 = reduce1(&poly);
 
     println!("Day 05: Alchemical Reduction (1/2): {}", reduce1);
 }
@@ -56,7 +56,7 @@ pub fn answer2() {
     let mut minimal_length = poly.len();
     for l in letters {
         let current_poly = poly.replace(|a: char| a.to_ascii_uppercase() == l, "");
-        let candidate = reduce1(current_poly);
+        let candidate = reduce1(&current_poly);
         if candidate < minimal_length {
             minimal_length = candidate;
         }

@@ -85,8 +85,8 @@ pub fn answer1() {
     let mut grid = HashMap::new();
     let mut closest_coord = None;
     let mut closest_distance = max_x + max_y;
-    for x in min_x..(max_x + 1) {
-        for y in min_y..(max_y + 1) {
+    for x in min_x..=max_x {
+        for y in min_y..=max_y {
             let current_coord = Coord { x: x, y: y };
             for candidate in coords.iter() {
                 let distance = current_coord.man_distance(candidate);

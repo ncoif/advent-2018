@@ -95,13 +95,10 @@ impl FromStr for Status {
     type Err = ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = s.trim();
-        if s == "wakes up" {
-            Ok(Status::WakesUp)
-        } else if s == "falls asleep" {
-            Ok(Status::FallsAsleep)
-        } else {
-            Ok(Status::ShiftStart(Guard::from_str(s).unwrap()))
+        match s.trim() {
+            "wakes up" => Ok(Status::WakesUp),
+            "falls asleep" => Ok(Status::FallsAsleep),
+            _ => Ok(Status::ShiftStart(Guard::from_str(s).unwrap())),
         }
     }
 }
@@ -250,7 +247,7 @@ pub fn answer2() {
     );
 }
 
-fn read_file<'a>() -> Vec<Event> {
+fn read_file() -> Vec<Event> {
     let filename = "input/input4.txt";
     let file = File::open(filename).expect("cannot open file");
     let reader = BufReader::new(file);
