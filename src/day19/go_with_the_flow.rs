@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::str::FromStr;
@@ -23,7 +26,7 @@ enum Opcode {
 }
 
 impl FromStr for Opcode {
-    type Err = ();
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         use self::Opcode::*;
@@ -44,7 +47,7 @@ impl FromStr for Opcode {
             "eqir" => Ok(Eqir),
             "eqri" => Ok(Eqri),
             "eqrr" => Ok(Eqrr),
-            _ => Err(()),
+            _ => Err(AocError::ParseString),
         }
     }
 }
@@ -79,7 +82,7 @@ struct Instruction {
 }
 
 impl FromStr for Instruction {
-    type Err = ();
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -159,25 +162,25 @@ impl Prog {
     }
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input19.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input19.txt")?;
     let prog = Prog::from_str(&s).unwrap();
 
     let mut reg = [0; 6];
     prog.run(&mut reg);
 
-    println!("Day 19: Go With The Flow (1/2): {:?}", reg[0]);
+    Ok(AocResponse::new(19, 1, "Go With The Flow", reg[0]))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input19.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input19.txt")?;
     let prog = Prog::from_str(&s).unwrap();
 
     let mut reg = [0; 6];
     reg[0] = 1;
     prog.run(&mut reg);
 
-    println!("Day 19: Go With The Flow (2/2): {:?}", reg[0]);
+    Ok(AocResponse::new(19, 2, "Go With The Flow", reg[0]))
 }
 
 #[test]

@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use std::fmt;
 use std::mem;
 use std::str::FromStr;
-use std::string::ParseError;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 enum Acre {
@@ -32,7 +31,7 @@ impl fmt::Display for Acre {
 }
 
 impl FromStr for World {
-    type Err = ParseError;
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let lines = s.split("\n");

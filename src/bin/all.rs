@@ -18,6 +18,7 @@ use aoc::day15::beverage_bandits;
 use aoc::day16::chronal_classification;
 use aoc::day17::reservoir_research;
 use aoc::day18::settlers_of_the_north_pole;
+use aoc::day19::go_with_the_flow;
 
 use std::env;
 
@@ -110,6 +111,9 @@ fn main() {
 
         181 => println_day!(settlers_of_the_north_pole::answer1()),
         182 => println_day!(settlers_of_the_north_pole::answer2()),
+
+        191 => println_day!(go_with_the_flow::answer1()),
+        192 => println_day!(go_with_the_flow::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
