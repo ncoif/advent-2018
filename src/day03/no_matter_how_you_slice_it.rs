@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
@@ -40,8 +43,8 @@ impl Area {
     }
 }
 
-pub fn answer1() {
-    let areas = read_file();
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let areas = read_file()?;
 
     let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
     let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
@@ -59,11 +62,16 @@ pub fn answer1() {
         .map(|v| v.iter().filter(|&c| *c > 1).count())
         .sum::<usize>();
 
-    println!("Day 03: No Matter How You Slice It (1/2): {}", conflicts);
+    Ok(AocResponse::new(
+        3,
+        1,
+        "No Matter How You Slice It",
+        conflicts,
+    ))
 }
 
-pub fn answer2() {
-    let areas = read_file();
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let areas = read_file()?;
 
     let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
     let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
@@ -76,6 +84,7 @@ pub fn answer2() {
         }
     }
 
+    let mut result = None;
     for p in &areas {
         let mut ok = true;
         for x in p.left..p.left + p.width {
@@ -86,19 +95,27 @@ pub fn answer2() {
             }
         }
         if ok {
-            println!("Day 03: No Matter How You Slice It (2/2): {:?}", p.id);
+            result = Some(p.id);
         }
+    }
+
+    match result {
+        None => Err(AocError::ComputeNotFound),
+        Some(r) => Ok(AocResponse::new(3, 2, "No Matter How You Slice It", r)),
     }
 }
 
-fn read_file<'a>() -> Vec<Area> {
+fn read_file() -> Result<Vec<Area>, AocError> {
     let filename = "input/input3.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Area::from_str(&s))
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Area::from_str(&line);
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
