@@ -10,6 +10,7 @@ use aoc::day07::the_sum_of_its_part;
 use aoc::day08::memory_maneuver;
 use aoc::day09::marble_mania;
 use aoc::day10::the_stars_align;
+use aoc::day11::chronal_charge;
 
 use std::env;
 
@@ -78,6 +79,9 @@ fn main() {
         92 => println_day!(marble_mania::answer2()),
 
         101 => println_day!(the_stars_align::answer1()),
+
+        111 => println_day!(chronal_charge::answer1()),
+        112 => println_day!(chronal_charge::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };

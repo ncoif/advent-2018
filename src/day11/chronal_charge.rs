@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 fn cell_power(x: usize, y: usize, serial: i32) -> i32 {
     let rack_id = x as i32 + 10;
     let power_start = (rack_id * y as i32 + serial) * rack_id;
@@ -5,7 +8,7 @@ fn cell_power(x: usize, y: usize, serial: i32) -> i32 {
     (hundredth - 5) as i32
 }
 
-pub fn answer1() {
+pub fn answer1() -> Result<AocResponse<String>, AocError> {
     let grid_size = 300;
     let serial = 7689;
 
@@ -42,10 +45,15 @@ pub fn answer1() {
         }
     }
 
-    println!("Day 11: Chronal Charge (1/2): {},{}", result_x, result_y);
+    Ok(AocResponse::new(
+        11,
+        1,
+        "Chronal Charge",
+        format!("{},{}", result_x, result_y),
+    ))
 }
 
-pub fn answer2() {
+pub fn answer2() -> Result<AocResponse<String>, AocError> {
     let grid_size = 300;
     let serial = 7689;
 
@@ -88,10 +96,12 @@ pub fn answer2() {
         }
     }
 
-    println!(
-        "Day 11: Chronal Charge (2/2): {},{},{}",
-        result_x, result_y, max_size
-    );
+    Ok(AocResponse::new(
+        11,
+        2,
+        "Chronal Charge",
+        format!("{},{},{}", result_x, result_y, max_size),
+    ))
 }
 
 #[test]
