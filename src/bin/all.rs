@@ -23,7 +23,8 @@ use aoc::day20::a_regular_map;
 use aoc::day21::chronal_conversion;
 use aoc::day22::mode_maze;
 use aoc::day23::experimental_emergency_teleportation;
-use aoc::day24::immune_system_simulator_20XX;
+use aoc::day24::immune_system_simulator;
+use aoc::day25::four_dimensional_adventure;
 
 use std::env;
 
@@ -131,8 +132,10 @@ fn main() {
 
         231 => println_day!(experimental_emergency_teleportation::answer1()),
 
-        241 => println_day!(immune_system_simulator_20XX::answer1()),
-        242 => println_day!(immune_system_simulator_20XX::answer2()),
+        241 => println_day!(immune_system_simulator::answer1()),
+        242 => println_day!(immune_system_simulator::answer2()),
+
+        251 => println_day!(four_dimensional_adventure::answer1()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };

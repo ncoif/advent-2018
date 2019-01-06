@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
@@ -52,34 +55,38 @@ fn neighbours(points: &[Point]) -> Vec<Vec<usize>> {
     neighbours
 }
 
-pub fn answer1() {
-    let points = read_file("input/input25.txt");
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let points = read_file("input/input25.txt")?;
     let neighbours = neighbours(&points);
 
     // https://docs.rs/pathfinding/1.1.10/pathfinding/undirected/connected_components/fn.components.html
     let constellations = pathfinding::undirected::connected_components::components(&neighbours);
 
-    println!(
-        "Day 25: Four-Dimensional Adventure (1/1): {:?}",
-        constellations.len()
-    );
+    Ok(AocResponse::new(
+        25,
+        1,
+        "Four-Dimensional Adventure",
+        constellations.len(),
+    ))
 }
 
-fn read_file(filename: &str) -> Vec<Point> {
-    let file = File::open(filename).expect("cannot open file");
+fn read_file(filename: &str) -> Result<Vec<Point>, AocError> {
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Point::from_str(&s))
-        .filter_map(|result| result.ok())
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Point::from_str(&line)?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
 #[test]
 fn test_constellations() {
-    let points = read_file("input/input25_debug.txt");
+    let points = read_file("input/input25_debug.txt").unwrap();
     let neighbours = neighbours(&points);
     let constellations = pathfinding::undirected::connected_components::components(&neighbours);
 
