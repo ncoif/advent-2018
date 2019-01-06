@@ -33,3 +33,15 @@ impl error::Error for AdventOfCodeError {
         }
     }
 }
+
+impl From<io::Error> for AdventOfCodeError {
+    fn from(err: io::Error) -> AdventOfCodeError {
+        AdventOfCodeError::Io(err)
+    }
+}
+
+impl From<num::ParseIntError> for AdventOfCodeError {
+    fn from(err: num::ParseIntError) -> AdventOfCodeError {
+        AdventOfCodeError::Parse(err)
+    }
+}

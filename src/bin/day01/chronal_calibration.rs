@@ -1,14 +1,18 @@
 use crate::common::error::AdventOfCodeError;
+use crate::common::response::AdventOfCodeResponse;
+
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-pub fn answer1() -> Result<i32, AdventOfCodeError> {
+type Frequency = i32;
+
+pub fn answer1() -> Result<AdventOfCodeResponse, AdventOfCodeError> {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
 
-    let inputs = read_file();
+    let inputs = read_file()?;
     while first_seen.is_none() {
         for input in &inputs {
             current_frequency += input;
@@ -22,21 +26,21 @@ pub fn answer1() -> Result<i32, AdventOfCodeError> {
         }
     }
 
-    println!(
-        "Day 01: Chronal Calibration (1/2): {:?}",
-        first_seen.unwrap()
-    );
-
-    Ok(first_seen.unwrap())
+    Ok(AdventOfCodeResponse::new(
+        1,
+        1,
+        "Chronal Calibration",
+        &first_seen.unwrap().to_string(),
+    ))
 }
 
-pub fn answer2() {
+pub fn answer2() -> Result<AdventOfCodeResponse, AdventOfCodeError> {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
     let mut final_frequency = None;
 
-    let inputs = read_file();
+    let inputs = read_file()?;
     while first_seen.is_none() {
         for input in &inputs {
             current_frequency += input;
@@ -52,20 +56,25 @@ pub fn answer2() {
         final_frequency.get_or_insert(current_frequency);
     }
 
-    println!(
-        "Day 01: Chronal Calibration (2/2): {:?}",
-        final_frequency.unwrap()
-    );
+    Ok(AdventOfCodeResponse::new(
+        1,
+        2,
+        "Chronal Calibration",
+        &final_frequency.unwrap().to_string(),
+    ))
 }
 
-fn read_file() -> Vec<i32> {
+fn read_file() -> Result<Vec<Frequency>, AdventOfCodeError> {
     let filename = "input/input1.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| s.parse::<i32>().expect("invalid number"))
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = line.parse::<i32>()?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }

@@ -6,4 +6,8 @@ fn main() {
         Ok(n) => println!("{}", n),
         Err(err) => println!("Error: {:?}", err),
     }
+    match day01::chronal_calibration::answer2() {
+        Ok(n) => println!("{}", n),
+        Err(err) => println!("Error: {:?}", err),
+    }
 }
