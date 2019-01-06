@@ -19,6 +19,7 @@ use aoc::day16::chronal_classification;
 use aoc::day17::reservoir_research;
 use aoc::day18::settlers_of_the_north_pole;
 use aoc::day19::go_with_the_flow;
+use aoc::day20::a_regular_map;
 
 use std::env;
 
@@ -114,6 +115,9 @@ fn main() {
 
         191 => println_day!(go_with_the_flow::answer1()),
         192 => println_day!(go_with_the_flow::answer2()),
+
+        201 => println_day!(a_regular_map::answer1()),
+        202 => println_day!(a_regular_map::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };

@@ -1,15 +1,10 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use regex_syntax::hir::{self, Hir, HirKind};
 use regex_syntax::ParserBuilder;
 use std::cmp;
 use std::collections::HashMap;
-use std::error::Error;
-use std::result;
-
-type Result<T> = result::Result<T, Box<Error>>;
-
-macro_rules! err {
-    ($($tt:tt)*) => { Err(Box::<Error>::from(format!($($tt)*))) }
-}
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct Coord {
@@ -18,7 +13,7 @@ struct Coord {
 }
 
 impl Coord {
-    fn mv(self, direction: char) -> Result<Coord> {
+    fn mv(self, direction: char) -> Result<Coord, AocError> {
         match direction {
             'N' => Ok(Coord {
                 x: self.x,
@@ -36,7 +31,7 @@ impl Coord {
                 x: self.x + 1,
                 y: self.y,
             }),
-            _ => err!("unexpected character"),
+            _ => Err(AocError::ParseString),
         }
     }
 }
@@ -45,7 +40,7 @@ impl Coord {
 type Distances = HashMap<Coord, usize>;
 
 // TODO: trying a proper Result response, so it seems I must return something, so I'm returning something meaningless
-fn distances(expr: &Hir, dists: &mut Distances, c: Coord) -> Result<Coord> {
+fn distances(expr: &Hir, dists: &mut Distances, c: Coord) -> Result<Coord, AocError> {
     match *expr.kind() {
         HirKind::Literal(hir::Literal::Unicode(ch)) => {
             let nextc = c.mv(ch)?;
@@ -74,13 +69,14 @@ fn distances(expr: &Hir, dists: &mut Distances, c: Coord) -> Result<Coord> {
     }
 }
 
-fn build_distances(s: &str) -> Result<Distances> {
+fn build_distances(s: &str) -> Result<Distances, AocError> {
     // use regex-syntax to build a high-level intermediate representation ("HIR") of regular expression
     // https://docs.rs/regex-syntax/0.6.4/regex_syntax/
     let expr = ParserBuilder::new()
         .nest_limit(1000)
         .build()
-        .parse(s.trim())?;
+        .parse(s.trim())
+        .unwrap();
 
     let mut dists = Distances::new();
     let origin = Coord { x: 0, y: 0 };
@@ -95,20 +91,20 @@ fn max_distance(dists: &Distances) -> usize {
     *dists.values().max().unwrap()
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input20.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input20.txt")?;
     let dists = build_distances(&s).unwrap();
     let result = max_distance(&dists);
 
-    println!("Day 20: A Regular Map (1/2): {:?}", result);
+    Ok(AocResponse::new(20, 1, "A Regular Map", result))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input20.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input20.txt")?;
     let dists = build_distances(&s).unwrap();
     let rooms = dists.values().filter(|&&d| d >= 1000).count();
 
-    println!("Day 20: A Regular Map (2/2): {:?}", rooms);
+    Ok(AocResponse::new(20, 2, "A Regular Map", rooms))
 }
 
 #[test]
