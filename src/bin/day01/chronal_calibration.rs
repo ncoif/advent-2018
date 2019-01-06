@@ -1,5 +1,5 @@
-use crate::common::error::AdventOfCodeError;
-use crate::common::response::AdventOfCodeResponse;
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
 
 use std::collections::HashSet;
 use std::fs::File;
@@ -7,7 +7,7 @@ use std::io::{BufRead, BufReader};
 
 type Frequency = i32;
 
-pub fn answer1() -> Result<AdventOfCodeResponse, AdventOfCodeError> {
+pub fn answer1() -> Result<AocResponse<Frequency>, AocError> {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
@@ -26,15 +26,13 @@ pub fn answer1() -> Result<AdventOfCodeResponse, AdventOfCodeError> {
         }
     }
 
-    Ok(AdventOfCodeResponse::new(
-        1,
-        1,
-        "Chronal Calibration",
-        &first_seen.unwrap().to_string(),
-    ))
+    match first_seen {
+        None => Err(AocError::ComputeNotFound),
+        Some(freq) => Ok(AocResponse::new(1, 1, "Chronal Calibration", freq)),
+    }
 }
 
-pub fn answer2() -> Result<AdventOfCodeResponse, AdventOfCodeError> {
+pub fn answer2() -> Result<AocResponse<Frequency>, AocError> {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
@@ -56,15 +54,13 @@ pub fn answer2() -> Result<AdventOfCodeResponse, AdventOfCodeError> {
         final_frequency.get_or_insert(current_frequency);
     }
 
-    Ok(AdventOfCodeResponse::new(
-        1,
-        2,
-        "Chronal Calibration",
-        &final_frequency.unwrap().to_string(),
-    ))
+    match final_frequency {
+        None => Err(AocError::ComputeNotFound),
+        Some(freq) => Ok(AocResponse::new(1, 2, "Chronal Calibration", freq)),
+    }
 }
 
-fn read_file() -> Result<Vec<Frequency>, AdventOfCodeError> {
+fn read_file() -> Result<Vec<Frequency>, AocError> {
     let filename = "input/input1.txt";
     let file = File::open(filename)?;
     let reader = BufReader::new(file);

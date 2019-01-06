@@ -1,15 +1,15 @@
 use std::fmt;
 
-//TODO: AdventOfCodeResponse<T> for different types of response
+//TODO: AocResponse<T> for different types of response
 #[derive(Debug)]
-pub struct AdventOfCodeResponse {
+pub struct AocResponse<T> {
     day: isize,
     part: isize,
     description: String,
-    answer: String,
+    answer: T,
 }
 
-impl fmt::Display for AdventOfCodeResponse {
+impl fmt::Display for AocResponse<i32> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -19,13 +19,13 @@ impl fmt::Display for AdventOfCodeResponse {
     }
 }
 
-impl AdventOfCodeResponse {
-    pub fn new(day: isize, part: isize, description: &str, answer: &str) -> Self {
-        AdventOfCodeResponse {
+impl AocResponse<i32> {
+    pub fn new(day: isize, part: isize, description: &str, answer: i32) -> Self {
+        AocResponse {
             day,
             part,
             description: description.to_string(),
-            answer: answer.to_string(),
+            answer,
         }
     }
 }
