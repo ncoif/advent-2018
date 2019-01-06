@@ -7,6 +7,7 @@ use std::num;
 pub enum AocError {
     Io(io::Error),
     Parse(num::ParseIntError),
+    InvalidDayProblem,
     ComputeNotFound,
 }
 
@@ -15,6 +16,7 @@ impl fmt::Display for AocError {
         match *self {
             AocError::Io(ref err) => write!(f, "IO error: {}", err),
             AocError::Parse(ref err) => write!(f, "Parse error: {}", err),
+            AocError::InvalidDayProblem => write!(f, "Error: invalid day and/or problem"),
             AocError::ComputeNotFound => write!(f, "Computation error: no answer found"),
         }
     }
@@ -25,6 +27,7 @@ impl error::Error for AocError {
         match *self {
             AocError::Io(ref err) => err.description(),
             AocError::Parse(ref err) => error::Error::description(err),
+            AocError::InvalidDayProblem => "Error: invalid day and/or problem",
             AocError::ComputeNotFound => "Computation error: no answer found",
         }
     }
@@ -33,6 +36,7 @@ impl error::Error for AocError {
         match *self {
             AocError::Io(ref err) => Some(err),
             AocError::Parse(ref err) => Some(err),
+            AocError::InvalidDayProblem => None,
             AocError::ComputeNotFound => None,
         }
     }
