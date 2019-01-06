@@ -11,6 +11,7 @@ use aoc::day07::the_sum_of_its_part;
 use aoc::day08::memory_maneuver;
 use aoc::day09::marble_mania;
 use aoc::day11::chronal_charge;
+use aoc::day12::subterranean_sustainability;
 
 use criterion::Criterion;
 
@@ -68,6 +69,13 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("day 11 answer 1", |b| b.iter(|| chronal_charge::answer1()));
     c.bench_function("day 11 answer 2", |b| b.iter(|| chronal_charge::answer2()));
+
+    c.bench_function("day 12 answer 1", |b| {
+        b.iter(|| subterranean_sustainability::answer1())
+    });
+    c.bench_function("day 12 answer 2", |b| {
+        b.iter(|| subterranean_sustainability::answer2())
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);

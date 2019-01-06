@@ -11,6 +11,7 @@ use aoc::day08::memory_maneuver;
 use aoc::day09::marble_mania;
 use aoc::day10::the_stars_align;
 use aoc::day11::chronal_charge;
+use aoc::day12::subterranean_sustainability;
 
 use std::env;
 
@@ -82,6 +83,9 @@ fn main() {
 
         111 => println_day!(chronal_charge::answer1()),
         112 => println_day!(chronal_charge::answer2()),
+
+        121 => println_day!(subterranean_sustainability::answer1()),
+        122 => println_day!(subterranean_sustainability::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };

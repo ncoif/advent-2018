@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use std::collections::HashSet;
 
 #[derive(Debug)]
@@ -60,16 +63,19 @@ fn generations(s: &str) -> isize {
     p.sum()
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input12.txt").expect("cannot read file");
-    println!(
-        "Day 12: Subterranean Sustainability (1/2): {}",
-        generations(&s)
-    );
+pub fn answer1() -> Result<AocResponse<isize>, AocError> {
+    let s = std::fs::read_to_string("input/input12.txt")?;
+
+    Ok(AocResponse::new(
+        12,
+        1,
+        "Subterranean Sustainability",
+        generations(&s),
+    ))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input12.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<isize>, AocError> {
+    let s = std::fs::read_to_string("input/input12.txt")?;
 
     let mut lines = s.split("\n");
     let mut state = lines.next().unwrap().split(" ").nth(2).unwrap().to_string();
@@ -99,7 +105,12 @@ pub fn answer2() {
         current = next;
     };
 
-    println!("Day 12: Subterranean Sustainability (2/2): {}", result);
+    Ok(AocResponse::new(
+        12,
+        2,
+        "Subterranean Sustainability",
+        result,
+    ))
 }
 
 #[test]
