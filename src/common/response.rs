@@ -1,7 +1,10 @@
 use std::fmt;
 
 #[derive(Debug)]
-pub struct AocResponse<T> {
+pub struct AocResponse<T>
+where
+    T: fmt::Display,
+{
     day: isize,
     part: isize,
     description: String,
