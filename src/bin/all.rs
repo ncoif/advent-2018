@@ -21,6 +21,7 @@ use aoc::day18::settlers_of_the_north_pole;
 use aoc::day19::go_with_the_flow;
 use aoc::day20::a_regular_map;
 use aoc::day21::chronal_conversion;
+use aoc::day22::mode_maze;
 
 use std::env;
 
@@ -122,6 +123,9 @@ fn main() {
 
         211 => println_day!(chronal_conversion::answer1()),
         212 => println_day!(chronal_conversion::answer2()),
+
+        221 => println_day!(mode_maze::answer1()),
+        222 => println_day!(mode_maze::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };

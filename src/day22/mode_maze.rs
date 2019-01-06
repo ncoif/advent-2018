@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RegionType {
     ROCKY,
@@ -224,14 +227,14 @@ impl Cave {
     }
 }
 
-pub fn answer1() {
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
     let cave = Cave::new(&Coord { x: 6, y: 770 }, 4845);
-    println!("Day 22: Mode Maze (1/2): {:?}", cave.risk_level());
+    Ok(AocResponse::new(22, 1, "Mode Maze", cave.risk_level()))
 }
 
-pub fn answer2() {
+pub fn answer2() -> Result<AocResponse<u64>, AocError> {
     let cave = Cave::new(&Coord { x: 6, y: 770 }, 4845);
-    println!("Day 22: Mode Maze (2/2): {:?}", cave.shortest_path());
+    Ok(AocResponse::new(22, 2, "Mode Maze", cave.shortest_path()))
 }
 
 #[test]

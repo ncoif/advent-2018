@@ -21,6 +21,7 @@ use aoc::day18::settlers_of_the_north_pole;
 use aoc::day19::go_with_the_flow;
 use aoc::day20::a_regular_map;
 use aoc::day21::chronal_conversion;
+use aoc::day22::mode_maze;
 
 use criterion::Criterion;
 
@@ -144,6 +145,9 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("day 21 answer 2", |b| {
         b.iter(|| chronal_conversion::answer2())
     });
+
+    c.bench_function("day 22 answer 1", |b| b.iter(|| mode_maze::answer1()));
+    c.bench_function("day 22 answer 2", |b| b.iter(|| mode_maze::answer2()));
 }
 
 criterion_group!(benches, criterion_benchmark);
