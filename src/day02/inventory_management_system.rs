@@ -1,10 +1,13 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::Chars;
 
-pub fn answer1() {
-    let inputs = read_file();
+pub fn answer1() -> Result<AocResponse<i32>, AocError> {
+    let inputs = read_file()?;
 
     let frequencies: Vec<HashMap<char, u32>> =
         inputs.iter().map(|s| frequencies(s.chars())).collect();
@@ -21,14 +24,16 @@ pub fn answer1() {
             (double, triple)
         });
 
-    println!(
-        "Day 02: Inventory Management System (1/2): {}",
-        double * triple
-    );
+    Ok(AocResponse::new(
+        2,
+        1,
+        "Inventory Management System",
+        double * triple,
+    ))
 }
 
-pub fn answer2() {
-    let inputs = read_file();
+pub fn answer2() -> Result<AocResponse<String>, AocError> {
+    let inputs = read_file()?;
 
     let mut result = None;
 
@@ -42,18 +47,24 @@ pub fn answer2() {
         }
     }
 
-    println!(
-        "Day 02: Inventory Management System (2/2): {:?}",
-        result.unwrap()
-    );
+    match result {
+        None => Err(AocError::ComputeNotFound),
+        Some(r) => Ok(AocResponse::new(2, 2, "Inventory Management System", r)),
+    }
 }
 
-fn read_file() -> Vec<String> {
+fn read_file() -> Result<Vec<String>, AocError> {
     let filename = "input/input2.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader.lines().filter_map(|result| result.ok()).collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
 fn frequencies(s: Chars) -> HashMap<char, u32> {
@@ -66,7 +77,7 @@ fn frequencies(s: Chars) -> HashMap<char, u32> {
     frequencies
 }
 
-fn common_letters(s1: &String, s2: &String) -> String {
+fn common_letters(s1: &str, s2: &str) -> String {
     s1.chars()
         .zip(s2.chars())
         .filter(|(c1, c2)| c1 == c2)

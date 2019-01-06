@@ -1,18 +1,15 @@
-use std::fmt;
+use std::fmt::{Display, Formatter, Result};
 
 #[derive(Debug)]
-pub struct AocResponse<T>
-where
-    T: fmt::Display,
-{
+pub struct AocResponse<T: Display> {
     day: isize,
     part: isize,
     description: String,
     answer: T,
 }
 
-impl fmt::Display for AocResponse<i32> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl<T: Display> Display for AocResponse<T> {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         write!(
             f,
             "Day {:02}: {} ({}/2): {}",
@@ -21,8 +18,8 @@ impl fmt::Display for AocResponse<i32> {
     }
 }
 
-impl AocResponse<i32> {
-    pub fn new(day: isize, part: isize, description: &str, answer: i32) -> Self {
+impl<T: Display + Clone> AocResponse<T> {
+    pub fn new(day: isize, part: isize, description: &str, answer: T) -> Self {
         AocResponse {
             day,
             part,
@@ -32,7 +29,7 @@ impl AocResponse<i32> {
     }
 
     #[allow(dead_code)]
-    pub fn get(&self) -> i32 {
-        self.answer
+    pub fn get(&self) -> T {
+        self.answer.clone()
     }
 }

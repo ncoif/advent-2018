@@ -15,5 +15,5 @@ regex-syntax = "0.6"
 criterion = "0.2"
 
 [[bench]]
-name = "day01"
+name = "all"
 harness = false
