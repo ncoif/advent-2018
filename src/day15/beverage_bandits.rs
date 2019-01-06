@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use std::collections::HashSet;
 use std::fmt;
 
@@ -285,18 +288,28 @@ fn combat2(s: &str) -> (u32, u32) {
     panic!()
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<u32>, AocError> {
+    let s = std::fs::read_to_string("input/input15.txt")?;
 
     let result = combat1(&s);
-    println!("Day 15: Beverage Bandits (1/2): {:?}", result.0 * result.1);
+    Ok(AocResponse::new(
+        15,
+        1,
+        "Beverage Bandits",
+        result.0 * result.1,
+    ))
 }
 
-pub fn answer2() {
+pub fn answer2() -> Result<AocResponse<u32>, AocError> {
     let s = std::fs::read_to_string("input/input15.txt").expect("cannot read file");
 
     let result = combat2(&s);
-    println!("Day 15: Beverage Bandits (2/2): {:?}", result.0 * result.1);
+    Ok(AocResponse::new(
+        15,
+        2,
+        "Beverage Bandits",
+        result.0 * result.1,
+    ))
 }
 
 #[test]
