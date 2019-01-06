@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::{BTreeSet, HashSet};
@@ -103,27 +106,30 @@ fn execute_in_parallel(prereqs: &mut Vec<Dependency>, workers: usize, offset: us
     time
 }
 
-fn read_file() -> Vec<Dependency> {
+fn read_file() -> Result<Vec<Dependency>, AocError> {
     //let filename = "input/input7_debug.txt";
     let filename = "input/input7.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Dependency::from_str(&s).unwrap())
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Dependency::from_str(&line)?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
-pub fn answer1() {
-    let mut dependencies = read_file();
+pub fn answer1() -> Result<AocResponse<String>, AocError> {
+    let mut dependencies = read_file()?;
     let order = instruction_order(&mut dependencies);
-    println!("Day 07: The Sum Of Its Parts (1/2): {}", order);
+    Ok(AocResponse::new(7, 1, "The Sum Of Its Parts", order))
 }
 
-pub fn answer2() {
-    let mut dependencies = read_file();
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let mut dependencies = read_file()?;
     let total_time = execute_in_parallel(&mut dependencies, 5, 60);
-    println!("Day 07: The Sum Of Its Parts (2/2): {}", total_time);
+    Ok(AocResponse::new(7, 2, "The Sum Of Its Parts", total_time))
 }

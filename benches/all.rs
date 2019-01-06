@@ -7,6 +7,7 @@ use aoc::day03::no_matter_how_you_slice_it;
 use aoc::day04::repose_record;
 use aoc::day05::alchemical_reduction;
 use aoc::day06::chronal_coordinates;
+use aoc::day07::the_sum_of_its_part;
 
 use criterion::Criterion;
 
@@ -47,6 +48,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
     c.bench_function("day 6 answer 2", |b| {
         b.iter(|| chronal_coordinates::answer2())
+    });
+
+    c.bench_function("day 7 answer 1", |b| {
+        b.iter(|| the_sum_of_its_part::answer1())
+    });
+    c.bench_function("day 7 answer 2", |b| {
+        b.iter(|| the_sum_of_its_part::answer2())
     });
 }
 

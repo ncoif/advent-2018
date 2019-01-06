@@ -6,6 +6,7 @@ use aoc::day03::no_matter_how_you_slice_it;
 use aoc::day04::repose_record;
 use aoc::day05::alchemical_reduction;
 use aoc::day06::chronal_coordinates;
+use aoc::day07::the_sum_of_its_part;
 
 use std::env;
 
@@ -63,6 +64,9 @@ fn main() {
 
         61 => println_day!(chronal_coordinates::answer1()),
         62 => println_day!(chronal_coordinates::answer2()),
+
+        71 => println_day!(the_sum_of_its_part::answer1()),
+        72 => println_day!(the_sum_of_its_part::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
