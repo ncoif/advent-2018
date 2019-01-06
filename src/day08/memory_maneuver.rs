@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 struct Node {
     children: Vec<Node>,
     metadata: Vec<i32>,
@@ -41,28 +44,40 @@ impl Node {
     }
 }
 
-fn read_file(filename: &str) -> Vec<i32> {
-    let s = std::fs::read_to_string(filename).unwrap();
-    s.split_whitespace()
-        .map(|n| n.parse::<i32>().expect("invalid node"))
-        .collect()
+fn read_file(filename: &str) -> Result<Vec<i32>, AocError> {
+    let s = std::fs::read_to_string(filename)?;
+
+    let mut nodes = vec![];
+    for e in s.split_whitespace() {
+        let node = e.parse::<i32>()?;
+        nodes.push(node);
+    }
+
+    Ok(nodes)
 }
 
-pub fn answer1() {
+pub fn answer1() -> Result<AocResponse<i32>, AocError> {
     //let nodes = read_file("input/input8_debug.txt".to_string());
-    let nodes = read_file("input/input8.txt");
+    let nodes = read_file("input/input8.txt")?;
 
     let answer1 = Node::parse(&mut nodes.into_iter());
-    println!(
-        "Day 08: Memory Maneuver (1/2): {}",
-        answer1.metadata_count()
-    );
+    Ok(AocResponse::new(
+        8,
+        1,
+        "Memory Maneuver",
+        answer1.metadata_count(),
+    ))
 }
 
-pub fn answer2() {
+pub fn answer2() -> Result<AocResponse<i32>, AocError> {
     //let nodes = read_file("input/input8_debug.txt".to_string());
-    let nodes = read_file("input/input8.txt");
+    let nodes = read_file("input/input8.txt")?;
 
     let answer2 = Node::parse(&mut nodes.into_iter());
-    println!("Day 08: Memory Maneuver (2/2): {}", answer2.answer2_count());
+    Ok(AocResponse::new(
+        8,
+        2,
+        "Memory Maneuver",
+        answer2.answer2_count(),
+    ))
 }

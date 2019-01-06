@@ -8,6 +8,7 @@ use aoc::day04::repose_record;
 use aoc::day05::alchemical_reduction;
 use aoc::day06::chronal_coordinates;
 use aoc::day07::the_sum_of_its_part;
+use aoc::day08::memory_maneuver;
 
 use criterion::Criterion;
 
@@ -56,6 +57,9 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("day 7 answer 2", |b| {
         b.iter(|| the_sum_of_its_part::answer2())
     });
+
+    c.bench_function("day 8 answer 1", |b| b.iter(|| memory_maneuver::answer1()));
+    c.bench_function("day 8 answer 2", |b| b.iter(|| memory_maneuver::answer2()));
 }
 
 criterion_group!(benches, criterion_benchmark);
