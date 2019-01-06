@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use std::collections::HashMap;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -129,8 +132,8 @@ impl Sample {
     }
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input16_q1.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<i32>, AocError> {
+    let s = std::fs::read_to_string("input/input16_q1.txt")?;
     let samples = Sample::parse(&s);
 
     let mut triple_candidates = 0;
@@ -141,14 +144,16 @@ pub fn answer1() {
         }
     }
 
-    println!(
-        "Day 16: Chronal Classification (1/2): {:?}",
-        triple_candidates
-    );
+    Ok(AocResponse::new(
+        16,
+        1,
+        "Chronal Classification",
+        triple_candidates,
+    ))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input16_q1.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input16_q1.txt")?;
     let samples = Sample::parse(&s);
 
     let mut to_map = Opcode::all().to_vec();
@@ -168,7 +173,7 @@ pub fn answer2() {
         }
     }
 
-    let prog = std::fs::read_to_string("input/input16_q2.txt").expect("cannot read file");
+    let prog = std::fs::read_to_string("input/input16_q2.txt")?;
     let mut reg = [0; 4];
     for inst in prog.split("\n").filter(|l| l.len() > 0) {
         let mut tokens = inst.split(" ").map(|s| s.parse::<usize>().unwrap());
@@ -182,7 +187,7 @@ pub fn answer2() {
         op.apply(&args, &mut reg);
     }
 
-    println!("Day 16: Chronal Classification (2/2): {:?}", reg[0]);
+    Ok(AocResponse::new(16, 2, "Chronal Classification", reg[0]))
 }
 
 #[test]

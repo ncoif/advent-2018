@@ -15,6 +15,7 @@ use aoc::day12::subterranean_sustainability;
 use aoc::day13::mine_cart_madness;
 use aoc::day14::chocolate_charts;
 use aoc::day15::beverage_bandits;
+use aoc::day16::chronal_classification;
 
 use std::env;
 
@@ -98,6 +99,9 @@ fn main() {
 
         151 => println_day!(beverage_bandits::answer1()),
         152 => println_day!(beverage_bandits::answer2()),
+
+        161 => println_day!(chronal_classification::answer1()),
+        162 => println_day!(chronal_classification::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
