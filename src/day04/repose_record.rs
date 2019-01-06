@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
@@ -58,7 +61,6 @@ impl Date {
     }
 
     fn duration_since(&self, date: &Date) -> u32 {
-        //TODO understand that
         let modulo = 60 * 24;
         (self.minute - date.minute + 60 * (self.hour - date.hour) % modulo + modulo) % modulo
     }
@@ -220,8 +222,8 @@ fn most_frequently_asleep(events: &[Event]) -> (u32, u32) {
     (g, m)
 }
 
-pub fn answer1() {
-    let mut inputs = read_file();
+pub fn answer1() -> Result<AocResponse<u32>, AocError> {
+    let mut inputs = read_file()?;
     inputs.sort();
 
     let worst_guard = sleep_times(&inputs);
@@ -230,31 +232,39 @@ pub fn answer1() {
     let best_minute = best_minute(&inputs, &worst_guard);
     //println!("worst_minute: {:?}", best_minute);
 
-    println!(
-        "Day 04: Repose Record (1/2): {:?}",
-        worst_guard.0 * best_minute
-    );
+    Ok(AocResponse::new(
+        4,
+        1,
+        "Repose Record",
+        worst_guard.0 * best_minute,
+    ))
 }
 
-pub fn answer2() {
-    let mut inputs = read_file();
+pub fn answer2() -> Result<AocResponse<u32>, AocError> {
+    let mut inputs = read_file()?;
     inputs.sort();
 
     let solution2 = most_frequently_asleep(&inputs);
-    println!(
-        "Day 04: Repose Record (2/2): {:?}",
-        solution2.0 * solution2.1
-    );
+
+    Ok(AocResponse::new(
+        4,
+        2,
+        "Repose Record",
+        solution2.0 * solution2.1,
+    ))
 }
 
-fn read_file() -> Vec<Event> {
+fn read_file() -> Result<Vec<Event>, AocError> {
     let filename = "input/input4.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Event::from_str(&s).unwrap())
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Event::from_str(&line)?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }

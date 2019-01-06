@@ -3,6 +3,7 @@ use aoc::common::error::AocError;
 use aoc::day01::chronal_calibration;
 use aoc::day02::inventory_management_system;
 use aoc::day03::no_matter_how_you_slice_it;
+use aoc::day04::repose_record;
 
 use std::env;
 
@@ -51,6 +52,9 @@ fn main() {
 
         31 => println_day!(no_matter_how_you_slice_it::answer1()),
         32 => println_day!(no_matter_how_you_slice_it::answer2()),
+
+        41 => println_day!(repose_record::answer1()),
+        42 => println_day!(repose_record::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
