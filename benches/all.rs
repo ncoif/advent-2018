@@ -17,6 +17,7 @@ use aoc::day14::chocolate_charts;
 use aoc::day15::beverage_bandits;
 use aoc::day16::chronal_classification;
 use aoc::day17::reservoir_research;
+use aoc::day18::settlers_of_the_north_pole;
 
 use criterion::Criterion;
 
@@ -115,6 +116,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
     c.bench_function("day 17 answer 2", |b| {
         b.iter(|| reservoir_research::answer2())
+    });
+
+    c.bench_function("day 18 answer 1", |b| {
+        b.iter(|| settlers_of_the_north_pole::answer1())
+    });
+    c.bench_function("day 18 answer 2", |b| {
+        b.iter(|| settlers_of_the_north_pole::answer2())
     });
 }
 

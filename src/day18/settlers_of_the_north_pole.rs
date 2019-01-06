@@ -1,9 +1,13 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use itertools::Itertools;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fmt;
 use std::mem;
 use std::str::FromStr;
+use std::string::ParseError;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 enum Acre {
@@ -28,7 +32,7 @@ impl fmt::Display for Acre {
 }
 
 impl FromStr for World {
-    type Err = ();
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let lines = s.split("\n");
@@ -172,22 +176,24 @@ impl World {
     }
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input18.txt").expect("cannot read file");
-    let mut world = World::from_str(&s).expect("failed to parse world");
+pub fn answer1() -> Result<AocResponse<u32>, AocError> {
+    let s = std::fs::read_to_string("input/input18.txt")?;
+    let mut world = World::from_str(&s)?;
 
     (0..10).for_each(|_| world.step());
     let resources = world.count_resources();
 
-    println!(
-        "Day 18: Settlers of The North Pole (1/2): {}",
-        resources.0 * resources.1
-    );
+    Ok(AocResponse::new(
+        18,
+        1,
+        "Settlers of The North Pole",
+        resources.0 * resources.1,
+    ))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input18.txt").expect("cannot read file");
-    let mut world = World::from_str(&s).expect("failed to parse world");
+pub fn answer2() -> Result<AocResponse<u32>, AocError> {
+    let s = std::fs::read_to_string("input/input18.txt")?;
+    let mut world = World::from_str(&s)?;
 
     let mut seen = HashMap::new();
 
@@ -221,10 +227,13 @@ pub fn answer2() {
     //println!("period: {}, target_modulo: {}, final_i: {}", period, target_modulo, current_i);
 
     let resources = world.count_resources();
-    println!(
-        "Day 18: Settlers of The North Pole (2/2): {}",
-        resources.0 * resources.1
-    );
+
+    Ok(AocResponse::new(
+        18,
+        2,
+        "Settlers of The North Pole",
+        resources.0 * resources.1,
+    ))
 }
 
 #[test]

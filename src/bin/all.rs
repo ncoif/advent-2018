@@ -17,6 +17,7 @@ use aoc::day14::chocolate_charts;
 use aoc::day15::beverage_bandits;
 use aoc::day16::chronal_classification;
 use aoc::day17::reservoir_research;
+use aoc::day18::settlers_of_the_north_pole;
 
 use std::env;
 
@@ -106,6 +107,9 @@ fn main() {
 
         171 => println_day!(reservoir_research::answer1()),
         172 => println_day!(reservoir_research::answer2()),
+
+        181 => println_day!(settlers_of_the_north_pole::answer1()),
+        182 => println_day!(settlers_of_the_north_pole::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
