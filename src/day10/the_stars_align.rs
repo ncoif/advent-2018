@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
@@ -102,21 +105,24 @@ impl Field {
     }
 }
 
-fn read_file() -> Vec<Star> {
+fn read_file() -> Result<Vec<Star>, AocError> {
     //let filename = "input/input10_debug.txt";
     let filename = "input/input10.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Star::from_str(&s).unwrap())
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Star::from_str(&line)?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
-pub fn answer1() {
-    let stars = read_file();
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let stars = read_file()?;
     let mut field = Field::new(stars);
 
     for _i in 0..12000 {
@@ -126,4 +132,7 @@ pub fn answer1() {
 
     // time: 10036
     // JJXZHKFP
+
+    // FIXME
+    Err(AocError::ComputeNotFound)
 }
