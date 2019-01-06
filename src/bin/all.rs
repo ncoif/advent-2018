@@ -13,6 +13,7 @@ use aoc::day10::the_stars_align;
 use aoc::day11::chronal_charge;
 use aoc::day12::subterranean_sustainability;
 use aoc::day13::mine_cart_madness;
+use aoc::day14::chocolate_charts;
 
 use std::env;
 
@@ -90,6 +91,9 @@ fn main() {
 
         131 => println_day!(mine_cart_madness::answer1()),
         132 => println_day!(mine_cart_madness::answer2()),
+
+        141 => println_day!(chocolate_charts::answer1()),
+        142 => println_day!(chocolate_charts::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };

@@ -13,6 +13,7 @@ use aoc::day09::marble_mania;
 use aoc::day11::chronal_charge;
 use aoc::day12::subterranean_sustainability;
 use aoc::day13::mine_cart_madness;
+use aoc::day14::chocolate_charts;
 
 use criterion::Criterion;
 
@@ -83,6 +84,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
     c.bench_function("day 13 answer 2", |b| {
         b.iter(|| mine_cart_madness::answer2())
+    });
+
+    c.bench_function("day 14 answer 1", |b| {
+        b.iter(|| chocolate_charts::answer1())
+    });
+    c.bench_function("day 14 answer 2", |b| {
+        b.iter(|| chocolate_charts::answer2())
     });
 }
 

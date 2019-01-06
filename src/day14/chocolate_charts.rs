@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 #[derive(Debug)]
 struct State {
     list: Vec<u8>,
@@ -61,15 +64,22 @@ fn simulate2(input: &[u8]) -> usize {
         .unwrap()
 }
 
-pub fn answer1() {
-    println!("Day 14: Chocolate Charts (1/2): {:?}", simulate1(580741));
+pub fn answer1() -> Result<AocResponse<String>, AocError> {
+    Ok(AocResponse::new(
+        14,
+        1,
+        "Chocolate Charts",
+        simulate1(580741),
+    ))
 }
 
-pub fn answer2() {
-    println!(
-        "Day 14: Chocolate Charts (2/2): {:?}",
-        simulate2(&vec![5, 8, 0, 7, 4, 1])
-    );
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    Ok(AocResponse::new(
+        14,
+        2,
+        "Chocolate Charts",
+        simulate2(&vec![5, 8, 0, 7, 4, 1]),
+    ))
 }
 
 #[test]
