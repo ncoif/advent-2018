@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use self::State::*;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -191,41 +194,50 @@ impl fmt::Display for Ground {
     }
 }
 
-fn read_file(filename: &str) -> Vec<Vein> {
-    let file = File::open(filename).expect("cannot open file");
+fn read_file(filename: &str) -> Result<Vec<Vein>, AocError> {
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Vein::from_str(&s))
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Vein::from_str(&line);
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
-pub fn answer1() {
-    let veins = read_file("input/input17.txt");
+pub fn answer1() -> Result<AocResponse<u32>, AocError> {
+    let veins = read_file("input/input17.txt")?;
 
     let mut ground = Ground::from_veins(&veins);
     ground.fill(500, 0, Flow::Down);
     //println!("{}", ground);
 
     let count = ground.count_water();
-    println!("Day 17: Reservoir Research (1/2): {}", count.0 + count.1);
+
+    Ok(AocResponse::new(
+        17,
+        1,
+        "Reservoir Research",
+        count.0 + count.1,
+    ))
 }
 
-pub fn answer2() {
-    let veins = read_file("input/input17.txt");
+pub fn answer2() -> Result<AocResponse<u32>, AocError> {
+    let veins = read_file("input/input17.txt")?;
 
     let mut ground = Ground::from_veins(&veins);
     ground.fill(500, 0, Flow::Down);
 
     let count = ground.count_water();
-    println!("Day 17: Reservoir Research (2/2): {}", count.0);
+    Ok(AocResponse::new(17, 2, "Reservoir Research", count.0))
 }
 
 #[test]
 fn test_parse() {
-    let veins = read_file("input/input17_debug.txt");
+    let veins = read_file("input/input17_debug.txt").unwrap();
 
     let field = Ground::from_veins(&veins);
 
@@ -238,7 +250,7 @@ fn test_parse() {
 
 #[test]
 fn test_fill() {
-    let veins = read_file("input/input17_debug.txt");
+    let veins = read_file("input/input17_debug.txt").unwrap();
 
     let mut ground = Ground::from_veins(&veins);
     println!("{}", ground);
