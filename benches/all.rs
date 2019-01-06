@@ -23,6 +23,7 @@ use aoc::day20::a_regular_map;
 use aoc::day21::chronal_conversion;
 use aoc::day22::mode_maze;
 use aoc::day23::experimental_emergency_teleportation;
+use aoc::day24::immune_system_simulator_20XX;
 
 use criterion::Criterion;
 
@@ -152,6 +153,13 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("day 23 answer 1", |b| {
         b.iter(|| experimental_emergency_teleportation::answer1())
+    });
+
+    c.bench_function("day 24 answer 1", |b| {
+        b.iter(|| immune_system_simulator_20XX::answer1())
+    });
+    c.bench_function("day 24 answer 2", |b| {
+        b.iter(|| immune_system_simulator_20XX::answer2())
     });
 }
 

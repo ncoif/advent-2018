@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 enum Element {
     FIRE,
@@ -198,20 +201,22 @@ fn boost_immune_system(armies: &mut Vec<Army>, boost: u64) {
         .for_each(|a| a.boost_damage(boost));
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<u64>, AocError> {
+    let s = std::fs::read_to_string("input/input24.txt")?;
     let mut armies = parse_armies(&s);
 
     let (score_s, score_i) = combat_to_death(&mut armies);
 
-    println!(
-        "Day 24: Immune System Simulator 20XX (1/2): {:?}",
-        score_s.max(score_i)
-    );
+    Ok(AocResponse::new(
+        24,
+        1,
+        "Immune System Simulator 20XX",
+        score_s.max(score_i),
+    ))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input24.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<u64>, AocError> {
+    let s = std::fs::read_to_string("input/input24.txt")?;
     let armies = parse_armies(&s);
 
     for boost in 0.. {
@@ -221,8 +226,12 @@ pub fn answer2() {
 
         let (score_s, score_i) = combat_to_death(&mut boostest_armies);
         if score_i == 0 {
-            println!("Day 24: Immune System Simulator 20XX (2/2): {:?}", score_s);
-            return;
+            return Ok(AocResponse::new(
+                24,
+                2,
+                "Immune System Simulator 20XX",
+                score_s,
+            ));
         }
     }
     unreachable!()
