@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 // change pointers of elements around, so never move/remove any element
 fn play(players: usize, points: usize) -> usize {
     // the index of the vector is the marble number, which contains a tuple (cw, ccw) to link to
@@ -40,12 +43,17 @@ fn play(players: usize, points: usize) -> usize {
     scores.into_iter().max().unwrap()
 }
 
-pub fn answer1() {
-    println!("Day 09: Marble Mania (1/2): {}", play(486, 70833));
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    Ok(AocResponse::new(9, 1, "Marble Mania", play(486, 70833)))
 }
 
-pub fn answer2() {
-    println!("Day 09: Marble Mania (2/2): {}", play(486, 70833 * 100));
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    Ok(AocResponse::new(
+        9,
+        2,
+        "Marble Mania",
+        play(486, 70833 * 100),
+    ))
 }
 
 #[test]

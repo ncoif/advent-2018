@@ -8,6 +8,7 @@ use aoc::day05::alchemical_reduction;
 use aoc::day06::chronal_coordinates;
 use aoc::day07::the_sum_of_its_part;
 use aoc::day08::memory_maneuver;
+use aoc::day09::marble_mania;
 
 use std::env;
 
@@ -71,6 +72,9 @@ fn main() {
 
         81 => println_day!(memory_maneuver::answer1()),
         82 => println_day!(memory_maneuver::answer2()),
+
+        91 => println_day!(marble_mania::answer1()),
+        92 => println_day!(marble_mania::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
