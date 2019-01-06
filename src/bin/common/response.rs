@@ -1,6 +1,5 @@
 use std::fmt;
 
-//TODO: AocResponse<T> for different types of response
 #[derive(Debug)]
 pub struct AocResponse<T> {
     day: isize,
@@ -27,5 +26,10 @@ impl AocResponse<i32> {
             description: description.to_string(),
             answer,
         }
+    }
+
+    #[allow(dead_code)]
+    pub fn get(&self) -> i32 {
+        self.answer
     }
 }

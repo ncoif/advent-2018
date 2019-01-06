@@ -11,31 +11,6 @@ pub fn answer1() -> Result<AocResponse<Frequency>, AocError> {
     let mut current_frequency = 0;
     let mut seen = HashSet::new();
     let mut first_seen = None;
-
-    let inputs = read_file()?;
-    while first_seen.is_none() {
-        for input in &inputs {
-            current_frequency += input;
-
-            if first_seen.is_none() {
-                if seen.contains(&current_frequency) {
-                    first_seen = Some(current_frequency);
-                }
-                seen.insert(current_frequency);
-            }
-        }
-    }
-
-    match first_seen {
-        None => Err(AocError::ComputeNotFound),
-        Some(freq) => Ok(AocResponse::new(1, 1, "Chronal Calibration", freq)),
-    }
-}
-
-pub fn answer2() -> Result<AocResponse<Frequency>, AocError> {
-    let mut current_frequency = 0;
-    let mut seen = HashSet::new();
-    let mut first_seen = None;
     let mut final_frequency = None;
 
     let inputs = read_file()?;
@@ -60,6 +35,31 @@ pub fn answer2() -> Result<AocResponse<Frequency>, AocError> {
     }
 }
 
+pub fn answer2() -> Result<AocResponse<Frequency>, AocError> {
+    let mut current_frequency = 0;
+    let mut seen = HashSet::new();
+    let mut first_seen = None;
+
+    let inputs = read_file()?;
+    while first_seen.is_none() {
+        for input in &inputs {
+            current_frequency += input;
+
+            if first_seen.is_none() {
+                if seen.contains(&current_frequency) {
+                    first_seen = Some(current_frequency);
+                }
+                seen.insert(current_frequency);
+            }
+        }
+    }
+
+    match first_seen {
+        None => Err(AocError::ComputeNotFound),
+        Some(freq) => Ok(AocResponse::new(1, 1, "Chronal Calibration", freq)),
+    }
+}
+
 fn read_file() -> Result<Vec<Frequency>, AocError> {
     let filename = "input/input1.txt";
     let file = File::open(filename)?;
@@ -73,4 +73,16 @@ fn read_file() -> Result<Vec<Frequency>, AocError> {
     }
 
     Ok(file_lines)
+}
+
+#[test]
+fn test_answer1() {
+    let answer = answer1().unwrap();
+    assert_eq!(answer.get(), 518);
+}
+
+#[test]
+fn test_answer2() {
+    let answer = answer2().unwrap();
+    assert_eq!(answer.get(), 72889);
 }
