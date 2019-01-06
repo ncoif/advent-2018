@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
@@ -37,17 +40,19 @@ impl Coord {
     }
 }
 
-fn read_file() -> Vec<Coord> {
-    //let filename = "input/input6_debug.txt";
+fn read_file() -> Result<Vec<Coord>, AocError> {
     let filename = "input/input6.txt";
-    let file = File::open(filename).expect("cannot open file");
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Coord::from_str(&s).unwrap())
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Coord::from_str(&line)?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
 fn find_min_max(coords: &[Coord]) -> (i32, i32, i32, i32) {
@@ -76,8 +81,8 @@ fn find_min_max(coords: &[Coord]) -> (i32, i32, i32, i32) {
     (min_x, max_x, min_y, max_y)
 }
 
-pub fn answer1() {
-    let coords = read_file();
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let coords = read_file()?;
 
     let (min_x, max_x, min_y, max_y) = find_min_max(&coords);
 
@@ -129,11 +134,11 @@ pub fn answer1() {
     }
 
     let (_, count) = counts.iter().max_by_key(|(_, c)| *c).unwrap();
-    println!("Day 06: Chronal Coordinates (1/2): {}", count);
+    Ok(AocResponse::new(6, 1, "Chronal Coordinates", *count))
 }
 
-pub fn answer2() {
-    let coords = read_file();
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let coords = read_file()?;
     let limit = 10000;
 
     let (min_x, max_x, min_y, max_y) = find_min_max(&coords);
@@ -152,5 +157,10 @@ pub fn answer2() {
         }
     }
 
-    println!("Day 06: Chronal Coordinates (2/2): {}", nb_points_in_region);
+    Ok(AocResponse::new(
+        6,
+        2,
+        "Chronal Coordinates",
+        nb_points_in_region,
+    ))
 }

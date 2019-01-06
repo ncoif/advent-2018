@@ -6,6 +6,7 @@ use aoc::day02::inventory_management_system;
 use aoc::day03::no_matter_how_you_slice_it;
 use aoc::day04::repose_record;
 use aoc::day05::alchemical_reduction;
+use aoc::day06::chronal_coordinates;
 
 use criterion::Criterion;
 
@@ -39,6 +40,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
     c.bench_function("day 5 answer 2", |b| {
         b.iter(|| alchemical_reduction::answer2())
+    });
+
+    c.bench_function("day 6 answer 1", |b| {
+        b.iter(|| chronal_coordinates::answer1())
+    });
+    c.bench_function("day 6 answer 2", |b| {
+        b.iter(|| chronal_coordinates::answer2())
     });
 }
 

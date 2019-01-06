@@ -5,6 +5,7 @@ use aoc::day02::inventory_management_system;
 use aoc::day03::no_matter_how_you_slice_it;
 use aoc::day04::repose_record;
 use aoc::day05::alchemical_reduction;
+use aoc::day06::chronal_coordinates;
 
 use std::env;
 
@@ -59,6 +60,9 @@ fn main() {
 
         51 => println_day!(alchemical_reduction::answer1()),
         52 => println_day!(alchemical_reduction::answer2()),
+
+        61 => println_day!(chronal_coordinates::answer1()),
+        62 => println_day!(chronal_coordinates::answer2()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
