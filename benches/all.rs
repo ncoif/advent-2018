@@ -12,6 +12,7 @@ use aoc::day08::memory_maneuver;
 use aoc::day09::marble_mania;
 use aoc::day11::chronal_charge;
 use aoc::day12::subterranean_sustainability;
+use aoc::day13::mine_cart_madness;
 
 use criterion::Criterion;
 
@@ -75,6 +76,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
     c.bench_function("day 12 answer 2", |b| {
         b.iter(|| subterranean_sustainability::answer2())
+    });
+
+    c.bench_function("day 13 answer 1", |b| {
+        b.iter(|| mine_cart_madness::answer1())
+    });
+    c.bench_function("day 13 answer 2", |b| {
+        b.iter(|| mine_cart_madness::answer2())
     });
 }
 

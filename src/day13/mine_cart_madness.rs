@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use std::fmt;
 
 #[derive(Debug)]
@@ -184,16 +187,28 @@ fn simulate2(s: &str) -> (usize, usize) {
     (w.carts[0].x, w.carts[0].y)
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<String>, AocError> {
+    let s = std::fs::read_to_string("input/input13.txt")?;
     let result = simulate1(&s);
-    println!("Day 13: Mine Cart Madness (1/2): {},{}", result.0, result.1);
+
+    Ok(AocResponse::new(
+        13,
+        1,
+        "Mine Cart Madness",
+        format!("{},{}", result.0, result.1),
+    ))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input13.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<String>, AocError> {
+    let s = std::fs::read_to_string("input/input13.txt")?;
     let result = simulate2(&s);
-    println!("Day 13: Mine Cart Madness (2/2): {},{}", result.0, result.1);
+
+    Ok(AocResponse::new(
+        13,
+        2,
+        "Mine Cart Madness",
+        format!("{},{}", result.0, result.1),
+    ))
 }
 
 #[test]
