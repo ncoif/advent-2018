@@ -20,6 +20,7 @@ use aoc::day17::reservoir_research;
 use aoc::day18::settlers_of_the_north_pole;
 use aoc::day19::go_with_the_flow;
 use aoc::day20::a_regular_map;
+use aoc::day21::chronal_conversion;
 
 use criterion::Criterion;
 
@@ -136,6 +137,13 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("day 20 answer 1", |b| b.iter(|| a_regular_map::answer1()));
     c.bench_function("day 20 answer 2", |b| b.iter(|| a_regular_map::answer2()));
+
+    c.bench_function("day 21 answer 1", |b| {
+        b.iter(|| chronal_conversion::answer1())
+    });
+    c.bench_function("day 21 answer 2", |b| {
+        b.iter(|| chronal_conversion::answer2())
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);

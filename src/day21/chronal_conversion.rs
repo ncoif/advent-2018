@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashSet;
@@ -24,7 +27,7 @@ enum Opcode {
 }
 
 impl FromStr for Opcode {
-    type Err = ();
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         use self::Opcode::*;
@@ -45,7 +48,7 @@ impl FromStr for Opcode {
             "eqir" => Ok(Eqir),
             "eqri" => Ok(Eqri),
             "eqrr" => Ok(Eqrr),
-            _ => Err(()),
+            _ => Err(AocError::ParseString),
         }
     }
 }
@@ -80,7 +83,7 @@ struct Instruction {
 }
 
 impl FromStr for Instruction {
-    type Err = ();
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -195,8 +198,8 @@ impl Prog {
     }
 }
 
-pub fn answer1() {
-    let s = std::fs::read_to_string("input/input21.txt").expect("cannot read file");
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input21.txt")?;
     let prog = Prog::from_str(&s).unwrap();
 
     // seems that ip 30 "eqrr 4 0 5" is the only one interacting with R0
@@ -209,21 +212,21 @@ pub fn answer1() {
     reg[0] = r0;
     prog.run(&mut reg);
 
-    println!("Day 21: Go With The Flow (1/2): {:?}", reg[0]);
+    Ok(AocResponse::new(21, 1, "Chronal Conversion", reg[0]))
 }
 
-pub fn answer2() {
-    let s = std::fs::read_to_string("input/input21.txt").expect("cannot read file");
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let s = std::fs::read_to_string("input/input21.txt")?;
     let prog = Prog::from_str(&s).unwrap();
 
     // look for all possible values of R4 for ip30 when running a program, and break once we found a cycle
     let mut reg = [0; 6];
     let r0 = prog.run_with_ip30_cycle(&mut reg);
 
-    println!("Day 21: Go With The Flow (2/2): {:?}", r0);
-
     // using this r0, run the program to confirm that it halts
     // let mut reg = [0; 6];
     // reg[0] = r0;
     // prog.run(&mut reg);
+
+    Ok(AocResponse::new(21, 2, "Chronal Conversion", r0))
 }
