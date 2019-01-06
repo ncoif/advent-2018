@@ -1,3 +1,6 @@
+#![feature(test)]
+extern crate test;
+
 mod common;
 mod day01;
 

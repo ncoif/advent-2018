@@ -4,6 +4,7 @@ use crate::common::response::AocResponse;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use test::{black_box, Bencher};
 
 type Frequency = i32;
 
@@ -85,4 +86,20 @@ fn test_answer1() {
 fn test_answer2() {
     let answer = answer2().unwrap();
     assert_eq!(answer.get(), 72889);
+}
+
+#[bench]
+#[allow(unused_must_use)]
+fn bench_answer1(b: &mut Bencher) {
+    b.iter(|| {
+        black_box(answer1());
+    });
+}
+
+#[bench]
+#[allow(unused_must_use)]
+fn bench_answer2(b: &mut Bencher) {
+    b.iter(|| {
+        black_box(answer2());
+    });
 }
