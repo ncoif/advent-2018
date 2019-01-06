@@ -1,3 +1,6 @@
+use crate::common::error::AocError;
+use crate::common::response::AocResponse;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
@@ -50,28 +53,32 @@ impl Nanobot {
     }
 }
 
-fn read_file(filename: &str) -> Vec<Nanobot> {
-    let file = File::open(filename).expect("cannot open file");
+fn read_file(filename: &str) -> Result<Vec<Nanobot>, AocError> {
+    let file = File::open(filename)?;
     let reader = BufReader::new(file);
 
-    reader
-        .lines()
-        .filter_map(|result| result.ok())
-        .map(|s| Nanobot::from_str(&s))
-        .filter_map(|result| result.ok())
-        .collect()
+    let mut file_lines = vec![];
+    for line in reader.lines() {
+        let line = line?;
+        let line = Nanobot::from_str(&line)?;
+        file_lines.push(line);
+    }
+
+    Ok(file_lines)
 }
 
-pub fn answer1() {
-    let nanobots = read_file("input/input23.txt");
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let nanobots = read_file("input/input23.txt")?;
 
     let max_radius_nanobot = nanobots.iter().max_by_key(|n| n.r).unwrap();
     let in_range = max_radius_nanobot.in_range(&nanobots);
 
-    println!(
-        "Day 23: Experimental Emergency Teleportation (1/2): {:?}",
-        in_range.len()
-    );
+    Ok(AocResponse::new(
+        23,
+        1,
+        "Experimental Emergency Teleportation",
+        in_range.len(),
+    ))
 }
 
 #[test]
@@ -109,7 +116,7 @@ fn test_nanobot_distance() {
 
 #[test]
 fn test_in_range() {
-    let nanobots = read_file("input/input23_debug.txt");
+    let nanobots = read_file("input/input23_debug.txt").unwrap();
 
     let max_radius_nanobot = nanobots.iter().max_by_key(|n| n.r).unwrap();
     let in_range = max_radius_nanobot.in_range(&nanobots);

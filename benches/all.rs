@@ -22,6 +22,7 @@ use aoc::day19::go_with_the_flow;
 use aoc::day20::a_regular_map;
 use aoc::day21::chronal_conversion;
 use aoc::day22::mode_maze;
+use aoc::day23::experimental_emergency_teleportation;
 
 use criterion::Criterion;
 
@@ -148,6 +149,10 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("day 22 answer 1", |b| b.iter(|| mode_maze::answer1()));
     c.bench_function("day 22 answer 2", |b| b.iter(|| mode_maze::answer2()));
+
+    c.bench_function("day 23 answer 1", |b| {
+        b.iter(|| experimental_emergency_teleportation::answer1())
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);

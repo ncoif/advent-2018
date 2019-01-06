@@ -22,6 +22,7 @@ use aoc::day19::go_with_the_flow;
 use aoc::day20::a_regular_map;
 use aoc::day21::chronal_conversion;
 use aoc::day22::mode_maze;
+use aoc::day23::experimental_emergency_teleportation;
 
 use std::env;
 
@@ -126,6 +127,8 @@ fn main() {
 
         221 => println_day!(mode_maze::answer1()),
         222 => println_day!(mode_maze::answer2()),
+
+        231 => println_day!(experimental_emergency_teleportation::answer1()),
 
         _ => println!("Error: {:?}", AocError::InvalidDayProblem),
     };
