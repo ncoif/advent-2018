@@ -54,19 +54,19 @@ pub fn answer1() -> Result<AocResponse<usize>, AocError> {
 
     let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
     let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
-    let mut claims = vec![vec![0usize; width]; height];
+    let mut claims = vec![0usize; width * height];
+
+    let access = |x, y| (x + width * y) as usize;
+
     for p in &areas {
         for x in p.left..p.left + p.width {
             for y in p.top..p.top + p.height {
-                claims[y][x] += 1;
+                claims[access(x, y)] += 1;
             }
         }
     }
 
-    let conflicts = claims
-        .iter()
-        .map(|v| v.iter().filter(|&c| *c > 1).count())
-        .sum::<usize>();
+    let conflicts = claims.iter().filter(|&c| *c > 1).count();
 
     Ok(AocResponse::new(
         3,
@@ -81,11 +81,14 @@ pub fn answer2() -> Result<AocResponse<usize>, AocError> {
 
     let width = areas.iter().map(|p| p.left + p.width).max().unwrap();
     let height = areas.iter().map(|p| p.top + p.height).max().unwrap();
-    let mut claims = vec![vec![0usize; width]; height];
+    let mut claims = vec![0usize; width * height];
+
+    let access = |x, y| (x + width * y) as usize;
+
     for p in &areas {
         for x in p.left..p.left + p.width {
             for y in p.top..p.top + p.height {
-                claims[y][x] += 1;
+                claims[access(x, y)] += 1;
             }
         }
     }
@@ -95,7 +98,7 @@ pub fn answer2() -> Result<AocResponse<usize>, AocError> {
         let mut ok = true;
         for x in p.left..p.left + p.width {
             for y in p.top..p.top + p.height {
-                if claims[y][x] > 1 {
+                if claims[access(x, y)] > 1 {
                     ok = false;
                 }
             }

@@ -76,7 +76,7 @@ struct Node {
 struct Cave {
     target: Coord,
     bound: Coord,
-    regions: Vec<Vec<Option<Region>>>,
+    regions: Vec<Option<Region>>,
 }
 
 impl Cave {
@@ -98,17 +98,19 @@ impl Cave {
         index_bound: &Coord,
         target: &Coord,
         depth: usize,
-    ) -> Vec<Vec<Option<Region>>> {
-        let mut regions = vec![vec![None; index_bound.x]; index_bound.y];
+    ) -> Vec<Option<Region>> {
+        let mut regions = vec![None; index_bound.x * index_bound.y];
 
-        regions[0][0] = Some(Region::new(0, depth));
-        regions[target.y][target.x] = Some(Region::new(0, depth));
+        let access = |x, y| (x + index_bound.x * y) as usize;
+
+        regions[access(0, 0)] = Some(Region::new(0, depth));
+        regions[access(target.x, target.y)] = Some(Region::new(0, depth));
 
         for x in 0..index_bound.x {
-            regions[0][x] = Some(Region::new(x * 16807, depth));
+            regions[access(x, 0)] = Some(Region::new(x * 16807, depth));
         }
         for y in 0..index_bound.y {
-            regions[y][0] = Some(Region::new(y * 48271, depth));
+            regions[access(0, y)] = Some(Region::new(y * 48271, depth));
         }
         for y in 1..index_bound.y {
             for x in 1..index_bound.x {
@@ -116,21 +118,25 @@ impl Cave {
                     continue;
                 }
 
-                let left = regions[y - 1][x].unwrap();
-                let above = regions[y][x - 1].unwrap();
+                let left = regions[access(x, y - 1)].unwrap();
+                let above = regions[access(x - 1, y)].unwrap();
                 let geo_index = left.erosion_level * above.erosion_level;
-                regions[y][x] = Some(Region::new(geo_index, depth));
+                regions[access(x, y)] = Some(Region::new(geo_index, depth));
             }
         }
 
         regions
     }
 
+    fn access(&self, x: usize, y: usize) -> usize {
+        x + self.bound.x * y
+    }
+
     fn risk_level(&self) -> usize {
         let mut risk = 0;
         for y in 0..=self.target.y {
             for x in 0..=self.target.x {
-                risk += self.regions[y][x].unwrap().risk_level();
+                risk += self.regions[self.access(x, y)].unwrap().risk_level();
             }
         }
 
@@ -153,7 +159,7 @@ impl Cave {
                 continue;
             }
 
-            if !self.regions[new_y as usize][new_x as usize]
+            if !self.regions[self.access(new_x as usize, new_y as usize)]
                 .expect("bound too small")
                 .can_equip(n.t)
             {
@@ -176,7 +182,7 @@ impl Cave {
                 continue;
             }
 
-            if !self.regions[n.y][n.x]
+            if !self.regions[self.access(n.x, n.y)]
                 .expect("bound too small")
                 .can_equip(*t)
             {
