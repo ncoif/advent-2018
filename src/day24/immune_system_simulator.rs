@@ -37,7 +37,7 @@ struct Army {
 
 impl Army {
     fn parse(s: &str, infection: bool) -> Army {
-        let tokens: Vec<&str> = s.split(" ").collect();
+        let tokens: Vec<&str> = s.split(' ').collect();
         let size = tokens[0].parse::<u64>().unwrap();
         let hit_points = tokens[4].parse::<u64>().unwrap();
         let initiative = tokens[tokens.len() - 1].parse::<u64>().unwrap();
@@ -54,11 +54,11 @@ impl Army {
                 .collect();
             for sub in spec.split("; ") {
                 let elements: Vec<_> = sub
-                    .split(" ")
+                    .split(' ')
                     .skip(2)
                     .map(|e| Element::parse(e.trim_end_matches(|x| ";),".contains(x))))
                     .collect();
-                if sub.trim_start_matches("(").starts_with("weak") {
+                if sub.trim_start_matches('(').starts_with("weak") {
                     weak = elements;
                 } else {
                     immune = elements;
@@ -79,8 +79,8 @@ impl Army {
     }
 
     fn parse_army(s: &str, is_infection: bool) -> Vec<Army> {
-        s.split("\n")
-            .filter(|l| l.len() > 0)
+        s.split('\n')
+            .filter(|l| !l.is_empty())
             .skip(1)
             .map(|l| Army::parse(l, is_infection))
             .collect()
@@ -148,7 +148,7 @@ fn combat_to_death(armies: &mut Vec<Army>) -> (u64, u64) {
 fn combat_target(armies: &[Army]) -> Vec<Option<usize>> {
     let mut attack_targets = vec![None; armies.len()];
 
-    let mut orders: Vec<usize> = (0..=armies.len() - 1).collect();
+    let mut orders: Vec<usize> = (0..armies.len()).collect();
     orders.sort_by_key(|&idx| {
         let a = &armies[idx];
         (-(a.effective_power() as i64), -(a.initiative as i64))

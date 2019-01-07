@@ -47,7 +47,7 @@ impl Region {
         }
     }
 
-    fn can_equip(&self, tool: &Tool) -> bool {
+    fn can_equip(&self, tool: Tool) -> bool {
         match (self.region_type, tool) {
             (RegionType::ROCKY, Tool::CLIMBING) => true,
             (RegionType::ROCKY, Tool::TORCH) => true,
@@ -60,13 +60,13 @@ impl Region {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Coord {
     x: usize,
     y: usize,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Node {
     x: usize,
     y: usize,
@@ -90,7 +90,7 @@ impl Cave {
         Cave {
             target: target.clone(),
             bound: index_bound,
-            regions: regions,
+            regions,
         }
     }
 
@@ -137,7 +137,7 @@ impl Cave {
         risk
     }
 
-    fn around(&self, n: Node) -> Vec<(Node, u64)> {
+    fn around(&self, n: &Node) -> Vec<(Node, u64)> {
         let mut arounds = vec![];
 
         // add all the neighbours
@@ -155,7 +155,7 @@ impl Cave {
 
             if !self.regions[new_y as usize][new_x as usize]
                 .expect("bound too small")
-                .can_equip(&n.t)
+                .can_equip(n.t)
             {
                 continue;
             }
@@ -178,7 +178,7 @@ impl Cave {
 
             if !self.regions[n.y][n.x]
                 .expect("bound too small")
-                .can_equip(t)
+                .can_equip(*t)
             {
                 continue;
             }
@@ -198,8 +198,8 @@ impl Cave {
 
     // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
     // or else "temporary value moved while borrowing" error
-    fn successors(&self, n: Node) -> impl Iterator<Item = (Node, u64)> {
-        let successors: Vec<_> = self.around(n.clone());
+    fn successors(&self, n: &Node) -> impl Iterator<Item = (Node, u64)> {
+        let successors: Vec<_> = self.around(n);
         //println!("successors of {:?} are {:?}", n, successors);
 
         successors.into_iter()
@@ -219,7 +219,7 @@ impl Cave {
 
         let shortest_path = pathfinding::directed::dijkstra::dijkstra(
             &start,
-            |n| self.successors(n.clone()),
+            |n| self.successors(n),
             |n| *n == target,
         );
 

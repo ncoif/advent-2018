@@ -34,9 +34,9 @@ impl FromStr for World {
     type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let lines = s.split("\n");
+        let lines = s.split('\n');
         let grid = lines
-            .filter(|line| *line != "")
+            .filter(|line| !line.is_empty())
             .map(|line| {
                 line.chars()
                     .map(|ch| match ch {
@@ -59,7 +59,7 @@ impl fmt::Display for World {
             for c in line.iter() {
                 write!(f, "{}", c)?;
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
 
         Ok(())
@@ -213,7 +213,7 @@ pub fn answer2() -> Result<AocResponse<u32>, AocError> {
         i += 1;
     };
 
-    let target_i = 1000000000u64;
+    let target_i = 1_000_000_000u64;
     let target_modulo = target_i % period as u64;
 
     let mut current_mod = current_i % period as u64;

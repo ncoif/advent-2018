@@ -42,9 +42,9 @@ impl Cart {
 impl World {
     fn parse(s: &str) -> World {
         let mut lines: Vec<Vec<u8>> = s
-            .split("\n")
-            .filter(|l| l.len() > 0)
-            .map(|s| format!("{}", s).as_bytes().to_vec())
+            .split('\n')
+            .filter(|l| !l.is_empty())
+            .map(|s| s.to_string().as_bytes().to_vec())
             .collect();
 
         let mut carts = vec![];
@@ -58,7 +58,9 @@ impl World {
                     _ => None,
                 };
 
-                cart.map(|c| carts.push(c));
+                if let Some(c) = cart {
+                    carts.push(c)
+                }
             }
         }
 
@@ -151,7 +153,7 @@ impl fmt::Display for World {
                     write!(f, "{}", *c as char)?;
                 }
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
 
         Ok(())

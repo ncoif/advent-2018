@@ -53,7 +53,7 @@ impl FromStr for Opcode {
 }
 
 impl Opcode {
-    fn apply(&self, i: &[usize], r: &mut [usize]) {
+    fn apply(self, i: &[usize], r: &mut [usize]) {
         match self {
             Opcode::Addr => r[i[2]] = r[i[0]] + r[i[1]],
             Opcode::Addi => r[i[2]] = r[i[0]] + i[1],
@@ -112,7 +112,7 @@ impl FromStr for Prog {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut lines = s.split("\n");
+        let mut lines = s.split('\n');
         let ip_s = lines.next().unwrap();
         let re_ip = Regex::new(r"#ip (\d)").unwrap();
         let ip_a = re_ip
@@ -154,7 +154,7 @@ impl Prog {
         // From lines 3 to 11 apreas to be a be a very inefficient way of determining whether R3 divides R2
 
         if reg[2] % reg[3] == 0 {
-            reg[0] = reg[0] + reg[3];
+            reg[0] += reg[3];
         }
         reg[1] = reg[2];
         reg[4] = 0;

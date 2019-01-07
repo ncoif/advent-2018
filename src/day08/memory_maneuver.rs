@@ -27,7 +27,7 @@ impl Node {
     }
 
     fn answer2_count(&self) -> i32 {
-        if self.children.len() == 0 {
+        if self.children.is_empty() {
             self.metadata.iter().sum::<i32>()
         } else {
             self.metadata

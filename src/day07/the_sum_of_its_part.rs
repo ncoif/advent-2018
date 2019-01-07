@@ -32,10 +32,7 @@ impl FromStr for Dependency {
         let before: char = c[1].parse().unwrap();
         let after: char = c[2].parse().unwrap();
 
-        Ok(Dependency {
-            before: before,
-            after: after,
-        })
+        Ok(Dependency { before, after })
     }
 }
 

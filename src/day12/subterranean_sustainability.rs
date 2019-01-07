@@ -22,7 +22,7 @@ impl Plantation {
         let last = next_state.bytes().rposition(|c| c == b'#').unwrap();
 
         let mut formated_state = String::from("....");
-        formated_state.push_str(&next_state[first..][..(last - first + 1)]);
+        formated_state.push_str(&next_state[first..][..=last - first]);
         formated_state.push_str("....");
 
         let formated_offset = self.offset + 2 - first as isize;
@@ -44,8 +44,8 @@ impl Plantation {
 }
 
 fn generations(s: &str) -> isize {
-    let mut lines = s.split("\n");
-    let mut state = lines.next().unwrap().split(" ").nth(2).unwrap().to_string();
+    let mut lines = s.split('\n');
+    let mut state = lines.next().unwrap().split(' ').nth(2).unwrap().to_string();
 
     // add 4 . on each side
     state.insert_str(0, "....");
@@ -54,7 +54,7 @@ fn generations(s: &str) -> isize {
     lines.next(); // skip blank line
     let rules: HashSet<String> = lines
         .filter(|l| l.ends_with(" => #")) // onyl rule that produce alive elements
-        .map(|s| s.split(" ").next().unwrap().parse::<String>().unwrap())
+        .map(|s| s.split(' ').next().unwrap().parse::<String>().unwrap())
         .collect();
 
     let mut p = Plantation { state, offset: 4 }; // the center is at offset 4 because we added 4 characters
@@ -77,8 +77,8 @@ pub fn answer1() -> Result<AocResponse<isize>, AocError> {
 pub fn answer2() -> Result<AocResponse<isize>, AocError> {
     let s = std::fs::read_to_string("input/input12.txt")?;
 
-    let mut lines = s.split("\n");
-    let mut state = lines.next().unwrap().split(" ").nth(2).unwrap().to_string();
+    let mut lines = s.split('\n');
+    let mut state = lines.next().unwrap().split(' ').nth(2).unwrap().to_string();
 
     // add 4 . on each side
     state.insert_str(0, "....");
@@ -87,7 +87,7 @@ pub fn answer2() -> Result<AocResponse<isize>, AocError> {
     lines.next(); // skip blank line
     let rules: HashSet<String> = lines
         .filter(|l| l.ends_with(" => #")) // onyl rule that produce alive elements
-        .map(|s| s.split(" ").next().unwrap().parse::<String>().unwrap())
+        .map(|s| s.split(' ').next().unwrap().parse::<String>().unwrap())
         .collect();
 
     let mut current = Plantation { state, offset: 4 }; // the center is at offset 4 because we added 4 characters

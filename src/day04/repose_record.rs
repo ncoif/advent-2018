@@ -40,11 +40,11 @@ impl FromStr for Date {
         let minute: u32 = c[5].parse().unwrap();
 
         Ok(Date {
-            year: year,
-            month: month,
-            day: day,
-            hour: hour,
-            minute: minute,
+            year,
+            month,
+            day,
+            hour,
+            minute,
         })
     }
 }

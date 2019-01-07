@@ -15,10 +15,10 @@ pub fn answer1() -> Result<AocResponse<i32>, AocError> {
     let (double, triple) = frequencies
         .iter()
         .fold((0, 0), |(mut double, mut triple), freq| {
-            if freq.values().find(|&v| *v == 2).is_some() {
+            if freq.values().any(|&v| v == 2) {
                 double += 1;
             }
-            if freq.values().find(|&v| *v == 3).is_some() {
+            if freq.values().any(|&v| v == 3) {
                 triple += 1;
             }
             (double, triple)

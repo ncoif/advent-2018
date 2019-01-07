@@ -69,7 +69,7 @@ pub fn answer1() -> Result<AocResponse<String>, AocError> {
         14,
         1,
         "Chocolate Charts",
-        simulate1(580741),
+        simulate1(580_741),
     ))
 }
 
@@ -78,7 +78,7 @@ pub fn answer2() -> Result<AocResponse<usize>, AocError> {
         14,
         2,
         "Chocolate Charts",
-        simulate2(&vec![5, 8, 0, 7, 4, 1]),
+        simulate2(&[5, 8, 0, 7, 4, 1]),
     ))
 }
 
@@ -92,8 +92,8 @@ fn test_simulate1() {
 
 #[test]
 fn test_simulate2() {
-    assert_eq!(simulate2(&vec![5, 1, 5, 8, 9]), 9);
-    assert_eq!(simulate2(&vec![0, 1, 2, 4, 5]), 5);
-    assert_eq!(simulate2(&vec![9, 2, 5, 1, 0]), 18);
-    assert_eq!(simulate2(&vec![5, 9, 4, 1, 4]), 2018);
+    assert_eq!(simulate2(&[5, 1, 5, 8, 9]), 9);
+    assert_eq!(simulate2(&[0, 1, 2, 4, 5]), 5);
+    assert_eq!(simulate2(&[9, 2, 5, 1, 0]), 18);
+    assert_eq!(simulate2(&[5, 9, 4, 1, 4]), 2018);
 }

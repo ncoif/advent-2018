@@ -45,7 +45,7 @@ impl Opcode {
         ]
     }
 
-    fn apply(&self, i: &[usize], r: &mut [usize]) {
+    fn apply(self, i: &[usize], r: &mut [usize]) {
         match self {
             Opcode::Addr => r[i[2]] = r[i[0]] + r[i[1]],
             Opcode::Addi => r[i[2]] = r[i[0]] + i[1],
@@ -81,7 +81,7 @@ impl Sample {
     }
 
     fn parse(s: &str) -> Vec<Sample> {
-        let mut lines = s.split("\n");
+        let mut lines = s.split('\n');
 
         let mut samples = vec![];
         while let Some(before_line) = &lines.next() {
@@ -90,20 +90,20 @@ impl Sample {
                 continue;
             }
             let before_vec: Vec<usize> = before_line[9..]
-                .trim_right_matches("]")
+                .trim_right_matches(']')
                 .split(", ")
                 .map(|t| t.parse::<usize>().unwrap())
                 .collect();
 
             let input_line = &lines.next().unwrap();
             let input_vec: Vec<usize> = input_line[..]
-                .split(" ")
+                .split(' ')
                 .map(|t| t.parse::<usize>().unwrap())
                 .collect();
 
             let after_line = &lines.next().unwrap();
             let after_vec: Vec<usize> = after_line[9..]
-                .trim_right_matches("]")
+                .trim_right_matches(']')
                 .split(", ")
                 .map(|t| t.parse::<usize>().unwrap())
                 .collect();
@@ -120,7 +120,7 @@ impl Sample {
 
     fn probe_ops(&self, ops: impl Iterator<Item = Opcode>) -> Vec<Opcode> {
         ops.filter(|op| {
-            let mut regs = self.before.clone();
+            let mut regs = self.before;
             op.apply(&self.input[1..4] as _, &mut regs);
             regs == self.after
         })
@@ -168,15 +168,15 @@ pub fn answer2() -> Result<AocResponse<usize>, AocError> {
             to_map.retain(|&tm| tm != op);
             mapped.insert(sample.opcode(), op);
         }
-        if to_map.len() == 0 {
+        if to_map.is_empty() {
             break;
         }
     }
 
     let prog = std::fs::read_to_string("input/input16_q2.txt")?;
     let mut reg = [0; 4];
-    for inst in prog.split("\n").filter(|l| l.len() > 0) {
-        let mut tokens = inst.split(" ").map(|s| s.parse::<usize>().unwrap());
+    for inst in prog.split('\n').filter(|l| !l.is_empty()) {
+        let mut tokens = inst.split(' ').map(|s| s.parse::<usize>().unwrap());
         let opcode = tokens.next().unwrap() as usize;
         let op = mapped[&opcode];
         let args = [

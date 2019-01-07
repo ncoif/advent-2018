@@ -51,7 +51,7 @@ impl Vein {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Flow {
     Down,
     Side,
@@ -122,12 +122,12 @@ impl Ground {
                 self.field[y][x] = Flow;
                 let mut limit = [0, 0];
                 // dir == 0 try left, dir == 1, try right
-                for dir in 0..=1 {
+                for (dir, limit_dir) in limit.iter_mut().enumerate() {
                     for dx in 1.. {
                         let new_x = if dir == 0 { x - dx } else { x + dx };
                         match self.field[y][new_x] {
                             Clay | Still => {
-                                limit[dir] = new_x;
+                                *limit_dir = new_x;
                                 break;
                             }
                             Flow | Sand => {
@@ -187,7 +187,7 @@ impl fmt::Display for Ground {
             for x in self.x_min - 1..=self.x_max + 1 {
                 write!(f, "{}", self.field[y][x])?;
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
 
         Ok(())

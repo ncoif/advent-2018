@@ -5,6 +5,8 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::num::ParseIntError;
+use std::str::FromStr;
 
 // represent a single entry, for example #1 @ 1,3: 4x4
 #[derive(Debug)]
@@ -22,24 +24,28 @@ lazy_static! {
             .unwrap();
 }
 
-impl Area {
-    pub fn from_str(text: &str) -> Self {
-        for caps in RE.captures_iter(text) {
-            let id = caps["id"].parse::<usize>().unwrap();
-            let left = caps["left"].parse::<usize>().unwrap();
-            let top = caps["top"].parse::<usize>().unwrap();
-            let width = caps["width"].parse::<usize>().unwrap();
-            let height = caps["height"].parse::<usize>().unwrap();
+impl FromStr for Area {
+    type Err = ParseIntError;
 
-            return Area {
-                id,
-                left,
-                top,
-                width,
-                height,
-            };
-        }
-        unreachable!();
+    fn from_str(text: &str) -> Result<Self, Self::Err> {
+        let caps = RE
+            .captures(text)
+            .ok_or_else(|| format!("cannot parse area {:?}", text))
+            .unwrap();
+
+        let id = caps["id"].parse::<usize>().unwrap();
+        let left = caps["left"].parse::<usize>().unwrap();
+        let top = caps["top"].parse::<usize>().unwrap();
+        let width = caps["width"].parse::<usize>().unwrap();
+        let height = caps["height"].parse::<usize>().unwrap();
+
+        Ok(Area {
+            id,
+            left,
+            top,
+            width,
+            height,
+        })
     }
 }
 
@@ -113,7 +119,7 @@ fn read_file() -> Result<Vec<Area>, AocError> {
     let mut file_lines = vec![];
     for line in reader.lines() {
         let line = line?;
-        let line = Area::from_str(&line);
+        let line = Area::from_str(&line)?;
         file_lines.push(line);
     }
 

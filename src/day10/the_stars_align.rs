@@ -62,10 +62,7 @@ struct Field {
 
 impl Field {
     fn new(stars: Vec<Star>) -> Self {
-        Field {
-            stars: stars,
-            time: 0,
-        }
+        Field { stars, time: 0 }
     }
 
     fn step(self: &mut Self) {
@@ -93,12 +90,13 @@ impl Field {
             println!("Day 10: The Stars Align (1/2):");
             for y in min_y..=max_y {
                 for x in min_x..=max_x {
-                    match pic[access(x, y)] {
-                        true => print!("#"),
-                        _ => print!("."),
+                    if pic[access(x, y)] {
+                        print!("#");
+                    } else {
+                        print!(".");
                     }
                 }
-                println!("");
+                println!();
             }
             println!("Day 10: The Stars Align (2/2): {}", self.time);
         }

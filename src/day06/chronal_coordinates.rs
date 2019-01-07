@@ -30,7 +30,7 @@ impl FromStr for Coord {
         let x: i32 = c[1].parse().unwrap();
         let y: i32 = c[2].parse().unwrap();
 
-        Ok(Coord { x: x, y: y })
+        Ok(Coord { x, y })
     }
 }
 
@@ -92,7 +92,7 @@ pub fn answer1() -> Result<AocResponse<usize>, AocError> {
     let mut closest_distance = max_x + max_y;
     for x in min_x..=max_x {
         for y in min_y..=max_y {
-            let current_coord = Coord { x: x, y: y };
+            let current_coord = Coord { x, y };
             for candidate in coords.iter() {
                 let distance = current_coord.man_distance(candidate);
 
@@ -144,9 +144,9 @@ pub fn answer2() -> Result<AocResponse<usize>, AocError> {
     let (min_x, max_x, min_y, max_y) = find_min_max(&coords);
 
     let mut nb_points_in_region = 0;
-    for x in min_x..(max_x + 1) {
-        for y in min_y..(max_y + 1) {
-            let candidate = Coord { x: x, y: y };
+    for x in min_x..=max_x {
+        for y in min_y..=max_y {
+            let candidate = Coord { x, y };
             let sum = coords.iter().fold(0, |mut sum, c| {
                 sum += candidate.man_distance(c);
                 sum

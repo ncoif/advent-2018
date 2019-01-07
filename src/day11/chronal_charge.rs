@@ -24,8 +24,8 @@ pub fn answer1() -> Result<AocResponse<String>, AocError> {
     let mut max_sum = 0;
     let mut result_x = 1;
     let mut result_y = 1;
-    for x in 2..=(grid_size - 1) {
-        for y in 2..=(grid_size - 1) {
+    for x in 2..grid_size {
+        for y in 2..grid_size {
             let mut sum = 0;
             sum += grid[access(x - 1, y - 1)];
             sum += grid[access(x, y - 1)];

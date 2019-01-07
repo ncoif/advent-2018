@@ -4,7 +4,7 @@ use crate::common::response::AocResponse;
 use std::collections::HashSet;
 use std::fmt;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Unit {
     x: usize,
     y: usize,
@@ -30,7 +30,7 @@ struct Node(usize, usize); // (x,y)
 
 impl State {
     fn parse(s: &str, ap_elf: u32, ap_gob: u32) -> State {
-        let lines = s.split("\n");
+        let lines = s.split('\n');
 
         let mut units = vec![];
         let mut walls = vec![];
@@ -111,10 +111,7 @@ impl State {
         let reachables = pathfinding::directed::dijkstra::dijkstra_all(n, |n| {
             // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
             // or else "temporary value moved while borrowing" error
-            Self::around(n.clone())
-                .filter(|n| self.is_free(n))
-                .map(|n| n.clone())
-                .map(|n| (n, 1)) // cost of 1
+            Self::around(*n).filter(|n| self.is_free(n)).map(|n| (n, 1)) // cost of 1
         });
 
         let mut reachables_nodes: Vec<_> = reachables.iter().map(|(k, v)| (*k, v.1)).collect();
@@ -144,10 +141,7 @@ impl State {
             |n| {
                 // cannot collect the iterator at any point here, as it will be collected by dijkstra_all
                 // or else "temporary value moved while borrowing" error
-                Self::around(n.clone())
-                    .filter(|n| self.is_free(n))
-                    .map(|n| n.clone())
-                    .map(|n| (n, 1)) // cost of 1
+                Self::around(*n).filter(|n| self.is_free(n)).map(|n| (n, 1)) // cost of 1
             },
             |n| *n == *to_n,
         );
@@ -216,7 +210,7 @@ impl State {
     }
 
     // return the number of rounds
-    fn to_death(&mut self) -> u32 {
+    fn fight_to_death(&mut self) -> u32 {
         let mut r = 0;
         loop {
             self.step();
@@ -252,7 +246,7 @@ impl fmt::Debug for State {
                 };
                 write!(f, "{}", char)?;
             }
-            writeln!(f, "")?;
+            writeln!(f)?;
         }
 
         Ok(())
@@ -262,7 +256,7 @@ impl fmt::Debug for State {
 fn combat1(s: &str) -> (u32, u32) {
     let mut state = State::parse(s, 3, 3);
 
-    let rounds = state.to_death();
+    let rounds = state.fight_to_death();
     let hps = state.remaining_hp();
 
     (rounds, hps)
@@ -584,7 +578,7 @@ fn test_combat_1() {
         3,
     );
 
-    assert_eq!(state.to_death(), 46);
+    assert_eq!(state.fight_to_death(), 46);
     assert_eq!(state.remaining_hp(), 590);
 }
 
@@ -603,6 +597,6 @@ fn test_combat_2() {
         3,
     );
 
-    assert_eq!(state.to_death(), 46);
+    assert_eq!(state.fight_to_death(), 46);
     assert_eq!(state.remaining_hp(), 859);
 }

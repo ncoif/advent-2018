@@ -54,7 +54,7 @@ impl FromStr for Opcode {
 }
 
 impl Opcode {
-    fn apply(&self, i: &[usize], r: &mut [usize]) {
+    fn apply(self, i: &[usize], r: &mut [usize]) {
         match self {
             Opcode::Addr => r[i[2]] = r[i[0]] + r[i[1]],
             Opcode::Addi => r[i[2]] = r[i[0]] + i[1],
@@ -113,7 +113,7 @@ impl FromStr for Prog {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut lines = s.split("\n");
+        let mut lines = s.split('\n');
         let ip_s = lines.next().unwrap();
         let re_ip = Regex::new(r"#ip (\d)").unwrap();
         let ip_a = re_ip
@@ -124,7 +124,7 @@ impl FromStr for Prog {
         let ip: usize = ip_a[1].parse().unwrap();
 
         let mut instructions = vec![];
-        for line in lines.filter(|l| *l != "") {
+        for line in lines.filter(|l| !l.is_empty()) {
             instructions.push(Instruction::from_str(line).unwrap());
         }
 

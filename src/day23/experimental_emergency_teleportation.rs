@@ -8,7 +8,7 @@ use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Nanobot {
     x: i64,
     y: i64,
@@ -19,22 +19,22 @@ struct Nanobot {
 impl FromStr for Nanobot {
     type Err = ParseIntError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(line: &str) -> Result<Self, Self::Err> {
         lazy_static! {
             static ref RE: Regex =
                 Regex::new(r"pos=<(\-*\d+),(\-*\d+),(\-*\d+)>, r=(\d+)").unwrap();
         }
-        let c = RE
-            .captures(s)
-            .ok_or_else(|| format!("cannot parse string {:?}", s))
+        let capture = RE
+            .captures(line)
+            .ok_or_else(|| format!("cannot parse string {:?}", line))
             .unwrap();
 
-        let x: i64 = c[1].parse().unwrap();
-        let y: i64 = c[2].parse().unwrap();
-        let z: i64 = c[3].parse().unwrap();
-        let r: u64 = c[4].parse().unwrap();
+        let x: i64 = capture[1].parse().unwrap();
+        let y: i64 = capture[2].parse().unwrap();
+        let z: i64 = capture[3].parse().unwrap();
+        let radius: u64 = capture[4].parse().unwrap();
 
-        Ok(Nanobot { x, y, z, r })
+        Ok(Nanobot { x, y, z, r: radius })
     }
 }
 
@@ -44,11 +44,11 @@ impl Nanobot {
     }
 
     // a copy of all the nanobots in range from the given list
-    fn in_range(&self, others: &Vec<Nanobot>) -> Vec<Nanobot> {
+    fn in_range(&self, others: &[Nanobot]) -> Vec<Nanobot> {
         others
             .iter()
             .filter(|n| self.distance_to(&n) <= self.r)
-            .map(|n| n.clone())
+            .cloned()
             .collect()
     }
 }
