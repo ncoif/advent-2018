@@ -3,7 +3,6 @@ use crate::common::response::AocResponse;
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
@@ -15,7 +14,7 @@ struct Star {
 }
 
 impl FromStr for Star {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let two: Vec<&str> = s
@@ -26,10 +25,10 @@ impl FromStr for Star {
         let pos: Vec<&str> = two[0].split(", ").collect();
         let vel: Vec<&str> = two[1].split(", ").collect();
 
-        let pos_x: i32 = pos[0].trim().parse().unwrap();
-        let pos_y: i32 = pos[1].trim().parse().unwrap();
-        let vel_x: i32 = vel[0].trim().parse().unwrap();
-        let vel_y: i32 = vel[1].trim().parse().unwrap();
+        let pos_x: i32 = pos[0].trim().parse()?;
+        let pos_y: i32 = pos[1].trim().parse()?;
+        let vel_x: i32 = vel[0].trim().parse()?;
+        let vel_y: i32 = vel[1].trim().parse()?;
 
         Ok(Star {
             pos_x,

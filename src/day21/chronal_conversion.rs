@@ -48,7 +48,7 @@ impl FromStr for Opcode {
             "eqir" => Ok(Eqir),
             "eqri" => Ok(Eqri),
             "eqrr" => Ok(Eqrr),
-            _ => Err(AocError::ParseString),
+            _ => Err(AocError::InvalidToken(s.to_string())),
         }
     }
 }
@@ -91,13 +91,12 @@ impl FromStr for Instruction {
         }
         let c = RE
             .captures(s)
-            .ok_or_else(|| format!("cannot parse string {:?}", s))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse string {:?}", s))?;
 
-        let op: Opcode = Opcode::from_str(&c[1]).unwrap();
-        let args_1: usize = c[2].parse().unwrap();
-        let args_2: usize = c[3].parse().unwrap();
-        let args_3: usize = c[4].parse().unwrap();
+        let op: Opcode = Opcode::from_str(&c[1])?;
+        let args_1: usize = c[2].parse()?;
+        let args_2: usize = c[3].parse()?;
+        let args_3: usize = c[4].parse()?;
 
         let args = [args_1, args_2, args_3];
         Ok(Instruction { op, args })

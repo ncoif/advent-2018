@@ -6,7 +6,6 @@ use regex::Regex;
 use std::collections::{BTreeSet, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -16,7 +15,7 @@ struct Dependency {
 }
 
 impl FromStr for Dependency {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -26,11 +25,10 @@ impl FromStr for Dependency {
         }
         let c = RE
             .captures(s)
-            .ok_or_else(|| format!("cannot parse coord {:?}", s))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse coord {:?}", s))?;
 
-        let before: char = c[1].parse().unwrap();
-        let after: char = c[2].parse().unwrap();
+        let before: char = c[1].parse()?;
+        let after: char = c[2].parse()?;
 
         Ok(Dependency { before, after })
     }

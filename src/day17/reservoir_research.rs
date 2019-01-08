@@ -8,6 +8,7 @@ use std::cmp::{max, min};
 use std::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::str::FromStr;
 
 #[derive(Debug)]
 struct Vein {
@@ -17,36 +18,37 @@ struct Vein {
     y_end: u32,
 }
 
-impl Vein {
-    fn from_str(s: &str) -> Vein {
+impl FromStr for Vein {
+    type Err = AocError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"([xy]{1})=(\d+), ([xy]{1})=(\d+)..(\d+)").unwrap();
         }
         let c = RE
             .captures(s)
-            .ok_or_else(|| format!("cannot parse date {:?}", s))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse date {:?}", s))?;
 
-        let first: char = c[1].parse().unwrap();
-        let first_v: u32 = c[2].parse().unwrap();
-        let _second: char = c[3].parse().unwrap();
-        let second_s: u32 = c[4].parse().unwrap();
-        let second_e: u32 = c[5].parse().unwrap();
+        let first: char = c[1].parse()?;
+        let first_v: u32 = c[2].parse()?;
+        let _second: char = c[3].parse()?;
+        let second_s: u32 = c[4].parse()?;
+        let second_e: u32 = c[5].parse()?;
 
         if first == 'x' {
-            Vein {
+            Ok(Vein {
                 x_start: first_v,
                 x_end: first_v,
                 y_start: second_s,
                 y_end: second_e,
-            }
+            })
         } else {
-            Vein {
+            Ok(Vein {
                 x_start: second_s,
                 x_end: second_e,
                 y_start: first_v,
                 y_end: first_v,
-            }
+            })
         }
     }
 }
@@ -201,7 +203,7 @@ fn read_file(filename: &str) -> Result<Vec<Vein>, AocError> {
     let mut file_lines = vec![];
     for line in reader.lines() {
         let line = line?;
-        let line = Vein::from_str(&line);
+        let line = Vein::from_str(&line)?;
         file_lines.push(line);
     }
 

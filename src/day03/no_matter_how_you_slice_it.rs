@@ -5,7 +5,6 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 // represent a single entry, for example #1 @ 1,3: 4x4
@@ -18,26 +17,26 @@ pub struct Area {
     height: usize,
 }
 
-lazy_static! {
-    static ref RE: Regex =
-        Regex::new(r"#(?P<id>\d+) @ (?P<left>\d+),(?P<top>\d+): (?P<width>\d+)x(?P<height>\d+)")
-            .unwrap();
-}
-
 impl FromStr for Area {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(text: &str) -> Result<Self, Self::Err> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(
+                r"#(?P<id>\d+) @ (?P<left>\d+),(?P<top>\d+): (?P<width>\d+)x(?P<height>\d+)"
+            )
+            .unwrap();
+        }
+
         let caps = RE
             .captures(text)
-            .ok_or_else(|| format!("cannot parse area {:?}", text))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse area {:?}", text))?;
 
-        let id = caps["id"].parse::<usize>().unwrap();
-        let left = caps["left"].parse::<usize>().unwrap();
-        let top = caps["top"].parse::<usize>().unwrap();
-        let width = caps["width"].parse::<usize>().unwrap();
-        let height = caps["height"].parse::<usize>().unwrap();
+        let id = caps["id"].parse::<usize>()?;
+        let left = caps["left"].parse::<usize>()?;
+        let top = caps["top"].parse::<usize>()?;
+        let width = caps["width"].parse::<usize>()?;
+        let height = caps["height"].parse::<usize>()?;
 
         Ok(Area {
             id,

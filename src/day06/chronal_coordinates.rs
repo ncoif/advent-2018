@@ -6,7 +6,6 @@ use regex::Regex;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -16,7 +15,7 @@ struct Coord {
 }
 
 impl FromStr for Coord {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -24,11 +23,10 @@ impl FromStr for Coord {
         }
         let c = RE
             .captures(s)
-            .ok_or_else(|| format!("cannot parse coord {:?}", s))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse coord {:?}", s))?;
 
-        let x: i32 = c[1].parse().unwrap();
-        let y: i32 = c[2].parse().unwrap();
+        let x: i32 = c[1].parse()?;
+        let y: i32 = c[2].parse()?;
 
         Ok(Coord { x, y })
     }

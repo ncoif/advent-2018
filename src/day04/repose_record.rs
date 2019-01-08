@@ -21,7 +21,7 @@ struct Date {
 }
 
 impl FromStr for Date {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -30,14 +30,13 @@ impl FromStr for Date {
         }
         let c = RE
             .captures(s)
-            .ok_or_else(|| format!("cannot parse date {:?}", s))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse date {:?}", s))?;
 
-        let year: u32 = c[1].parse().unwrap();
-        let month: u32 = c[2].parse().unwrap();
-        let day: u32 = c[3].parse().unwrap();
-        let hour: u32 = c[4].parse().unwrap();
-        let minute: u32 = c[5].parse().unwrap();
+        let year: u32 = c[1].parse()?;
+        let month: u32 = c[2].parse()?;
+        let day: u32 = c[3].parse()?;
+        let hour: u32 = c[4].parse()?;
+        let minute: u32 = c[5].parse()?;
 
         Ok(Date {
             year,

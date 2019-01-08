@@ -5,13 +5,12 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 struct Point(i64, i64, i64, i64);
 
 impl FromStr for Point {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -19,13 +18,12 @@ impl FromStr for Point {
         }
         let c = RE
             .captures(s)
-            .ok_or_else(|| format!("cannot parse string {:?}", s))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse string {:?}", s))?;
 
-        let d1: i64 = c[1].parse().unwrap();
-        let d2: i64 = c[2].parse().unwrap();
-        let d3: i64 = c[3].parse().unwrap();
-        let d4: i64 = c[4].parse().unwrap();
+        let d1: i64 = c[1].parse()?;
+        let d2: i64 = c[2].parse()?;
+        let d3: i64 = c[3].parse()?;
+        let d4: i64 = c[4].parse()?;
 
         Ok(Point(d1, d2, d3, d4))
     }

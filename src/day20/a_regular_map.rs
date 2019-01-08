@@ -31,7 +31,7 @@ impl Coord {
                 x: self.x + 1,
                 y: self.y,
             }),
-            _ => Err(AocError::ParseString),
+            _ => Err(AocError::InvalidToken(direction.to_string())),
         }
     }
 }
@@ -93,7 +93,7 @@ fn max_distance(dists: &Distances) -> usize {
 
 pub fn answer1() -> Result<AocResponse<usize>, AocError> {
     let s = std::fs::read_to_string("input/input20.txt")?;
-    let dists = build_distances(&s).unwrap();
+    let dists = build_distances(&s)?;
     let result = max_distance(&dists);
 
     Ok(AocResponse::new(20, 1, "A Regular Map", result))
@@ -101,7 +101,7 @@ pub fn answer1() -> Result<AocResponse<usize>, AocError> {
 
 pub fn answer2() -> Result<AocResponse<usize>, AocError> {
     let s = std::fs::read_to_string("input/input20.txt")?;
-    let dists = build_distances(&s).unwrap();
+    let dists = build_distances(&s)?;
     let rooms = dists.values().filter(|&&d| d >= 1000).count();
 
     Ok(AocResponse::new(20, 2, "A Regular Map", rooms))

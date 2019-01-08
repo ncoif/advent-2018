@@ -5,7 +5,6 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -17,7 +16,7 @@ struct Nanobot {
 }
 
 impl FromStr for Nanobot {
-    type Err = ParseIntError;
+    type Err = AocError;
 
     fn from_str(line: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -26,13 +25,12 @@ impl FromStr for Nanobot {
         }
         let capture = RE
             .captures(line)
-            .ok_or_else(|| format!("cannot parse string {:?}", line))
-            .unwrap();
+            .ok_or_else(|| format!("cannot parse string {:?}", line))?;
 
-        let x: i64 = capture[1].parse().unwrap();
-        let y: i64 = capture[2].parse().unwrap();
-        let z: i64 = capture[3].parse().unwrap();
-        let radius: u64 = capture[4].parse().unwrap();
+        let x: i64 = capture[1].parse()?;
+        let y: i64 = capture[2].parse()?;
+        let z: i64 = capture[3].parse()?;
+        let radius: u64 = capture[4].parse()?;
 
         Ok(Nanobot { x, y, z, r: radius })
     }
