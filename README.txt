@@ -9,6 +9,7 @@ My try to learn rust with https://adventofcode.com/ this year
 `cargo build --release`
 `cargo test`
 `cargo bench`
+`cargo bench -- d01` to benchmark a single day
 
 # To run
 
