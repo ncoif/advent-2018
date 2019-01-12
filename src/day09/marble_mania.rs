@@ -5,7 +5,8 @@ use crate::common::response::AocResponse;
 fn play(players: usize, points: usize) -> usize {
     // the index of the vector is the marble number, which contains a tuple (cw, ccw) to link to
     // the marbles on each side
-    let mut marbles = vec![(0, 0)]; // cw, ccw
+    let mut marbles: Vec<(usize, usize)> = Vec::with_capacity(points);
+    marbles.push((0, 0));
     let mut current = 0;
     let mut scores = vec![0; players];
 
