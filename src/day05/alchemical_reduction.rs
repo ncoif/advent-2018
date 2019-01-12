@@ -39,16 +39,7 @@ fn reduce1(poly: &str) -> usize {
     head.len()
 }
 
-pub fn answer1() -> Result<AocResponse<usize>, AocError> {
-    let poly = read_file()?;
-    let reduce1 = reduce1(&poly);
-
-    Ok(AocResponse::new(5, 1, "Alchemical Reduction", reduce1))
-}
-
-pub fn answer2() -> Result<AocResponse<usize>, AocError> {
-    let poly = read_file()?;
-
+fn reduce2(poly: &str) -> usize {
     let mut letters = HashSet::new();
     for c in poly.chars() {
         letters.insert(c.to_ascii_uppercase());
@@ -62,10 +53,29 @@ pub fn answer2() -> Result<AocResponse<usize>, AocError> {
         }
     }
 
-    Ok(AocResponse::new(
-        5,
-        2,
-        "Alchemical Reduction",
-        minimal_length,
-    ))
+    minimal_length
+}
+
+pub fn answer1() -> Result<AocResponse<usize>, AocError> {
+    let poly = read_file()?;
+    let reduce1 = reduce1(&poly);
+
+    Ok(AocResponse::new(5, 1, "Alchemical Reduction", reduce1))
+}
+
+pub fn answer2() -> Result<AocResponse<usize>, AocError> {
+    let poly = read_file()?;
+    let reduce2 = reduce2(&poly);
+
+    Ok(AocResponse::new(5, 2, "Alchemical Reduction", reduce2))
+}
+
+#[test]
+fn test_answer1() {
+    assert_eq!(10, reduce1("dabAcCaCBAcCcaDA"));
+}
+
+#[test]
+fn test_answer2() {
+    assert_eq!(4, reduce2("dabAcCaCBAcCcaDA"));
 }
