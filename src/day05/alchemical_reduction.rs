@@ -1,7 +1,7 @@
 use crate::common::error::AocError;
 use crate::common::response::AocResponse;
 
-use std::collections::{HashSet, LinkedList};
+use std::collections::{HashSet, VecDeque};
 use std::fs::File;
 use std::io::{BufReader, Read};
 
@@ -17,12 +17,12 @@ fn read_file() -> Result<String, AocError> {
 }
 
 fn char_matches(c1: char, c2: char) -> bool {
-    c1.eq_ignore_ascii_case(&c2) && c1 != c2
+    c1 != c2 && c1.eq_ignore_ascii_case(&c2)
 }
 
 fn reduce1(poly: &str) -> usize {
-    let mut tail = poly.chars().collect::<LinkedList<_>>();
-    let mut head: LinkedList<char> = LinkedList::new();
+    let mut tail = poly.chars().collect::<VecDeque<_>>();
+    let mut head: VecDeque<_> = VecDeque::new();
 
     while let Some(unit1) = tail.pop_front() {
         if let Some(unit2) = head.back() {
@@ -40,13 +40,14 @@ fn reduce1(poly: &str) -> usize {
 }
 
 fn reduce2(poly: &str) -> usize {
-    let mut letters = HashSet::new();
-    for c in poly.chars() {
-        letters.insert(c.to_ascii_uppercase());
-    }
+    let letters: HashSet<_> = poly.chars().map(|c| c.to_ascii_uppercase()).collect();
+
     let mut minimal_length = poly.len();
     for l in letters {
-        let current_poly = poly.replace(|a: char| a.to_ascii_uppercase() == l, "");
+        let current_poly: String = poly
+            .chars()
+            .filter(|c| c.to_ascii_uppercase() != l)
+            .collect();
         let candidate = reduce1(&current_poly);
         if candidate < minimal_length {
             minimal_length = candidate;
