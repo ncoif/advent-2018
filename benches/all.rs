@@ -121,4 +121,14 @@ fn criterion_benchmark(c: &mut Criterion) {
 }
 
 criterion_group!(benches, criterion_benchmark);
-criterion_main!(benches);
+//criterion_main!(benches);
+
+fn main() {
+    // reducing the default sample_size to 10
+    // otherwise some methods would require that takes ~300ms would take 43min to benchmark
+    let mut criterion = Criterion::default().sample_size(10).configure_from_args();
+
+    criterion_benchmark(&mut criterion);
+
+    criterion.final_summary();
+}
