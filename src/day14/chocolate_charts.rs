@@ -10,17 +10,18 @@ struct State {
 
 impl State {
     fn step(&mut self) {
-        let sum = self.list[self.elf1] + self.list[self.elf2];
+        let (r_elf1, r_elf2) = (self.list[self.elf1], self.list[self.elf2]);
+        let sum = r_elf1 + r_elf2;
         if sum / 10 != 0 {
             self.list.push(sum / 10);
         }
         self.list.push(sum % 10);
-        self.elf1 = (self.elf1 + 1 + self.list[self.elf1] as usize) % self.list.len();
-        self.elf2 = (self.elf2 + 1 + self.list[self.elf2] as usize) % self.list.len();
+        self.elf1 = (self.elf1 + 1 + r_elf1 as usize) % self.list.len();
+        self.elf2 = (self.elf2 + 1 + r_elf2 as usize) % self.list.len();
     }
 
     fn result1(&self, n: usize) -> String {
-        self.list[n..][..10]
+        self.list[n..n + 10]
             .iter()
             .map(|r| (b'0' + r) as char)
             .collect()
@@ -65,21 +66,13 @@ fn simulate2(input: &[u8]) -> usize {
 }
 
 pub fn answer1() -> Result<AocResponse<String>, AocError> {
-    Ok(AocResponse::new(
-        14,
-        1,
-        "Chocolate Charts",
-        simulate1(580_741),
-    ))
+    let simu = simulate1(580_741);
+    Ok(AocResponse::new(14, 1, "Chocolate Charts", simu))
 }
 
 pub fn answer2() -> Result<AocResponse<usize>, AocError> {
-    Ok(AocResponse::new(
-        14,
-        2,
-        "Chocolate Charts",
-        simulate2(&[5, 8, 0, 7, 4, 1]),
-    ))
+    let simu = simulate2(&[5, 8, 0, 7, 4, 1]);
+    Ok(AocResponse::new(14, 2, "Chocolate Charts", simu))
 }
 
 #[test]
